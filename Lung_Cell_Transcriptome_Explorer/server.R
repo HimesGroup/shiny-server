@@ -9,9 +9,10 @@ library(dplyr)
 #options(error = browser)
 
 #Load data files - gene names and dataset info
-sras <- fread("../databases/dataset_info.csv") %>% tbl_df
-all_genes <- fread("../databases/gene_names.csv") %>% tbl_df
-unfiltered_genes <- fread("../databases/sleuth_unfiltered_genes.csv") %>% tbl_df
+# "lcte" appended to beginning of filename stands for "lung cell transcriptome explorer"
+sras <- fread("../databases/lcte_dataset_info.csv") %>% tbl_df
+all_genes <- fread("../databases/lcte_gene_names.csv") %>% tbl_df
+unfiltered_genes <- fread("../databases/lcte_sleuth_unfiltered_genes.csv") %>% tbl_df
 
 #sleuth output: fold changes, pvalues, conditions - for data table beneath plot
 de <- list()
