@@ -132,8 +132,8 @@ server <- shinyServer(function(input, output, session) {
         sras %>% filter(Tissue == input$tissue) %$% de[[SRA_ID]] %>% subset(ext_gene %in% curr_gene()) %>%  
             mutate(b=round(b, digits=2), pval=format(pval, scientific=TRUE, digits=3), qval=format(qval, scientific=TRUE, digits=3)) %>% 
             arrange(-b, qval) %>% 
-            dplyr::select(target_id, Comparison, b, pval, qval) %>% #rearrange columns in desired order
-            dplyr::rename(`Transcript`=target_id, `Beta value`=b, `P-value`=pval, `Q-value`=qval)
+            dplyr::select(target_id, Comparison, b, qval) %>% #rearrange columns in desired order
+            dplyr::rename(`Transcript`=target_id, `Beta value`=b, `Q-value`=qval)
         
         
     }, options=list(paging=FALSE, searching=FALSE)
