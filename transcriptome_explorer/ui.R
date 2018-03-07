@@ -22,9 +22,9 @@ ui <- shinyUI(fluidPage(
       br(),
       
       p("Abundance of each transcript is expressed in Transcripts per Million Reads Mapped (TPM) as computed by",
-        a("kallisto.", href="https://pachterlab.github.io/kallisto/"),
+        a("kallisto.", href="https://pachterlab.github.io/kallisto/", target="_blank"),
         "Differential expression results were obtained with",
-        a("sleuth.", href="http://pachterlab.github.io/sleuth/"),
+        a("sleuth.", href="http://pachterlab.github.io/sleuth/", target="_blank"),
         "The table includes transcripts for which at least 47% of samples had 5 or more reads.",
         "The plot includes transcripts in the table with average TPM > 1 across all conditions."),
       
@@ -34,10 +34,10 @@ ui <- shinyUI(fluidPage(
       br(),
       br(),
       br(),
-      img(src="bigorb.png", height=42, width=48),
+      fluidRow(column(3, imageOutput("logo")),
       "Created with ",
-      a("RStudio's shiny", href="http://www.rstudio.com/shiny")
-    ),
+      a("RStudio's Shiny", href="http://www.rstudio.com/shiny", target="_blank")
+    )),
     
     # Show a plot of the generated distribution
     mainPanel(p(""),

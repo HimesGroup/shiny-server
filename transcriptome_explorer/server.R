@@ -44,6 +44,7 @@ server <- shinyServer(function(input, output, session) {
       curr_gene()
     })
     
+    # more information about the dataset selected
     output$studyText <- renderUI({
         if (!is.null(input$debugcode) && (input$debugcode == "studyText")) {
             browser()
@@ -51,15 +52,14 @@ server <- shinyServer(function(input, output, session) {
         
         sras %>% filter(Tissue == input$tissue) %$% 
             p("Data used is available in the SRA under accession ",
-              a(paste0(SRA_ID, ","), href=paste0("http://www.ncbi.nlm.nih.gov/sra/?term=", SRA_ID)),
+              a(paste0(SRA_ID, ","), href=paste0("http://www.ncbi.nlm.nih.gov/sra/?term=", SRA_ID), target="_blank"),
               "and corresponds to ",
               Description,
-              if (PMID != "-") {
-                  HTML(paste0("More details were published <a href=http://www.ncbi.nlm.nih.gov/pubmed/?term=", PMID, ">here.</a>"))
-              }
-            )
+              "More details were published ",
+              a("here.", href=paste0("http://www.ncbi.nlm.nih.gov/pubmed/?term=", PMID), target="_blank"))
     })
     
+    #generate facetted boxplot for the gene selected, using kallisto TPMs
     getGeneBoxPlot <-reactive({
       
       validate(need(curr_gene() != "", "Please enter a gene id")) # no gene symbol was input
@@ -111,6 +111,7 @@ server <- shinyServer(function(input, output, session) {
         }
     })    
     
+    #output boxplot
     output$GeneBoxPlot <- renderPlot(width = 650, height = 500, {
         if (!is.null(input$debugcode) && (input$debugcode == "geneBoxPlot")) {
             browser()
@@ -119,6 +120,7 @@ server <- shinyServer(function(input, output, session) {
         gbp
     })
     
+    #output accompanying sleuth results
     output$table_title <- renderUI({
       title_string <- paste0("Differential Expression Results for ", curr_gene())
       HTML(title_string)
@@ -132,13 +134,23 @@ server <- shinyServer(function(input, output, session) {
         sras %>% filter(Tissue == input$tissue) %$% de[[SRA_ID]] %>% subset(ext_gene %in% curr_gene()) %>%  
             mutate(b=round(b, digits=2), pval=format(pval, scientific=TRUE, digits=3), qval=format(qval, scientific=TRUE, digits=3)) %>% 
             arrange(-b, qval) %>% 
-            dplyr::select(target_id, Comparison, b, qval) %>% #rearrange columns in desired order
-            dplyr::rename(`Transcript`=target_id, `Beta value`=b, `Q-value`=qval)
+            dplyr::select(target_id, Comparison, b, pval, qval) %>% #rearrange columns in desired order
+            dplyr::rename(`Transcript`=target_id, `Beta value`=b, `P-value`=pval, `Q-value`=qval)
         
         
     }, options=list(paging=FALSE, searching=FALSE)
     )
     
+    #R logo for user interface 
+    output$logo <- renderImage({ 
+      return(list(
+        src = "../databases/www/bigorb.png",
+        height=38.7*1.5,
+        width=42.7*1.5,
+        filetype = "image/png",
+        alt = "bigorb"))}, deleteFile = FALSE)
+    
+    #download gene boxplot
     output$downloadPic <- downloadHandler(
         filename = function() {paste(input$tissue, "_", curr_gene(), "_", Sys.Date(), '.png', sep='')},
         content = function(file) {
