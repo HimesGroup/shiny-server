@@ -132,11 +132,11 @@ server <- shinyServer(function(input, output, session) {
         }
         
         sras %>% filter(Tissue == input$tissue) %$% de[[SRA_ID]] %>% subset(ext_gene %in% curr_gene()) %>%  
-            mutate(b=round(b, digits=2), pval=format(pval, scientific=TRUE, digits=3), qval=format(qval, scientific=TRUE, digits=3)) %>% 
-            arrange(-b, qval) %>% 
-            dplyr::select(target_id, Comparison, b, pval, qval) %>% #rearrange columns in desired order
-            dplyr::rename(`Transcript`=target_id, `Beta value`=b, `P-value`=pval, `Q-value`=qval)
-        
+            arrange(-b, qval) %>%   
+            mutate(b=round(b, digits=2), qval=format(qval, scientific=TRUE, digits=3)) %>% 
+            dplyr::select(target_id, Comparison, b, qval) %>% #rearrange columns in desired order
+            dplyr::rename(`Transcript`=target_id, `Beta value`=b, `Q-value`=qval)
+        #removed p-values from the table, since we had originally saved two of the datasets without p-values to save space
         
     }, options=list(paging=FALSE, searching=FALSE)
     )
