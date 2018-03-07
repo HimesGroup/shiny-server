@@ -1,7 +1,6 @@
 library(shiny)
 library(datasets)
 
-# Define UI for application that draws a histogram
 ui <- shinyUI(fluidPage(
   br(),
   
@@ -39,7 +38,6 @@ ui <- shinyUI(fluidPage(
       a("RStudio's Shiny", href="http://www.rstudio.com/shiny", target="_blank")
     )),
     
-    # Show a plot of the generated distribution
     mainPanel(p(""),
               #h5("Results For Each Experimental Condition", align="center"),
               #h3(textOutput("gene", container=span)),
