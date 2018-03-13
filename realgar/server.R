@@ -945,4 +945,4 @@ server <- shinyServer(function(input, output, session) {
 #     
 #     output$SNP_data_download <- downloadHandler(filename = function() {paste0('REALGAR_SNP_results_',graphgene(), '.csv')},
 #                                                 content = function(file) {write.csv(snp_data(), file, row.names=FALSE)})
-# })
+})
