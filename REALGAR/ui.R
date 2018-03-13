@@ -1,7 +1,6 @@
 library(shiny)
 library(shinythemes)
 
-# Define UI for application that displays GEO results based on user choices
 ui <- shinyUI(fluidPage(theme = shinytheme("lumen"), 
                         #h1(strong("REALGAR"), align="center", style = "color: #9E443A;"),
                         h3(strong("Reducing Associations by Linking Genes And transcriptomic Results (REALGAR)"), align="center", style = "color: #9E443A;"), hr(),
