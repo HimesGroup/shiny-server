@@ -19,7 +19,7 @@ source("utilities/name_convert.R")
 
 #
 # load dataset descriptions
-Dataset_Info <- readRDS("/srv/shiny-server/databases/microarray_data_infosheet_R.RDS")
+# Dataset_Info <- readRDS("/srv/shiny-server/databases/microarray_data_infosheet_R.RDS")
 
 #load and name GEO microarray and RNA-Seq datasets
 # for (i in Dataset_Info$Unique_ID) {assign(i, readRDS(paste0("/srv/shiny-server/databases/microarray_results/", i, ".RDS")))}
