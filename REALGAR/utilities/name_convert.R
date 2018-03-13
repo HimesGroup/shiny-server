@@ -1,5 +1,5 @@
 ###
-# Usage
+# Usage:
 ###
 
 # This script is used for converting short names to full names. Make sure names in each vector are in correct order!

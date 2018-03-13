@@ -1,5 +1,5 @@
 ###
-# Usage
+# Usage:
 ###
 # This script is used for meta-analysis. The function meta.summaries is modified from rmeta package
 # It estimates the variance of a weighted average using the squares of the weights (standard error). Random model is applied.
