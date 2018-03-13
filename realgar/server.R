@@ -24,8 +24,8 @@ source("utilities/name_convert.R")
 #load and name GEO microarray and RNA-Seq datasets
 # for (i in Dataset_Info$Unique_ID) {assign(i, readRDS(paste0("/srv/shiny-server/databases/microarray_results/", i, ".RDS")))}
 
-Dataset_Info$PMID <- as.character(Dataset_Info$PMID) #else next line does not work
-Dataset_Info[is.na(Dataset_Info$PMID), "PMID"] <- ""
+# Dataset_Info$PMID <- as.character(Dataset_Info$PMID) #else next line does not work
+# Dataset_Info[is.na(Dataset_Info$PMID), "PMID"] <- ""
 
 #load info for gene tracks: gene locations, TFBS, SNPs, etc.
 # tfbs <- readRDS("/srv/shiny-server/databases/tfbs_for_app.RDS") #TFBS data from ENCODE - matched to gene ids using bedtools
@@ -624,28 +624,28 @@ server <- shinyServer(function(input, output, session) {
     output$forestplot_asthma = renderPlot({forestplot_asthma()}, height=650)
     output$forestplot_GC = renderPlot({forestplot_GC()}, height=650)
     
-    output$color_scale1 <- output$color_scale2 <- renderImage({ #need two separate output names - else it fails (can't output same thing twice?)
-        return(list(
-            src = "/srv/shiny-server/databases/www/color_scale_vertical.png",
-            height=550,
-            width=59,
-            filetype = "image/png",
-            alt = "color_scale"))}, deleteFile = FALSE)
-    
-    
+    # output$color_scale1 <- output$color_scale2 <- renderImage({ #need two separate output names - else it fails (can't output same thing twice?)
+    #     return(list(
+    #         src = "/srv/shiny-server/databases/www/color_scale_vertical.png",
+    #         height=550,
+    #         width=59,
+    #         filetype = "image/png",
+    #         alt = "color_scale"))}, deleteFile = FALSE)
+    # 
+    # 
     ###############################
     ## Gene, SNP and TFBS tracks ##
     ###############################
     
-    #horizontal color scale for gene tracks
-    output$color_scale3 <- renderImage({ 
-        return(list(
-            src = "/srv/shiny-server/databases/www/color_scale_horizontal.png",
-            height=109*1.05,
-            width=1015*1.05,
-            filetype = "image/png",
-            alt = "color_scale"))}, deleteFile = FALSE)
-    
+    # #horizontal color scale for gene tracks
+    # output$color_scale3 <- renderImage({ 
+    #     return(list(
+    #         src = "/srv/shiny-server/databases/www/color_scale_horizontal.png",
+    #         height=109*1.05,
+    #         width=1015*1.05,
+    #         filetype = "image/png",
+    #         alt = "color_scale"))}, deleteFile = FALSE)
+    # 
     #filter data for selected gene
     gene_subs <- reactive({
         gene_subs_temp <- unique(filter(gene_locations, symbol==curr_gene()))
