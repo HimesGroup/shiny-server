@@ -22,10 +22,10 @@ source("utilities/name_convert.R")
 Dataset_Info <- readRDS("/srv/shiny-server/databases/microarray_data_infosheet_R.RDS")
 
 #load and name GEO microarray and RNA-Seq datasets
-for (i in Dataset_Info$Unique_ID) {assign(i, readRDS(paste0("/srv/shiny-server/databases/microarray_results/", i, ".RDS")))} 
+#for (i in Dataset_Info$Unique_ID) {assign(i, readRDS(paste0("/srv/shiny-server/databases/microarray_results/", i, ".RDS")))} 
 
-Dataset_Info$PMID <- as.character(Dataset_Info$PMID) #else next line does not work
-Dataset_Info[is.na(Dataset_Info$PMID), "PMID"] <- ""
+# Dataset_Info$PMID <- as.character(Dataset_Info$PMID) #else next line does not work
+# Dataset_Info[is.na(Dataset_Info$PMID), "PMID"] <- ""
 
 #load info for gene tracks: gene locations, TFBS, SNPs, etc.
 tfbs <- readRDS("/srv/shiny-server/databases/tfbs_for_app.RDS") #TFBS data from ENCODE - matched to gene ids using bedtools
