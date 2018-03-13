@@ -1,5 +1,5 @@
 ###
-# Usage
+# Usage:
 ###
 # This script is used to combine p-values using different methods.
 # R codes for sumlog (Fisher's) and sumz (Liptak's) functions are modified from metap package (Michael Dewey, January 22, 2017), for liptak function is modified from Dr. Blanca Himes' codes.
