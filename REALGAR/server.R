@@ -18,23 +18,23 @@ source("utilities/comb_pval.R")
 source("utilities/name_convert.R")
 
 # load dataset descriptions
-Dataset_Info <- readRDS("databases/microarray_data_infosheet_R.RDS")
+Dataset_Info <- readRDS("/srv/shiny-server/databases/microarray_data_infosheet_R.RDS")
 
 #load and name GEO microarray and RNA-Seq datasets
-for (i in Dataset_Info$Unique_ID) {assign(i, readRDS(paste0("databases/microarray_results/", i, ".RDS")))} 
+for (i in Dataset_Info$Unique_ID) {assign(i, readRDS(paste0("/srv/shiny-server/databases/microarray_results/", i, ".RDS")))} 
 
 Dataset_Info$PMID <- as.character(Dataset_Info$PMID) #else next line does not work
 Dataset_Info[is.na(Dataset_Info$PMID), "PMID"] <- ""
 
 #load info for gene tracks: gene locations, TFBS, SNPs, etc.
-tfbs <- readRDS("databases/tfbs_for_app.RDS") #TFBS data from ENCODE - matched to gene ids using bedtools
-snp <- readRDS("databases/grasp_output_for_app.RDS") #SNP data from GRASP - matched to gene ids using bedtools
-snp_eve <- readRDS("databases/eve_data_realgar.RDS") #SNP data from EVE - was already in hg19 - matched to gene ids using bedtools 
-snp_gabriel <- readRDS("databases/gabriel_data_realgar.RDS") #SNP data from GABRIEL - lifted over from hg17 to hg19 - matched to gene ids using bedtools 
-snp_fer <- readRDS("databases/allerg_GWAS_data_realgar.RDS")
-snp_TAGC <- readRDS("databases/TAGC_data_realgar.RDS")
-gene_locations <- fread("databases/gene_positions.txt", header = TRUE, stringsAsFactors = FALSE) #gene location & transcript data from GENCODE
-chrom_bands <- readRDS("databases/chrom_bands.RDS") #chromosome band info for ideogram - makes ideogram load 25 seconds faster
+tfbs <- readRDS("/srv/shiny-server/databases/tfbs_for_app.RDS") #TFBS data from ENCODE - matched to gene ids using bedtools
+snp <- readRDS("/srv/shiny-server/databases/grasp_output_for_app.RDS") #SNP data from GRASP - matched to gene ids using bedtools
+snp_eve <- readRDS("/srv/shiny-server/databases/eve_data_realgar.RDS") #SNP data from EVE - was already in hg19 - matched to gene ids using bedtools 
+snp_gabriel <- readRDS("/srv/shiny-server/databases/gabriel_data_realgar.RDS") #SNP data from GABRIEL - lifted over from hg17 to hg19 - matched to gene ids using bedtools 
+snp_fer <- readRDS("/srv/shiny-server/databases/allerg_GWAS_data_realgar.RDS")
+snp_TAGC <- readRDS("/srv/shiny-server/databases/TAGC_data_realgar.RDS")
+gene_locations <- fread("/srv/shiny-server/databases/gene_positions.txt", header = TRUE, stringsAsFactors = FALSE) #gene location & transcript data from GENCODE
+chrom_bands <- readRDS("/srv/shiny-server/databases/databases/chrom_bands.RDS") #chromosome band info for ideogram - makes ideogram load 25 seconds faster
 #unlike all other files, gene_locations is faster with fread than with readRDS (2s load, vs 4s)
 
 #compute -log10 for SNPs -- used for SNP colors
