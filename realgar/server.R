@@ -13,9 +13,9 @@ library(stringr)
 library(viridis) 
 library(DT) 
 library(Gviz)
-source("utilities/meta.R")
-source("utilities/comb_pval.R")
-source("utilities/name_convert.R")
+source("/srv/shiny-server/realgar/utilities/meta.R")
+source("/srv/shiny-server/realgar/utilities/comb_pval.R")
+source("/srv/shiny-server/realgar/utilities/name_convert.R")
 
 #
 # load dataset descriptions
