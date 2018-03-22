@@ -5,7 +5,7 @@
 # use this type of command to easily see dataset loading time in RStudio  
 # currently 3 seconds from "start package load" to "finish gene_locations load"
 
-.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/")
+.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/") # else have problems with Gviz package not being found
 
 library(shiny)
 library(dplyr)
@@ -604,7 +604,7 @@ server <- shinyServer(function(input, output, session) {
         
         forestplot(tabletext, title = title, tableplot, zero = 1, 
                    xlab = "Fold Change", boxsize = boxsize, col = fpColors(zero="black"), 
-                   lwd.ci = 2, xticks = xticks, 
+                   lwd.ci = 2, xticks = xticks, colgap=unit(4,"mm"),
                    is.summary = if (nrow(dat)>1) {c(TRUE,rep(FALSE,nrow(dat)-1),TRUE)} else {c(TRUE,rep(FALSE,nrow(dat)))}, 
                    # need if-else in case only one dataset selected - else it would look like a summary row
                    lineheight = unit(19.7/size_par, "cm"), mar = unit(c(5,0,0,5),"mm"), fn.ci_norm = color_fn,
