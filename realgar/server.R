@@ -604,7 +604,7 @@ server <- shinyServer(function(input, output, session) {
         
         forestplot(tabletext, title = title, tableplot, zero = 1, 
                    xlab = "Fold Change", boxsize = boxsize, col = fpColors(zero="black"), 
-                   lwd.ci = 2, xticks = xticks, 
+                   lwd.ci = 2, xticks = xticks, colgap=unit(4,"mm"),
                    is.summary = if (nrow(dat)>1) {c(TRUE,rep(FALSE,nrow(dat)-1),TRUE)} else {c(TRUE,rep(FALSE,nrow(dat)))}, 
                    # need if-else in case only one dataset selected - else it would look like a summary row
                    lineheight = unit(19.7/size_par, "cm"), mar = unit(c(5,0,0,5),"mm"), fn.ci_norm = color_fn,
