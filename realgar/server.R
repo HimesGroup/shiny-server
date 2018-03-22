@@ -4,6 +4,9 @@
 # cat(file=stderr(), as.character(Sys.time()),"packages start\n")
 # use this type of command to easily see dataset loading time in RStudio  
 # currently 3 seconds from "start package load" to "finish gene_locations load"
+
+.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/")
+
 library(shiny)
 library(dplyr)
 library(data.table)
