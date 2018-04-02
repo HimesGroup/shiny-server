@@ -161,7 +161,7 @@ server <- shinyServer(function(input, output, session) {
         }})
     
     #GWAS
-    GWAS_choices <- c("EVE"="snp_eve_subs", "Ferreira"="snp_fer_subs", "GABRIEL"="snp_gabriel_subs", "GRASP"="snp_subs", "TAGC Consortium"="snp_TAGC_subs")
+    GWAS_choices <- c("EVE"="snp_eve_subs", "Ferreira"="snp_fer_subs", "GABRIEL"="snp_gabriel_subs", "GRASP"="snp_subs", "TAGC"="snp_TAGC_subs")
     
     observe({
         if(input$selectall_GWAS == 0) return(NULL) 
