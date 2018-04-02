@@ -22,10 +22,10 @@ source("/srv/shiny-server/realgar/utilities/name_convert.R")
 
 #
 # load dataset descriptions
-Dataset_Info <- readRDS("/srv/shiny-server/databases/microarray_data_infosheet_R.RDS")
+Dataset_Info <- readRDS("/srv/shiny-server/databases/Microarray_data_infosheet_R.RDS")
 
 #load and name GEO microarray and RNA-Seq datasets
-for (i in Dataset_Info$Unique_ID) {assign(i, readRDS(paste0("/srv/shiny-server/databases/microarray_results/", i, ".RDS")))}
+for (i in na.omit(Dataset_Info$Unique_ID)) {assign(i, readRDS(paste0("/srv/shiny-server/databases/microarray_results/", i, ".RDS")))}
 
 Dataset_Info$PMID <- as.character(Dataset_Info$PMID) #else next line does not work
 Dataset_Info[is.na(Dataset_Info$PMID), "PMID"] <- ""
@@ -250,10 +250,10 @@ server <- shinyServer(function(input, output, session) {
     notavail_text <- reactive({text=""})
     output$notavail_choice = renderText(notavail_text())
     
-    
+    # gene expression (GEO) studies table
     #add links for GEO_ID and PMID
     GEO_data <- reactive({
-        validate(need(nrow(UserDataset_Info()) != 0, "Please choose at least one dataset.")) #Generate a error message when no data is loaded.
+        validate(need(nrow(UserDataset_Info()) != 0, "No gene expression datasets selected")) #Generate a error message when no data is loaded.
         
         UserDataset_Info() %>%
             dplyr::mutate(GEO_ID_link = ifelse(grepl("SRP", GEO_ID), #GEO link is conditional on whether GEO_ID is an "SRP" or "GSE"
@@ -263,20 +263,48 @@ server <- shinyServer(function(input, output, session) {
     
     
     
-    Dataset <- reactive({paste0("<a href='",  GEO_data()$GEO_ID_link, "' target='_blank'>",GEO_data()$GEO_ID,"</a>")})
-    PMID <- reactive({paste0("<a href='",  GEO_data()$PMID_link, "' target='_blank'>",GEO_data()$PMID,"</a>")})
-    Description <- reactive({GEO_data()$Description})
+    GEO_Dataset <- reactive({paste0("<a href='",  GEO_data()$GEO_ID_link, "' target='_blank'>",GEO_data()$GEO_ID,"</a>")})
+    GEO_PMID <- reactive({paste0("<a href='",  GEO_data()$PMID_link, "' target='_blank'>",GEO_data()$PMID,"</a>")})
+    GEO_Description <- reactive({GEO_data()$Description})
     
     GEO_links <- reactive({
-        df <- data.frame(Dataset(), PMID(), Description())
+        df <- data.frame(GEO_Dataset(), GEO_PMID(), GEO_Description())
         colnames(df) <- c("Dataset", "PMID", "Description")
-        df})
+        df
+    })
     
+    # gwas studies table
+
+    GWAS_data <- reactive({
+      df <- Dataset_Info[which(Dataset_Info$Tissue %in% input$which_SNPs),c("GEO_ID", "PMID", "Description")]
+      validate(need(nrow(df) != 0, "No GWAS datasets selected")) #Generate a error message when no data is loaded.
+      colnames(df) <- c("Dataset", "Link", "Description") # I put the link for the study into the PMID column of the spreadsheet for convenience - change later?
+      df
+    })
+    
+    GWAS_Dataset <- reactive({paste0("<a href='",  GWAS_data()$Link, "' target='_blank'>",GWAS_data()$Dataset,"</a>")})
+    GWAS_Description <- reactive({GWAS_data()$Description})
+    
+    GWAS_links <- reactive ({
+      df <- data.frame(GWAS_Dataset(), GWAS_Description())
+      colnames(df) <- c("Dataset", "Description")
+      df
+    })
+    
+    
+    #table output for "Datasets Loaded" tab
     output$GEO_table <- DT::renderDataTable(GEO_links(),  
                                             class = 'cell-border stripe', 
                                             rownames = FALSE, 
                                             options = list(paging = FALSE, searching = FALSE),
-                                            escape=FALSE)
+                                            escape = FALSE)
+    
+    output$GWAS_table <- DT::renderDataTable(GWAS_links(),
+                                             class = 'cell-border stripe',
+                                             rownames = FALSE,
+                                             options = list(paging = FALSE, searching = FALSE), 
+                                             escape = FALSE)
+    
     #########################################
     ## Select GEO data for plots and table ##
     #########################################
@@ -380,6 +408,7 @@ server <- shinyServer(function(input, output, session) {
     })
     
     output$GC_pcomb_text <- renderText({GC_pcomb()})
+    
     ###################################
     ##          Meta-analysis        ##
     ###################################
