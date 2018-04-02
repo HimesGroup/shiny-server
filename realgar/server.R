@@ -21,8 +21,12 @@ source("/srv/shiny-server/realgar/utilities/comb_pval.R")
 source("/srv/shiny-server/realgar/utilities/name_convert.R")
 
 #
-# load dataset descriptions
-Dataset_Info <- readRDS("/srv/shiny-server/databases/Microarray_data_infosheet_R.RDS")
+# load descriptions of all gene expression and GWAS datasets
+Alldata_Info <- readRDS("/srv/shiny-server/databases/Microarray_data_infosheet_R.RDS")
+
+#then split off into gene expression and GWAS dataset info - else forest plot text columns get messed up
+GWAS_Dataset_Info <- Alldata_Info[which(Alldata_Info$App == "GWAS"),]
+Dataset_Info <- Alldata_Info[which(!(Alldata_Info$App == "GWAS")),]
 
 #load and name GEO microarray and RNA-Seq datasets
 for (i in na.omit(Dataset_Info$Unique_ID)) {assign(i, readRDS(paste0("/srv/shiny-server/databases/microarray_results/", i, ".RDS")))}
@@ -276,7 +280,7 @@ server <- shinyServer(function(input, output, session) {
     # gwas studies table
 
     GWAS_data <- reactive({
-      df <- Dataset_Info[which(Dataset_Info$Tissue %in% input$which_SNPs),c("GEO_ID", "PMID", "Description")]
+      df <- GWAS_Dataset_Info[which(GWAS_Dataset_Info$Tissue %in% input$which_SNPs),c("GEO_ID", "PMID", "Description")]
       validate(need(nrow(df) != 0, "No GWAS datasets selected")) #Generate a error message when no data is loaded.
       colnames(df) <- c("Dataset", "Link", "Description") # I put the link for the study into the PMID column of the spreadsheet for convenience - change later?
       df
