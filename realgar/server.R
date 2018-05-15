@@ -262,7 +262,7 @@ server <- shinyServer(function(input, output, session) {
         UserDataset_Info() %>%
             dplyr::mutate(GEO_ID_link = ifelse(grepl("SRP", GEO_ID), #GEO link is conditional on whether GEO_ID is an "SRP" or "GSE"
                                                paste0("http://www.ncbi.nlm.nih.gov/sra/?term=", GEO_ID), 
-                                               paste0("http://www.ncbi.nlm.nih.gov/gquery/?term=", GEO_ID)),
+                                               paste0("https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=", GEO_ID)),
                           PMID_link = paste0("http://www.ncbi.nlm.nih.gov/pubmed/?term=", PMID))})
     
     
