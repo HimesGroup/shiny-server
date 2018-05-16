@@ -1,6 +1,6 @@
 library(shiny)
 library(shinythemes)
-
+###
 #
 ui <- shinyUI(fluidPage(theme = shinytheme("lumen"), 
                         #h1(strong("REALGAR"), align="center", style = "color: #9E443A;"),
@@ -50,7 +50,7 @@ ui <- shinyUI(fluidPage(theme = shinytheme("lumen"),
                                                                                     column(2, 
                                                                                            fluidRow(checkboxGroupInput(inputId="Asthma", label="Asthma Type", 
                                                                                                                        choices=c("Allergic asthma"="allergic_asthma", "Asthma"="asthma", "Asthma and rhinitis"="asthma_and_rhinitis",
-                                                                                                                                                                           "Fatal asthma"="fatal_asthma", "Mild asthma"="mild_asthma", 
+                                                                                                                                                                           "Fatal asthma"="fatal_asthma", "Mild to Moderate asthma"="mild_to_moderate", 
                                                                                                                                  "Non-allergic asthma"="non_allergic_asthma",
                                                                                                                                                                            "Severe asthma"="severe_asthma"), selected="asthma"), inline = TRUE),
                                                                                            fluidRow(actionButton("selectall_asthma","Select all")), align="left"),
