@@ -1,6 +1,6 @@
 library(shiny)
 library(shinythemes)
-
+###
 #
 ui <- shinyUI(fluidPage(theme = shinytheme("lumen"), 
                         #h1(strong("REALGAR"), align="center", style = "color: #9E443A;"),
