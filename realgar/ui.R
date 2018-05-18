@@ -4,7 +4,7 @@ library(shinythemes)
 #
 ui <- shinyUI(fluidPage(theme = shinytheme("lumen"), 
                         #h1(strong("REALGAR"), align="center", style = "color: #9E443A;"),
-                        h3(strong("Reducing Associations by Linking Genes And transcriptomic Results (REALGAR)"), align="center", style = "color: #9E443A;"), hr(),
+                        h3(strong("Reducing Associations by Linking Genes And omics Results (REALGAR)"), align="center", style = "color: #9E443A;"), hr(),
                         p("REALGAR is a tissue-specific, disease-focused resource for integrating omics results. ",
                           "This app brings together genome-wide association study (GWAS) results, ",
                           " transcript data from ",
