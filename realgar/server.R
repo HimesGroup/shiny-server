@@ -118,7 +118,7 @@ server <- shinyServer(function(input, output, session) {
                         "Lymphoblastoid cell" = "LCL","Macrophage" = "MACRO", "MCF10A-Myc" = "MCF10A-Myc",
                         "Nasal epithelium"="NE","Osteosarcoma U2OS cell" = "U2O", 
                         "Peripheral blood mononuclear cell"="PBMC","Small airway epithelium"="SAE",
-                        "White blood cell"="WBC","Whole lung"="Lung")
+                        "White blood cell"="WBC","Whole lung"="Lung","Blood"="Blood")
     observe({
         if(input$selectall_tissue == 0) return(NULL) # don't do anything if action button has been clicked 0 times
         else if (input$selectall_tissue%%2 == 0) { # %% means "modulus" - i.e. here you're testing if button has been clicked a multiple of 2 times
