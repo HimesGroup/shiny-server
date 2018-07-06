@@ -265,14 +265,16 @@ server <- shinyServer(function(input, output, session) {
             dplyr::mutate(GEO_ID_link = ifelse(grepl("SRP", GEO_ID), #GEO link is conditional on whether GEO_ID is an "SRP" or "GSE"
                                                paste0("http://www.ncbi.nlm.nih.gov/sra/?term=", GEO_ID), 
                                                paste0("https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=", GEO_ID)),
-                          PMID_link = paste0("http://www.ncbi.nlm.nih.gov/pubmed/?term=", PMID))})
+                          PMID_link = paste0("http://www.ncbi.nlm.nih.gov/pubmed/?term=", PMID),
+                          QC_link = paste0("http://public.himeslab.org/html/",GEO_ID,"_QC_report.html"))})
     
     
     
     GEO_Dataset <- reactive({paste0("<a href='",  GEO_data()$GEO_ID_link, "' target='_blank'>",GEO_data()$GEO_ID,"</a>")})
     GEO_PMID <- reactive({paste0("<a href='",  GEO_data()$PMID_link, "' target='_blank'>",GEO_data()$PMID,"</a>")})
     GEO_Description <- reactive({GEO_data()$Description})
-    GEO_Report <- reactive({GEO_data()$Report})
+    GEO_Report <- reactive({paste0("<a href='",  GEO_data()$QC_link, "' target='_blank'>",GEO_data()$Report,"</a>")})
+    #GEO_Report <- reactive({GEO_data()$Report})
     
     
     GEO_links <- reactive({
