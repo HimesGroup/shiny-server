@@ -266,7 +266,9 @@ server <- shinyServer(function(input, output, session) {
                                                paste0("http://www.ncbi.nlm.nih.gov/sra/?term=", GEO_ID), 
                                                paste0("https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=", GEO_ID)),
                           PMID_link = paste0("http://www.ncbi.nlm.nih.gov/pubmed/?term=", PMID),
-                          QC_link = paste0("http://public.himeslab.org/html/",GEO_ID,"_QC_report.html"))})
+                          QC_link = ifelse(grepl("SRP", GEO_ID), #QC link is conditional on whether GEO_ID is an "SRP" or "GSE"
+                                 paste0("http://public.himeslab.org/html/",GEO_ID,"_QC_RnaSeqReport.html"), 
+                                 paste0("http://public.himeslab.org/html/",GEO_ID,"_QC_report.html")))})
     
     
     
