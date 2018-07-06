@@ -1,4 +1,4 @@
-# detach("package:Gviz", unload=TRUE) # this is to keep RStudio happy - run if loading app more than once in same session - keep commented out otherwise
+#detach("package:Gviz", unload=TRUE) # this is to keep RStudio happy - run if loading app more than once in same session - keep commented out otherwise
 # if load Gviz 2x in same session (i.e. close & re-run app), get "object of type 'closure' is not subsettable" error
 # should not be an issue when running app from the website
 # cat(file=stderr(), as.character(Sys.time()),"packages start\n")
@@ -33,6 +33,7 @@ for (i in na.omit(Dataset_Info$Unique_ID)) {assign(i, readRDS(paste0("/srv/shiny
 
 Dataset_Info$PMID <- as.character(Dataset_Info$PMID) #else next line does not work
 Dataset_Info[is.na(Dataset_Info$PMID), "PMID"] <- ""
+Dataset_Info$Report <- as.character(c("QC"))
 
 #load info for gene tracks: gene locations, TFBS, SNPs, etc.
 tfbs <- readRDS("/srv/shiny-server/databases/tfbs_for_app.RDS") #TFBS data from ENCODE - matched to gene ids using bedtools
@@ -271,19 +272,23 @@ server <- shinyServer(function(input, output, session) {
     GEO_Dataset <- reactive({paste0("<a href='",  GEO_data()$GEO_ID_link, "' target='_blank'>",GEO_data()$GEO_ID,"</a>")})
     GEO_PMID <- reactive({paste0("<a href='",  GEO_data()$PMID_link, "' target='_blank'>",GEO_data()$PMID,"</a>")})
     GEO_Description <- reactive({GEO_data()$Description})
+    GEO_Report <- reactive({GEO_data()$Report})
+    
     
     GEO_links <- reactive({
-        df <- data.frame(GEO_Dataset(), GEO_PMID(), GEO_Description())
-        colnames(df) <- c("Dataset", "PMID", "Description")
+        #df <- data.frame(GEO_Dataset(), GEO_PMID(), GEO_Description())
+        df <- data.frame(GEO_Dataset(), GEO_PMID(),GEO_Report(), GEO_Description())
+        colnames(df) <- c("Dataset", "PMID", "Report","Description")
+        #colnames(df) <- c("Dataset", "PMID","Description")
         df
     })
     
     # gwas studies table
 
     GWAS_data <- reactive({
-      df <- GWAS_Dataset_Info[which(GWAS_Dataset_Info$Tissue %in% input$which_SNPs),c("GEO_ID", "PMID", "Description")]
+      df <- GWAS_Dataset_Info[which(GWAS_Dataset_Info$Tissue %in% input$which_SNPs),c("GEO_ID", "PMID","Description")]
       validate(need(nrow(df) != 0, "No GWAS datasets selected")) #Generate a error message when no data is loaded.
-      colnames(df) <- c("Dataset", "Link", "Description") # I put the link for the study into the PMID column of the spreadsheet for convenience - change later?
+      colnames(df) <- c("Dataset", "Link","Description") # I put the link for the study into the PMID column of the spreadsheet for convenience - change later?
       df
     })
     
