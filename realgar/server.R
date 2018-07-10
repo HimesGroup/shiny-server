@@ -275,14 +275,15 @@ server <- shinyServer(function(input, output, session) {
     GEO_Dataset <- reactive({paste0("<a href='",  GEO_data()$GEO_ID_link, "' target='_blank'>",GEO_data()$GEO_ID,"</a>")})
     GEO_PMID <- reactive({paste0("<a href='",  GEO_data()$PMID_link, "' target='_blank'>",GEO_data()$PMID,"</a>")})
     GEO_Description <- reactive({GEO_data()$Description})
+    GEO_Library <- reactive({GEO_data()$Library_prep})
     GEO_Report <- reactive({paste0("<a href='",  GEO_data()$QC_link, "' target='_blank'>",GEO_data()$Report,"</a>")})
     #GEO_Report <- reactive({GEO_data()$Report})
     
     
     GEO_links <- reactive({
         #df <- data.frame(GEO_Dataset(), GEO_PMID(), GEO_Description())
-        df <- data.frame(GEO_Dataset(), GEO_PMID(),GEO_Report(), GEO_Description())
-        colnames(df) <- c("Dataset", "PMID", "Report","Description")
+        df <- data.frame(GEO_Dataset(), GEO_PMID(),GEO_Report(), GEO_Description(),GEO_Library())
+        colnames(df) <- c("Dataset", "PMID", "Report","Description","Library")
         #colnames(df) <- c("Dataset", "PMID","Description")
         df
     })
