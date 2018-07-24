@@ -44,6 +44,7 @@ snp_fer <- readRDS("/srv/shiny-server/databases/allerg_GWAS_data_realgar.RDS") #
 snp_TAGC <- readRDS("/srv/shiny-server/databases/TAGC_data_realgar.RDS") #SNP data from TAGC - already in hg19 - matched to gene ids using bedtools
 gene_locations <- fread("/srv/shiny-server/databases/gene_positions.txt", header = TRUE, stringsAsFactors = FALSE) #gene location & transcript data from GENCODE
 chrom_bands <- readRDS("/srv/shiny-server/databases/chrom_bands.RDS") #chromosome band info for ideogram - makes ideogram load 25 seconds faster
+all_genes <- readRDS("/srv/shiny-server/databases/Gene_names.RDS")
 #unlike all other files, gene_locations is faster with fread than with readRDS (2s load, vs 4s)
 
 #compute -log10 for SNPs -- used for SNP colors
@@ -88,13 +89,18 @@ heatmap_colors <-  inferno # heatmap colors - used in p-value plot
 # server
 server <- shinyServer(function(input, output, session) {
     
+   all_genes <- unique(all_genes)
+   genes <- reactive({selectizeInput("current", "Official Gene Symbol or SNP ID:", all_genes, selected="GAPDH", options = list(create = TRUE))})
+   output$genesAvail <- renderUI({genes()})
+   
+   current <- reactive({toString(input$current)})
     curr_gene <- reactive({
-        if (gsub(" ", "", tolower(input$curr_gene), fixed=TRUE) %in% c(snp$snp, snp_eve$snp, snp_gabriel$snp, snp_fer$snp, snp_TAGC$snp)) { #if SNP ID is entered, convert internally to nearest gene symbol  
-            all_matches <- rbind(rbind(snp[which(snp$snp==gsub(" ", "", tolower(input$curr_gene), fixed=TRUE)), c("snp", "end", "symbol")], 
-                                       snp_eve[which(snp_eve$snp==gsub(" ", "", tolower(input$curr_gene), fixed=TRUE)), c("snp", "end", "symbol")]), 
-                                 snp_gabriel[which(snp_gabriel$snp==gsub(" ", "", tolower(input$curr_gene), fixed=TRUE)), c("snp", "end", "symbol")],
-                                 snp_fer[which(snp_fer$snp==gsub(" ", "", tolower(input$curr_gene), fixed=TRUE)), c("snp", "end", "symbol")],
-                                 snp_TAGC[which(snp_TAGC$snp==gsub(" ", "", tolower(input$curr_gene), fixed=TRUE)), c("snp", "end", "symbol")])
+        if (gsub(" ", "", tolower(current()), fixed=TRUE) %in% c(snp$snp, snp_eve$snp, snp_gabriel$snp, snp_fer$snp, snp_TAGC$snp)) { #if SNP ID is entered, convert internally to nearest gene symbol  
+            all_matches <- rbind(rbind(snp[which(snp$snp==gsub(" ", "", tolower(current()), fixed=TRUE)), c("snp", "end", "symbol")], 
+                                       snp_eve[which(snp_eve$snp==gsub(" ", "", tolower(current()), fixed=TRUE)), c("snp", "end", "symbol")]), 
+                                 snp_gabriel[which(snp_gabriel$snp==gsub(" ", "", tolower(current()), fixed=TRUE)), c("snp", "end", "symbol")],
+                                 snp_fer[which(snp_fer$snp==gsub(" ", "", tolower(current()), fixed=TRUE)), c("snp", "end", "symbol")],
+                                 snp_TAGC[which(snp_TAGC$snp==gsub(" ", "", tolower(current()), fixed=TRUE)), c("snp", "end", "symbol")])
             gene_locations_unique <- gene_locations[which(!duplicated(gene_locations$symbol)),]
             all_matches <- merge(all_matches, gene_locations_unique[,c("symbol", "start")], by="symbol")
             all_matches$dist <- abs(all_matches$start - all_matches$end) # here, "end" is snp position, "start" is gene start 
@@ -102,7 +108,7 @@ server <- shinyServer(function(input, output, session) {
         } else { 
             # if it is not in the list of snps, it is a gene id OR a snp that is not associated with asthma
             # in the latter case it will not show up in the list of genes & user gets an "enter valid gene/snp id" message
-            gsub(" ", "", toupper(input$curr_gene), fixed = TRUE) #make uppercase, remove spaces
+            gsub(" ", "", toupper(current()), fixed = TRUE) #make uppercase, remove spaces
         }
     })  
     
