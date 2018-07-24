@@ -90,7 +90,7 @@ heatmap_colors <-  inferno # heatmap colors - used in p-value plot
 server <- shinyServer(function(input, output, session) {
     
    all_genes <- unique(all_genes)
-   genes <- reactive({selectizeInput("current", "Official Gene Symbol or SNP ID:", all_genes, selected="GAPDH", options = list(create = TRUE))})
+   genes <- reactive({selectizeInput("current", "Official Gene Symbol or SNP ID:", all_genes, selected="GAPDH", width="185px", options = list(create = TRUE))})
    output$genesAvail <- renderUI({genes()})
    
    current <- reactive({toString(input$current)})
