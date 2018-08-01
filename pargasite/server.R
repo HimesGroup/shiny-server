@@ -11,7 +11,7 @@ library(pargasite)
 
 full_usa = st_as_sf(map("state", plot = FALSE, fill = TRUE))
 
-epa.sites <- read.csv("data/epa_site_locations.csv") 
+epa.sites <- read.csv("/srv/shiny-server/pargasite/data/epa_site_locations.csv") 
 
 shinyServer(function(input, output, session){
 
@@ -71,7 +71,7 @@ shinyServer(function(input, output, session){
   output$map <- renderLeaflet({
     leaflet(full_usa) %>% addTiles() %>%
       setView(-98.35, 39.5, zoom = 4) %>%
-      addRasterImage(x = ras.t(), colors = palette(), method = "ngb") %>%
+      addRasterImage(x = ras.t(), colors = palette()) %>%
       addPolygons(color = "black", weight = 1, fillColor = "transparent") %>%
       addLegend(pal = colorNumeric(terrain.colors(8), values(ras.t()), na.color = "transparent"),
                 values = values(ras.t()),
