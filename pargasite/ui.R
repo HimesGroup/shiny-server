@@ -1,7 +1,7 @@
 library(leaflet)
 
 shinyUI(fluidPage(theme = "bootstrap.css",
-
+                  
                   tags$head(
                     tags$style(HTML("
                                     h1 {
@@ -11,8 +11,8 @@ shinyUI(fluidPage(theme = "bootstrap.css",
                                     }
 
                                     "))
-                    ),
-
+                  ),
+                  
                   headerPanel("Pollution And health Risk factor Geospatial Analysis SITE (PARGASITE)"
                   ),
                   mainPanel(
@@ -37,26 +37,28 @@ shinyUI(fluidPage(theme = "bootstrap.css",
                     br(),
                     h4("Upload dataset to get corresponding pollution estimates"),
                     p("The file returned will have a column for each pollutant; the value will be an average of monthly estimates over the specified time period."),
-                    div(style = "width:48%; display:inline-block;", selectizeInput('start_month', label = "Start month",
-                                choices = c("Jan", "Feb", "March", "April", "May",
-                                            "June", "July", "Aug", "Sept", "Oct",
-                                            "Nov", "Dec"),
-                                selected = "Jan",
-                                multiple = FALSE)),
-                    div(style = "width:48%; display:inline-block", numericInput('start_year', label = "Start year",
-                                 value = 2005,
-                                 min = 2005,
-                                 max = 2017)),
-                    div(style = "width:48%; display:inline-block;", selectizeInput('end_month', label = "End month",
-                                                                                   choices = c("Jan", "Feb", "March", "April", "May",
-                                                                                               "June", "July", "Aug", "Sept", "Oct",
-                                                                                               "Nov", "Dec"),
-                                                                                   selected = "Dec",
-                                                                                   multiple = FALSE)),
-                    div(style = "width:48%; display:inline-block", numericInput('start_year', label = "Starting year",
-                                                                                value = 2017,
-                                                                                min = 2005,
-                                                                                max = 2017)),
+                    fluidRow(
+                      column(6, selectizeInput('start_month', label = "Start month",
+                                               choices = c("Jan", "Feb", "March", "April", "May",
+                                                           "June", "July", "Aug", "Sept", "Oct",
+                                                           "Nov", "Dec"),
+                                               selected = "Jan",
+                                               multiple = FALSE)),
+                      column(6, numericInput('start_year', label = "Start year",
+                                             value = 2005,
+                                             min = 2005,
+                                             max = 2017))),
+                    fluidRow(
+                      column(6, selectizeInput('end_month', label = "End month",
+                                               choices = c("Jan", "Feb", "March", "April", "May",
+                                                           "June", "July", "Aug", "Sept", "Oct",
+                                                           "Nov", "Dec"),
+                                               selected = "Dec",
+                                               multiple = FALSE)),
+                      column(6, numericInput('end_year', label = "End year",
+                                             value = 2017,
+                                             min = 2005,
+                                             max = 2017))),
                     fileInput("user_file", "Choose .csv file with Latitude and Longitude columns",
                               multiple = FALSE,
                               accept = c("text/csv",
