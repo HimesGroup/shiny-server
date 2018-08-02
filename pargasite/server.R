@@ -1,5 +1,6 @@
 .libPaths("/home/rebecca/R/x86_64-pc-linux-gnu-library/3.4/")
 
+library(leaflet)
 library(shiny)
 library(sf)
 library(maps)
