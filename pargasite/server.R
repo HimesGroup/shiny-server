@@ -7,7 +7,7 @@ library(sp)
 #library(mapview)
 source("labelFormatFunction.R")
 source("month_to_num.R")
-library(pargasite)
+#library(pargasite)
 
 full_usa = st_as_sf(map("state", plot = FALSE, fill = TRUE))
 
