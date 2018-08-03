@@ -14,17 +14,17 @@ source("getPollutionEstimates.R")
 #library(pargasite)
 
 ## load in all bricks
-pm_yearly_brick_full <- brick("../../../../var/www/pargasite_data/pm_yearly_brick_full.grd")
-ozone_yearly_brick_full <- brick("../../../../var/www/pargasite_data/ozone_yearly_brick_full.grd")
-no2_yearly_brick_full <- brick("../../../../var/www/pargasite_data/no2_yearly_brick_full.grd")
-so2_yearly_brick_full <- brick("../../../../var/www/pargasite_data/so2_yearly_brick_full.grd")
-co_yearly_brick_full <- brick("../../../../var/www/pargasite_data/co_yearly_brick_full.grd")
+pm_yearly_brick_full <- brick("../../../../var/www/pargasite_data/pm_yearly_brick_full.tif")
+ozone_yearly_brick_full <- brick("../../../../var/www/pargasite_data/ozone_yearly_brick_full.tif")
+no2_yearly_brick_full <- brick("../../../../var/www/pargasite_data/no2_yearly_brick_full.tif")
+so2_yearly_brick_full <- brick("../../../../var/www/pargasite_data/so2_yearly_brick_full.tif")
+co_yearly_brick_full <- brick("../../../../var/www/pargasite_data/co_yearly_brick_full.tif")
 
-pm_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/pm_yearly_brick_cropped.grd")
-ozone_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/ozone_yearly_brick_cropped.grd")
-no2_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/no2_yearly_brick_cropped.grd")
-so2_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/so2_yearly_brick_cropped.grd")
-co_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/co_yearly_brick_cropped.grd")
+pm_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/pm_yearly_brick_cropped.tif")
+ozone_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/ozone_yearly_brick_cropped.tif")
+no2_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/no2_yearly_brick_cropped.tif")
+so2_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/so2_yearly_brick_cropped.tif")
+co_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/co_yearly_brick_cropped.tif")
 
 full_usa = st_as_sf(map("state", plot = FALSE, fill = TRUE))
 
