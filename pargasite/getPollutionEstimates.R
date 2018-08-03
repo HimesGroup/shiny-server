@@ -1,8 +1,8 @@
-pm_monthly_brick <- brick("../../../../var/www/pargasite_data/pm_monthly_brick.grd")
-ozone_monthly_brick <- brick("../../../../var/www/pargasite_data/ozone_monthly_brick.grd")
-no2_monthly_brick <- brick("../../../../var/www/pargasite_data/no2_monthly_brick.grd")
-so2_monthly_brick <- brick("../../../../var/www/pargasite_data/so2_monthly_brick.grd")
-co_monthly_brick <- brick("../../../../var/www/pargasite_data/co_monthly_brick.grd")
+pm_monthly_brick <- brick("../../../../var/www/pargasite_data/pm_monthly_brick.tif")
+ozone_monthly_brick <- brick("../../../../var/www/pargasite_data/ozone_monthly_brick.tif")
+no2_monthly_brick <- brick("../../../../var/www/pargasite_data/no2_monthly_brick.tif")
+so2_monthly_brick <- brick("../../../../var/www/pargasite_data/so2_monthly_brick.tif")
+co_monthly_brick <- brick("../../../../var/www/pargasite_data/co_monthly_brick.tif")
 
 getPollutionEstimates.df.app <- function(data, monthyear_start,
                                          monthyear_end) {
