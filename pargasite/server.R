@@ -89,7 +89,7 @@ shinyServer(function(input, output, session){
   output$map <- renderLeaflet({
     leaflet(full_usa) %>% addTiles() %>%
       setView(-98.35, 39.5, zoom = 4) %>%
-      addRasterImage(x = ras.t(), colors = palette(), method = "ngb") %>%
+      addRasterImage(x = ras.t(), colors = palette(), method = "ngb", opacity = 0.7) %>%
       addPolygons(color = "black", weight = 1, fillColor = "transparent") %>%
       addLegend(pal = colorNumeric(terrain.colors(8), values(ras.t()), na.color = "transparent"),
                 values = values(ras.t()),
