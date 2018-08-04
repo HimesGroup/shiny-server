@@ -7,13 +7,11 @@ library(maps)
 library(dplyr)
 library(raster)
 library(sp)
-#library(mapview)
 source("labelFormatFunction.R")
 source("month_to_num.R")
 source("getPollutionEstimates.R")
-#library(pargasite)
 
-## load in all bricks
+## load in annual bricks
 pm_yearly_brick_full <- brick("../../../../var/www/pargasite_data/pm_yearly_brick_full.tif")
 ozone_yearly_brick_full <- brick("../../../../var/www/pargasite_data/ozone_yearly_brick_full.tif")
 no2_yearly_brick_full <- brick("../../../../var/www/pargasite_data/no2_yearly_brick_full.tif")
@@ -125,7 +123,7 @@ shinyServer(function(input, output, session){
       filename <- function() { "pargasite_file.csv" },
       content <- function(file){
         infile <- read.csv(input$user_file$datapath)
-        outfile <- getPollutionEstimates.df.app(infile, monthyear_start(), monthyear_end())
+        outfile <- getPollutionEstimates.df.app(as.data.frame(infile), monthyear_start(), monthyear_end())
         write.csv(outfile, file, row.names = FALSE)
       }
     )
