@@ -14,7 +14,7 @@ shinyUI(fluidPage(theme = "bootstrap.css",
                                     "))
                   ),
                   
-                  headerPanel("Pollution And health Risk factor Geospatial Analysis SITE (PARGASITE)"
+                  headerPanel("Pollution-Associated Risk Geospatial Analysis SITE (PARGASITE)"
                   ),
                   mainPanel(
                     leafletOutput("map", width = "100%"),
