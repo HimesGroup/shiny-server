@@ -79,7 +79,7 @@ snp_eve$color_meta_P_LAT <- inferno(8002)[as.numeric(cut(snp_eve$neg_log_meta_p_
 # make a list of gene symbols in all datasets for checking whether gene symbol entered is valid - used for GeneSymbol later on
 genes_avail <- vector()
 for (i in ls()[grep("GSE", ls())]) {
-    gene_names <- as.character(levels(get(i)$SYMBOL))
+    gene_names <- as.character(levels(get(i)$Gene))
     genes_avail <- unique(c(genes_avail, gene_names))
 }
 
@@ -123,8 +123,9 @@ server <- shinyServer(function(input, output, session) {
                         "Bronchoalveolar lavage"="BAL", "CD4"="CD4", "CD8"="CD8",
                         "Lens epithelium" = "LEC","Lymphoblastic leukemia cell" = "chALL", 
                         "Lymphoblastoid cell" = "LCL","Macrophage" = "MACRO", "MCF10A-Myc" = "MCF10A-Myc",
-                        "Nasal epithelium"="NE","Osteosarcoma U2OS cell" = "U2O", 
+                        "Nasal epithelium"="NE","Osteosarcoma U2OS cell" = "U2OS",
                         "Peripheral blood mononuclear cell"="PBMC","Small airway epithelium"="SAE",
+                        "Skeletal muscle myotubes"="myotubes",
                         "White blood cell"="WBC","Whole lung"="Lung","Blood"="Blood")
     observe({
         if(input$selectall_tissue == 0) return(NULL) # don't do anything if action button has been clicked 0 times
@@ -335,11 +336,11 @@ server <- shinyServer(function(input, output, session) {
         
         #select data for the gene currently selected
         data_filter <- function(x){
-            x <- x %>%
-                dplyr::filter(SYMBOL==curr_gene()) %>%
-                dplyr::select(logFC, P.Value, adj.P.Val, SD) %>% 
-                dplyr::filter(P.Value==min(P.Value)) %>%
-                dplyr::mutate(lower = logFC - 2*SD, upper = logFC + 2*SD)
+          x <- x %>%
+            dplyr::filter(Gene==curr_gene()) %>%
+            dplyr::select(logFC, P.Value, adj.P.Val, SD, rank) %>% 
+            dplyr::filter(P.Value==min(P.Value)) %>%
+            dplyr::mutate(lower = logFC - 2*SD, upper = logFC + 2*SD)
         }
         
         #get data for given gene for each study selected
@@ -347,13 +348,7 @@ server <- shinyServer(function(input, output, session) {
             curr.gene.data=get(i,environment())
             Total = UserDataset_Info() %>% dplyr::filter(Unique_ID == i) %>% select(Total) # This 'Total' is total sample size and can be used to combine p-values
             data_type = UserDataset_Info() %>% dplyr::filter(Unique_ID == i) %>% select(App) #This 'data_type' can be used to separate asthma and GC data. 
-            
-            if(any(tbl_vars(curr.gene.data)=="qValuesBatch")) {
-                curr.gene.data <- (curr.gene.data %>%
-                                       dplyr::select(-P.Value,-adj.P.Val) %>%
-                                       dplyr::rename(P.Value=pValuesBatch) %>%
-                                       dplyr::rename(adj.P.Val=qValuesBatch))}
-            
+
             #use data_filter function from above to filter curr.gene.data
             if (any(GeneSymbol())) {
                 
@@ -400,30 +395,30 @@ server <- shinyServer(function(input, output, session) {
     
     # asthma
     asthma_pcomb <- reactive({
-        dat <- data_Asthma()
-        if (length(dat$adj.P.Val)>1) {
-            #write.table(dat,paste0("Asthma_",curr_gene(),".txt"),col.names=T,row.names=F,sep="\t",quote=F)
-            asthma_liptak_pcomb <- liptak_stat(dat)
-            asthma_sumlog_pcomb <- sumlog_stat(dat)
-            pcomb_text=paste0("Combined p-values by Liptak's method =", asthma_liptak_pcomb, "; by Fisher's method = ", asthma_sumlog_pcomb)
-        }
-        else {pcomb_text=""}
-        pcomb_text
+      dat <- data_Asthma()
+      if (length(dat$adj.P.Val)>1) {
+        #write.table(dat,paste0("Asthma_",curr_gene(),".txt"),col.names=T,row.names=F,sep="\t",quote=F)
+        asthma_rankprod_pcomb <- rankprod_stat(dat)
+        asthma_sumlog_pcomb <- sumlog_stat(dat)
+        pcomb_text=paste0("P-value-based integration = ", asthma_sumlog_pcomb, "; Rank-based integration = ", asthma_rankprod_pcomb)
+      }
+      else {pcomb_text=""}
+      pcomb_text
     })
     
     output$asthma_pcomb_text <- renderText({asthma_pcomb()})
     
     # GC
     GC_pcomb <- reactive({
-        dat <- data_GC()
-        if (length(dat$adj.P.Val)>1) {
-            #write.table(dat,paste0("GC_",curr_gene(),".txt"),col.names=T,row.names=F,sep="\t",quote=F)
-            GC_liptak_pcomb <- liptak_stat(dat)
-            GC_sumlog_pcomb <- sumlog_stat(dat)
-            pcomb_text=paste0("Combined p-values by Liptak's method =", GC_liptak_pcomb, "; by Fisher's method = ", GC_sumlog_pcomb)
-        }
-        else {pcomb_text=""}
-        pcomb_text
+      dat <- data_GC()
+      if (length(dat$adj.P.Val)>1) {
+        #write.table(dat,paste0("GC_",curr_gene(),".txt"),col.names=T,row.names=F,sep="\t",quote=F)
+        GC_rankprod_pcomb <- rankprod_stat(dat)
+        GC_sumlog_pcomb <- sumlog_stat(dat)
+        pcomb_text=paste0("P value-based Fisher's method = ", GC_sumlog_pcomb, "; Rank-based Rank Products method = ", GC_rankprod_pcomb)
+      }
+      else {pcomb_text=""}
+      pcomb_text
     })
     
     output$GC_pcomb_text <- renderText({GC_pcomb()})
@@ -602,7 +597,7 @@ server <- shinyServer(function(input, output, session) {
         if (nrow(dat)>1) {
             tabletext[nrow(tabletext),c("GEO_ID")] <- ""
             tabletext[nrow(tabletext),c("Long_tissue_name")] <- ""
-            tabletext[nrow(tabletext),3] <- "Combined" # "Asthma" or "Treatment" is in column 3
+            tabletext[nrow(tabletext),3] <- "Effect-size-based integration" # "Asthma" or "Treatment" is in column 3
         }
         
         # remove double quote
