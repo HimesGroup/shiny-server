@@ -415,7 +415,7 @@ server <- shinyServer(function(input, output, session) {
         #write.table(dat,paste0("GC_",curr_gene(),".txt"),col.names=T,row.names=F,sep="\t",quote=F)
         GC_rankprod_pcomb <- rankprod_stat(dat)
         GC_sumlog_pcomb <- sumlog_stat(dat)
-        pcomb_text=paste0("P value-based Fisher's method = ", GC_sumlog_pcomb, "; Rank-based Rank Products method = ", GC_rankprod_pcomb)
+        pcomb_text=paste0("P-value-based integration = ", GC_sumlog_pcomb, "; Rank-based integration = ", GC_rankprod_pcomb)
       }
       else {pcomb_text=""}
       pcomb_text
@@ -597,7 +597,7 @@ server <- shinyServer(function(input, output, session) {
         if (nrow(dat)>1) {
             tabletext[nrow(tabletext),c("GEO_ID")] <- ""
             tabletext[nrow(tabletext),c("Long_tissue_name")] <- ""
-            tabletext[nrow(tabletext),3] <- "Effect-size-based integration" # "Asthma" or "Treatment" is in column 3
+            tabletext[nrow(tabletext),3] <- "Effect size-based integration" # "Asthma" or "Treatment" is in column 3
         }
         
         # remove double quote
