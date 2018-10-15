@@ -1,5 +1,6 @@
 library(shiny)
 library(shinythemes)
+
 ###
 #
 ui <- shinyUI(fluidPage(theme = shinytheme("lumen"), 
@@ -72,7 +73,7 @@ ui <- shinyUI(fluidPage(theme = shinytheme("lumen"),
                                                                                            conditionalPanel(condition = "output.Other_options==' '",
                                                                                            actionButton("selectall_other","Select all")))),
                                                                                     column(3, 
-                                                                                           fluidRow(checkboxGroupInput(inputId="Treatment", label="Treatment", 
+                                                                                           fluidRow(checkboxGroupInput(inputId="Treatment", label=strong("Treatment:"), 
                                                                                                                           choices = c("Beta-agonist treatment"="BA", 
                                                                                                                                       "Glucocorticoid treatment" = "GC", 
                                                                                                                                       "Smoking"="smoking", 
@@ -84,7 +85,7 @@ ui <- shinyUI(fluidPage(theme = shinytheme("lumen"),
                                                                                                     tags$head(tags$style(type="text/css", "#curr_gene {width: 190px}"))), 
                                                                                            align="left"),
                                                                                     column(2,
-                                                                                           fluidRow(checkboxGroupInput(inputId="which_SNPs", label="GWAS Results", 
+                                                                                           fluidRow(checkboxGroupInput(inputId="which_SNPs", label=strong("GWAS Results:"), 
                                                                                                                        choices=c("EVE"="snp_eve_subs", 
                                                                                                                                  "Ferreira"="snp_fer_subs", 
                                                                                                                                  "GABRIEL"="snp_gabriel_subs", 
@@ -144,3 +145,4 @@ ui <- shinyUI(fluidPage(theme = shinytheme("lumen"),
                                                     fluidRow(DT::dataTableOutput(outputId="GWAS_table"), br()),
                                                     fluidRow(img(src="https://www.rstudio.com/wp-content/uploads/2014/04/shiny-400x464.png", height=124*.65, width=110.4*.65), 
                                                              "Created with RStudio's ", a("Shiny", href="http://www.rstudio.com/shiny", target="_blank")))))))
+
