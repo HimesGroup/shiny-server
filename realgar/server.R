@@ -232,30 +232,6 @@ server <- shinyServer(function(input, output, session) {
       }
     })
     
-    observe({
-      if ("Structural" %in% input$Tissue) {
-        output$STissue_options <- reactive({if("Structural" %in% input$Tissue) {" "} else {""}})
-        updateCheckboxGroupInput(session,"STissue","",choices=stissue_choices,selected=stissue_choices)
-        updateActionButton(session, "selectall_stissue", label="Unselect all")
-      } 
-    })
-    
-    observe({
-      if ("Blood" %in% input$Tissue) {
-        output$BTissue_options <- reactive({if("Blood" %in% input$Tissue) {" "} else {""}})
-        updateCheckboxGroupInput(session,"BTissue","",choices=btissue_choices,selected=btissue_choices)
-        updateActionButton(session, "selectall_btissue", label="Unselect all")
-      } 
-    })
-    
-    observe({
-      if ("Cancer" %in% input$Tissue) {
-        output$CTissue_options <- reactive({if("Cancer" %in% input$Tissue) {" "} else {""}})
-        updateCheckboxGroupInput(session,"CTissue","",choices=ctissue_choices,selected=ctissue_choices)
-        updateActionButton(session, "selectall_ctissue", label="Unselect all")
-      }
-    })
-    
     
     #Disease types: Asthma types, COPD, Other
     
@@ -320,22 +296,6 @@ server <- shinyServer(function(input, output, session) {
       }
     })
     
-    observe({
-      if ("Asthma-Affection Status" %in% input$Asthma) {
-        output$Asthma_options <- reactive({if("Asthma-Affection Status" %in% input$Asthma) {" "} else {""}})
-        updateCheckboxGroupInput(session, "AsthmaAF", "", choices=asthma_choices, selected=asthma_choices)
-        updateActionButton(session, "selectall_asthma", label="Unselect all")
-      } 
-    })
-    
-    
-    observe({
-      if ("Asthma-Endotypes" %in% input$Asthma) {
-        output$Other_options <- reactive({if("Asthma-Endotypes" %in% input$Asthma) {" "} else {""}})
-        updateCheckboxGroupInput(session, "Other", "", choices=other_choices, selected=other_choices)
-        updateActionButton(session, "selectall_other", label="Unselect all")
-      }
-    })
     
     #Treatment
     treatment_choices <- c("Beta-agonist treatment"="BA", "Glucocorticoid treatment" = "GC", "Smoking"="smoking", "Vitamin D treatment"="vitD")
