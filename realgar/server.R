@@ -202,8 +202,8 @@ server <- shinyServer(function(input, output, session) {
         # choose all the choices _except_ "All"
         #selected_choices <- setdiff(choices, "All")
         #updateSelectInput(session, "Tissue", selected = selected_choices)
-        updateSelectizeInput(session, "Tissue", choices = NULL, selected = "All")
         
+        updateSelectizeInput(session, "Tissue", choices = NULL, selected = "All")
         updateCheckboxGroupInput(session,"STissue","",choices=stissue_choices, selected = stissue_choices)
         updateActionButton(session, "selectall_stissue", label="Unselect all")
         output$STissue_options <- renderText({ NULL })
@@ -216,7 +216,7 @@ server <- shinyServer(function(input, output, session) {
         updateActionButton(session, "selectall_ctissue", label="Unselect all")
         output$CTissue_options <- renderText({ NULL })
   
-      }  else {
+      } else if(!"All" %in% input$Tissue){
         updateSelectizeInput(session, "Tissue", choices = choices, selected = input$Tissue)
         output$STissue_options <- reactive({if("Structural" %in% input$Tissue) {" "} else {""}})
         updateCheckboxGroupInput(session,"STissue","",choices=stissue_choices)
@@ -231,6 +231,7 @@ server <- shinyServer(function(input, output, session) {
         updateActionButton(session, "selectall_ctissue", label="Select all")
       }
     })
+    
     
     
     #Disease types: Asthma types, COPD, Other
@@ -285,7 +286,8 @@ server <- shinyServer(function(input, output, session) {
         updateActionButton(session, "selectall_other", label="Unselect all")
         output$Other_options <- renderText({ NULL })
         
-      } else {
+      } else if(!"All" %in% input$Asthma) {
+        updateSelectizeInput(session, "Asthma", choices = dchoices, selected = input$Asthma)
         output$Asthma_options <- reactive({if("Asthma-Affection Status" %in% input$Asthma) {" "} else {""}})
         updateCheckboxGroupInput(session, "AsthmaAF", "", choices=asthma_choices)
         updateActionButton(session, "selectall_asthma", label="Select all")
@@ -295,6 +297,7 @@ server <- shinyServer(function(input, output, session) {
         updateActionButton(session, "selectall_other", label="Select all")
       }
     })
+    
     
     
     #Treatment
