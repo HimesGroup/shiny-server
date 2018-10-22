@@ -196,6 +196,7 @@ server <- shinyServer(function(input, output, session) {
     
     #All Tissues
     choices = c("All","Structural", "Blood", "Cancer")
+    choices2 = c("Structural", "Blood", "Cancer")
     
     observe({
       if ("All" %in% input$Tissue) {
@@ -215,8 +216,26 @@ server <- shinyServer(function(input, output, session) {
         updateCheckboxGroupInput(session,"CTissue","",choices=ctissue_choices, selected = ctissue_choices)
         updateActionButton(session, "selectall_ctissue", label="Unselect all")
         output$CTissue_options <- renderText({ NULL })
+        
+      } else if ("Cancer" %in% input$Tissue) {
+        updateSelectizeInput(session, "Tissue", choices = choices2, selected = input$Tissue)
+        output$CTissue_options <- reactive({if("Cancer" %in% input$Tissue) {" "} else {""}})
+        updateCheckboxGroupInput(session,"CTissue","",choices=ctissue_choices,selected=ctissue_choices)
+        updateActionButton(session, "selectall_ctissue", label="Unselect all")
+        
+      } else if ("Blood" %in% input$Tissue) {
+        updateSelectizeInput(session, "Tissue", choices = choices2, selected = input$Tissue)
+        output$BTissue_options <- reactive({if("Blood" %in% input$Tissue) {" "} else {""}})
+        updateCheckboxGroupInput(session,"BTissue","",choices=btissue_choices,selected=btissue_choices)
+        updateActionButton(session, "selectall_btissue", label="Unselect all")
+        
+      } else if ("Structural" %in% input$Tissue) {
+        updateSelectizeInput(session, "Tissue", choices = choices2, selected = input$Tissue)
+        output$STissue_options <- reactive({if("Structural" %in% input$Tissue) {" "} else {""}})
+        updateCheckboxGroupInput(session,"STissue","",choices=stissue_choices,selected=stissue_choices)
+        updateActionButton(session, "selectall_stissue", label="Unselect all")
   
-      } else if(!"All" %in% input$Tissue){
+      } else {
         updateSelectizeInput(session, "Tissue", choices = choices, selected = input$Tissue)
         output$STissue_options <- reactive({if("Structural" %in% input$Tissue) {" "} else {""}})
         updateCheckboxGroupInput(session,"STissue","",choices=stissue_choices)
@@ -229,10 +248,10 @@ server <- shinyServer(function(input, output, session) {
         output$CTissue_options <- reactive({if("Cancer" %in% input$Tissue) {" "} else {""}})
         updateCheckboxGroupInput(session,"CTissue","",choices=ctissue_choices)
         updateActionButton(session, "selectall_ctissue", label="Select all")
-      }
+      } 
     })
     
-    
+  
     
     #Disease types: Asthma types, COPD, Other
     
@@ -274,6 +293,7 @@ server <- shinyServer(function(input, output, session) {
     
     #All Diseases
     dchoices = c("All","Asthma-Affection Status","Asthma-Endotypes")
+    dchoices2 = c("Asthma-Affection Status","Asthma-Endotypes")
     
     observe({
       if ("All" %in% input$Asthma) {
@@ -286,7 +306,19 @@ server <- shinyServer(function(input, output, session) {
         updateActionButton(session, "selectall_other", label="Unselect all")
         output$Other_options <- renderText({ NULL })
         
-      } else if(!"All" %in% input$Asthma) {
+      } else if ("Asthma-Endotypes" %in% input$Asthma) {
+        updateSelectizeInput(session, "Asthma", choices = dchoices2, selected = input$Asthma)
+        output$Other_options <- reactive({if("Asthma-Endotypes" %in% input$Asthma) {" "} else {""}})
+        updateCheckboxGroupInput(session, "Other", "", choices=other_choices, selected=other_choices)
+        updateActionButton(session, "selectall_other", label="Unselect all")
+        
+      } else if ("Asthma-Affection Status" %in% input$Asthma) {
+        updateSelectizeInput(session, "Asthma", choices = dchoices2, selected = input$Asthma)
+        output$Asthma_options <- reactive({if("Asthma-Affection Status" %in% input$Asthma) {" "} else {""}})
+        updateCheckboxGroupInput(session, "AsthmaAF", "", choices=asthma_choices, selected=asthma_choices)
+        updateActionButton(session, "selectall_asthma", label="Unselect all")
+        
+      } else {
         updateSelectizeInput(session, "Asthma", choices = dchoices, selected = input$Asthma)
         output$Asthma_options <- reactive({if("Asthma-Affection Status" %in% input$Asthma) {" "} else {""}})
         updateCheckboxGroupInput(session, "AsthmaAF", "", choices=asthma_choices)
@@ -297,7 +329,6 @@ server <- shinyServer(function(input, output, session) {
         updateActionButton(session, "selectall_other", label="Select all")
       }
     })
-    
     
     
     #Treatment
