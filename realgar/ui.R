@@ -1,5 +1,6 @@
 library(shiny)
 library(shinythemes)
+library(shinyWidgets)
 
 ###
 #
@@ -30,6 +31,16 @@ ui <- shinyUI(fluidPage(theme = shinytheme("lumen"),
                           "(2) brief descriptions for all GWAS studies selected. ",
                           "If you would like to view REALGAR's RNA-Seq results at a transcript level, please see the ",
                           a("Lung Cell Transcriptome Explorer.", href="http://himeslab.org/asthmagenes/", target="_blank")),
+                        p("Differential expression results for individual microarray and RNA-Sequencing study were obtained using ",
+                          a("RAVED", href="https://github.com/HimesGroup/raved", target="_blank"),
+                          ". Integrated results were obtained using three summary statistics-based approches: ",
+                          "(1) an effect size-based method that applied a random-effects model, ",
+                          "(2) p-value-based method that applied Fisher's sum-of-logs method, ",
+                          "and  (3) rank-based method that adpoted the Rank Product. ",
+                          "Note that p-values from the p-value-based and effect size-based methods are not adjusted for multiple corrections in this app, ",
+                          "so we suggest that users apply a stringent threshold of multiple corrections corresponding to 25,000 genes (i.e. 2x10-6). ",
+                          "For the rank-based method, an analytic rank product is provided instead of the permutated empirical p-value, ",
+                          "so we suggest users refer to the rank score when prioritizing the genes for functional validation."),
                         p("This app was created by Maya Shumyatcher, Mengyuan Kan and Blanca Himes at the ", 
                           a("Himes Lab", href="http://himeslab.org/", target="_blank"),"."), br(),
                         
@@ -40,7 +51,8 @@ ui <- shinyUI(fluidPage(theme = shinytheme("lumen"),
                                                                        fluidRow(h4(strong("Select options:")),align = "left"), 
                                                                        fluidRow(div(style="margin-right: 25px",
                                                                                     column(3, 
-                                                                                           fluidRow(selectizeInput("Tissue", strong("Tissue:"), choices=c("All","Structural", "Blood", "Cancer"),width="200px",multiple=TRUE,options = list(placeholder = 'Select tissue type(s)'))),
+                                                                                           fluidRow(pickerInput("Tissue",label = strong("Tissue:"),choices = c("Structural", "Blood", "Cancer"),multiple = TRUE,width="240px",options = list(`actions-Box` = TRUE,`none-Selected-Text` = "Select tissue type(s)"))),
+                                                                                           #fluidRow(selectizeInput("Tissue", strong("Tissue:"), choices=c("All","Structural", "Blood", "Cancer"),width="200px",multiple=TRUE,options = list(placeholder = 'Select tissue type(s)'))),
                                                                                            uiOutput("STissue_options"), conditionalPanel(condition = "output.STissue_options==' '",
                                                                                            checkboxGroupInput(inputId="STissue", label="",
                                                                                            choices = c("Airway smooth muscle"="ASM", "Bronchial epithelium"="BE","Bronchoalveolar lavage"="BAL",
@@ -56,7 +68,8 @@ ui <- shinyUI(fluidPage(theme = shinytheme("lumen"),
                                                                                            choices=c("Lymphoblastic leukemia cell" = "chALL","Osteosarcoma U2OS cell" = "U2OS"))),
                                                                                            conditionalPanel(condition = "output.CTissue_options==' '", actionButton("selectall_ctissue","Select all"))),
                                                                                     column(3,
-                                                                                           fluidRow(selectizeInput("Asthma", strong("Disease:"), choices=c("All","Asthma-Affection Status","Asthma-Endotypes"),width="200px",multiple=TRUE,options = list(placeholder = 'Select disease type(s)'))),
+                                                                                           fluidRow(pickerInput("Asthma",label = strong("Disease:"),choices = c("Asthma-Affection Status","Asthma-Endotypes"),multiple = TRUE,width="240px",options = list(`actions-Box` = TRUE,`none-Selected-Text` = "Select disease type(s)"))),
+                                                                                           #fluidRow(selectizeInput("Asthma", strong("Disease:"), choices=c("All","Asthma-Affection Status","Asthma-Endotypes"),width="200px",multiple=TRUE,options = list(placeholder = 'Select disease type(s)'))),
                                                                                            fluidRow(
                                                                                            uiOutput("Asthma_options"), conditionalPanel(condition = "output.Asthma_options==' '",
                                                                                            checkboxGroupInput(inputId = "AsthmaAF", label = "", choices=c("Allergic asthma vs Healthy"="allergic_asthma", "Asthma vs Healthy"="asthma",
