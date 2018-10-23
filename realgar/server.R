@@ -29,10 +29,7 @@ GWAS_Dataset_Info <- Alldata_Info[which(Alldata_Info$App == "GWAS"),]
 Dataset_Info <- Alldata_Info[which(!(Alldata_Info$App == "GWAS")),]
 
 #load and name GEO microarray and RNA-Seq datasets
-#for (i in na.omit(Dataset_Info$Unique_ID)) {assign(i, readRDS(paste0("/srv/shiny-server/databases/microarray_results/", i, ".RDS")))}
-for (i in na.omit(Dataset_Info$Unique_ID)) {assign(i, read_feather(paste0("/srv/shiny-server/databases/results_feather_files/", i, ".feather")))}
-#files = as.vector(na.omit(Dataset_Info$Unique_ID))
-#foreach(i=1:length(files)) %dopar% assign(files[i], read_feather(paste0("/srv/shiny-server/databases/results_feather_files/", files[i], ".feather")))
+for (i in na.omit(Dataset_Info$Unique_ID)) {assign(i, readRDS(paste0("/srv/shiny-server/databases/microarray_results/", i, ".RDS")))}
 
 Dataset_Info$PMID <- as.character(Dataset_Info$PMID) #else next line does not work
 Dataset_Info[is.na(Dataset_Info$PMID), "PMID"] <- ""
@@ -121,164 +118,43 @@ server <- shinyServer(function(input, output, session) {
     ## "Select all" buttons for tissue, asthma, treatment and GWAS study selection ##
     #################################################################################
     
- edit_branch
-    #STissue
-    stissue_choices <-c("Airway smooth muscle"="ASM", "Bronchial epithelium"="BE","Bronchoalveolar lavage"="BAL",
-                        "Lens epithelium" = "LEC","Nasal epithelium"="NE","Small airway epithelium"="SAE","Whole lung"="Lung","Skeletal muscle myotubes"="myotubes")
-    
-    output$STissue_options <- reactive({if("Structural" %in% input$Tissue){" "} else {NULL}})
-    
+    #Tissue
+    tissue_choices <- c("Airway smooth muscle"="ASM", "Bronchial epithelium"="BE", 
+                        "Bronchoalveolar lavage"="BAL", "CD4"="CD4", "CD8"="CD8",
+                        "Lens epithelium" = "LEC","Lymphoblastic leukemia cell" = "chALL", 
+                        "Lymphoblastoid cell" = "LCL","Macrophage" = "MACRO", "MCF10A-Myc" = "MCF10A-Myc",
+                        "Nasal epithelium"="NE","Osteosarcoma U2OS cell" = "U2OS",
+                        "Peripheral blood mononuclear cell"="PBMC","Small airway epithelium"="SAE",
+                        "Skeletal muscle myotubes"="myotubes",
+                        "White blood cell"="WBC","Whole lung"="Lung","Blood"="Blood")
     observe({
-      if(input$selectall_stissue == 0) return(NULL) # don't do anything if action button has been clicked 0 times
-      else if (input$selectall_stissue%%2 == 0) { # %% means "modulus" - i.e. here you're testing if button has been clicked a multiple of 2 times
-        updateCheckboxGroupInput(session,"STissue","",choices=stissue_choices, selected = stissue_choices)
-        updateActionButton(session, "selectall_stissue", label="Unselect all") # change action button label based on user input
-      } else { # else is 1, 3, 5 etc.
-        updateCheckboxGroupInput(session,"STissue","",choices=stissue_choices)
-        updateActionButton(session, "selectall_stissue", label="Select all")
-      }
-    })
-    
-    #BTissue
-    
-    btissue_choices <-c("CD4"="CD4", "CD8"="CD8", "MCF10A-Myc" = "MCF10A-Myc",
-                        "Lymphoblastoid cell" = "LCL","Macrophage" = "MACRO", 
-                        "Peripheral blood mononuclear cell"="PBMC","White blood cell"="WBC","Whole Blood"="Blood")
-    
-    output$BTissue_options <- reactive({if("Blood" %in% input$Tissue) {" "} else {NULL}})
-    
-    observe({
-      if(input$selectall_btissue == 0) return(NULL) # don't do anything if action button has been clicked 0 times
-      else if (input$selectall_btissue%%2 == 0) { # %% means "modulus" - i.e. here you're testing if button has been clicked a multiple of 2 times
-        updateCheckboxGroupInput(session,"BTissue","",choices=btissue_choices, selected = btissue_choices)
-        updateActionButton(session, "selectall_btissue", label="Unselect all") # change action button label based on user input
-      } else { # else is 1, 3, 5 etc.
-        updateCheckboxGroupInput(session,"BTissue","",choices=btissue_choices)
-        updateActionButton(session, "selectall_btissue", label="Select all")
-      }
+        if(input$selectall_tissue == 0) return(NULL) # don't do anything if action button has been clicked 0 times
+        else if (input$selectall_tissue%%2 == 0) { # %% means "modulus" - i.e. here you're testing if button has been clicked a multiple of 2 times
+            updateCheckboxGroupInput(session,"Tissue","Tissue",choices=tissue_choices, inline = TRUE)
+            updateActionButton(session, "selectall_tissue", label="Select all") # change action button label based on user input
+        } else { # else is 1, 3, 5 etc.
+            updateCheckboxGroupInput(session, "Tissue", "Tissue", choices = tissue_choices, selected = tissue_choices, inline = TRUE)
+            updateActionButton(session, "selectall_tissue", label="Unselect all")
+        }
     })
     
     
-    #CTissue
-    ctissue_choices <-c("Lymphoblastic leukemia cell" = "chALL","Osteosarcoma U2OS cell" = "U2OS")
-    
-    output$CTissue_options <- reactive({if("Cancer" %in% input$Tissue) {" "} else {NULL}})
-    
-    observe({
-      if(input$selectall_ctissue == 0) return(NULL) # don't do anything if action button has been clicked 0 times
-      else if (input$selectall_ctissue%%2 == 0) { # %% means "modulus" - i.e. here you're testing if button has been clicked a multiple of 2 times
-        updateCheckboxGroupInput(session,"CTissue","",choices=ctissue_choices, selected = ctissue_choices)
-        updateActionButton(session, "selectall_ctissue", label="Unselect all") # change action button label based on user input
-      } else { # else is 1, 3, 5 etc.
-        updateCheckboxGroupInput(session,"CTissue","",choices=ctissue_choices)
-        updateActionButton(session, "selectall_ctissue", label="Select all")
-      }
-    })
-    
-  #   #All Tissues
-    choices = c("Structural", "Blood", "Cancer")
-
-    observe({
-    if ("Cancer" %in% input$Tissue) {
-      updatePickerInput(session, "Tissue", choices = choices, selected = input$Tissue)
-      updateCheckboxGroupInput(session,"CTissue","",choices=ctissue_choices,selected=ctissue_choices)
-      updateActionButton(session, "selectall_ctissue", label="Unselect all")
-    } else {
-      updatePickerInput(session, "Tissue", choices = choices, selected = input$Tissue)
-      updateCheckboxGroupInput(session,"CTissue","",choices=ctissue_choices)
-      updateActionButton(session, "selectall_ctissue", label="Select all")
-    }
-    })
-
-    observe({
-    if ("Blood" %in% input$Tissue) {
-      updatePickerInput(session, "Tissue", choices = choices, selected = input$Tissue)
-      updateCheckboxGroupInput(session,"BTissue","",choices=btissue_choices,selected=btissue_choices)
-      updateActionButton(session, "selectall_btissue", label="Unselect all")
-    } else {
-      updatePickerInput(session, "Tissue", choices = choices, selected = input$Tissue)
-      updateCheckboxGroupInput(session,"BTissue","",choices=btissue_choices)
-      updateActionButton(session, "selectall_btissue", label="Select all")
-    }
-  })
-
-    observe({
-    if ("Structural" %in% input$Tissue) {
-      updatePickerInput(session, "Tissue", choices = choices, selected = input$Tissue)
-      updateCheckboxGroupInput(session,"STissue","",choices=stissue_choices,selected=stissue_choices)
-      updateActionButton(session, "selectall_stissue", label="Unselect all")
-    } else {
-      updatePickerInput(session, "Tissue", choices = choices, selected = input$Tissue)
-      updateCheckboxGroupInput(session,"STissue","",choices=stissue_choices)
-      updateActionButton(session, "selectall_stissue", label="Select all")
-    }
-  })
-    
-    #Disease types: Asthma types, COPD, Other
-    
-    #Asthma-Affection Status
-    asthma_choices <- c("Allergic asthma vs Healthy"="allergic_asthma", "Asthma vs Healthy"="asthma",
+    #Asthma
+    asthma_choices <- c("Allergic asthma vs Healthy"="allergic_asthma", "Asthma vs Healthy"="asthma", "Asthma and rhinitis"="asthma_and_rhinitis",
                         "Fatal asthma vs Healthy"="fatal_asthma", "Mild to Moderate asthma vs Healthy"="mild_to_moderate", 
-                        "Severe asthma vs Healthy"="severe_asthma")
-    
-    output$Asthma_options <- reactive({if("Asthma-Affection Status" %in% input$Asthma) {" "} else {NULL}})
-    
-    
+                        "Non-allergic asthma"="non_allergic_asthma",
+                        "Severe asthma vs Healthy"="severe_asthma", "Obese Asthma vs Normal-weight Asthma"="obese_asthma")
     observe({
-      if(input$selectall_asthma == 0) return(NULL) 
-      else if (input$selectall_asthma%%2 == 0) {
-        updateCheckboxGroupInput(session, "AsthmaAF", "", choices=asthma_choices, selected=asthma_choices)
-        updateActionButton(session, "selectall_asthma", label="Unselect all")
-      } else {
-        updateCheckboxGroupInput(session,"AsthmaAF","", choices=asthma_choices)
-        updateActionButton(session, "selectall_asthma", label="Select all")
-      }})
+        if(input$selectall_asthma == 0) return(NULL) 
+        else if (input$selectall_asthma%%2 == 0) {
+            updateCheckboxGroupInput(session, "Asthma", "Asthma", choices=asthma_choices)
+            updateActionButton(session, "selectall_asthma", label="Select all")
+        } else {
+            updateCheckboxGroupInput(session,"Asthma","Asthma", choices=asthma_choices, selected=asthma_choices)
+            updateActionButton(session, "selectall_asthma", label="Unselect all")
+        }})
     
     
-    #Asthma-Endotypes
-    other_choices <- c("Asthma with Rhinitis vs Healthy"="asthma_and_rhinitis",
-                       "Non-Allergic vs Allergic Asthma"="non_allergic_asthma",
-                       "Obese Asthma vs Normal-weight Asthma"="obese_asthma")
-    
-    output$Other_options <- reactive({if("Asthma-Endotypes" %in% input$Asthma) {" "} else {NULL}})
-    
-    observe({
-      if(input$selectall_other == 0) return(NULL) 
-      else if (input$selectall_other%%2 == 0) {
-        updateCheckboxGroupInput(session, "Other", "", choices=other_choices, selected=other_choices)
-        updateActionButton(session, "selectall_other", label="Unselect all")
-      } else {
-        updateCheckboxGroupInput(session,"Other", "", choices=other_choices)
-        updateActionButton(session, "selectall_other", label="Select all")
-      }})
-    
-    #All Diseases
-    choices2 = c("Asthma-Affection Status","Asthma-Endotypes")
-    
-    observe({
-          if ("Asthma-Endotypes" %in% input$Asthma) {
-              updatePickerInput(session, "Asthma", choices = choices2, selected = input$Asthma)
-              updateCheckboxGroupInput(session, "Other", "", choices=other_choices, selected=other_choices)
-              updateActionButton(session, "selectall_other", label="Unselect all")
-              } else {
-              updatePickerInput(session, "Asthma", choices = choices2, selected = input$Asthma)
-              updateCheckboxGroupInput(session, "Other", "", choices=other_choices)
-              updateActionButton(session, "selectall_other", label="Select all")
-             }
-          })
-    
-    observe({
-          if ("Asthma-Affection Status" %in% input$Asthma) {
-              updatePickerInput(session, "Asthma", choices = choices2, selected = input$Asthma)
-              updateCheckboxGroupInput(session, "AsthmaAF", "", choices=asthma_choices, selected=asthma_choices)
-              updateActionButton(session, "selectall_asthma", label="Unselect all")
-               } else {
-              updatePickerInput(session, "Asthma", choices = choices2, selected = input$Asthma)
-              updateCheckboxGroupInput(session, "AsthmaAF", "", choices=asthma_choices)
-              updateActionButton(session, "selectall_asthma", label="Select all")
-              }
-          })
-         
     #Treatment
     treatment_choices <- c("Beta-agonist treatment"="BA", "Glucocorticoid treatment" = "GC", "Smoking"="smoking", "Vitamin D treatment"="vitD")
     
