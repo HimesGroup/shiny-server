@@ -1,5 +1,7 @@
 library(shiny)
 library(shinythemes)
+library(shinyWidgets)
+
 ###
 #
 ui <- shinyUI(fluidPage(theme = shinytheme("lumen"), 
@@ -66,7 +68,43 @@ ui <- shinyUI(fluidPage(theme = shinytheme("lumen"),
                                                                                                                                  "Severe asthma vs Healthy"="severe_asthma", "Obese Asthma vs Normal-weight Asthma"="obese_asthma"), selected="asthma"), inline = TRUE),
                                                                                            fluidRow(actionButton("selectall_asthma","Select all")), align="left"),
                                                                                     column(3, 
-                                                                                           fluidRow(checkboxGroupInput(inputId="Treatment", label="Treatment", 
+ 
+                                                                                           fluidRow(pickerInput("Tissue",label = strong("Tissue:"),choices = c("Structural", "Blood", "Cancer"),multiple = TRUE,width="240px",options = list(`actions-Box` = TRUE,`none-Selected-Text` = "Select tissue type(s)"))),
+                                                                                           #fluidRow(selectizeInput("Tissue", strong("Tissue:"), choices=c("All","Structural", "Blood", "Cancer"),width="200px",multiple=TRUE,options = list(placeholder = 'Select tissue type(s)'))),
+                                                                                           uiOutput("STissue_options"), conditionalPanel(condition = "output.STissue_options==' '",
+                                                                                           checkboxGroupInput(inputId="STissue", label="",
+                                                                                           choices = c("Airway smooth muscle"="ASM", "Bronchial epithelium"="BE","Bronchoalveolar lavage"="BAL",
+                                                                                                       "Lens epithelium" = "LEC","Nasal epithelium"="NE","Small airway epithelium"="SAE","Whole lung"="Lung","Skeletal muscle myotubes"="myotubes"))),
+                                                                                           conditionalPanel(condition = "output.STissue_options==' '", actionButton("selectall_stissue","Select all")),
+                                                                                           uiOutput("BTissue_options"), conditionalPanel(condition = "output.BTissue_options==' '",
+                                                                                           checkboxGroupInput(inputId="BTissue", label="", 
+                                                                                           choices=c("CD4"="CD4", "CD8"="CD8", "MCF10A-Myc" = "MCF10A-Myc","Lymphoblastoid cell" = "LCL","Macrophage" = "MACRO", 
+                                                                                                     "Peripheral blood mononuclear cell"="PBMC","White blood cell"="WBC","Whole Blood"="Blood"))),
+                                                                                           conditionalPanel(condition = "output.BTissue_options==' '", actionButton("selectall_btissue","Select all")),
+                                                                                           uiOutput("CTissue_options"), conditionalPanel(condition = "output.CTissue_options==' '",
+                                                                                           checkboxGroupInput(inputId="CTissue", label="", 
+                                                                                           choices=c("Lymphoblastic leukemia cell" = "chALL","Osteosarcoma U2OS cell" = "U2OS"))),
+                                                                                           conditionalPanel(condition = "output.CTissue_options==' '", actionButton("selectall_ctissue","Select all"))),
+                                                                                    column(3,
+                                                                                           fluidRow(pickerInput("Asthma",label = strong("Disease:"),choices = c("Asthma-Affection Status","Asthma-Endotypes"),multiple = TRUE,width="240px",options = list(`actions-Box` = TRUE,`none-Selected-Text` = "Select disease type(s)"))),
+                                                                                           #fluidRow(selectizeInput("Asthma", strong("Disease:"), choices=c("All","Asthma-Affection Status","Asthma-Endotypes"),width="200px",multiple=TRUE,options = list(placeholder = 'Select disease type(s)'))),
+                                                                                           fluidRow(
+                                                                                           uiOutput("Asthma_options"), conditionalPanel(condition = "output.Asthma_options==' '",
+                                                                                           checkboxGroupInput(inputId = "AsthmaAF", label = "", choices=c("Allergic asthma vs Healthy"="allergic_asthma", "Asthma vs Healthy"="asthma",
+                                                                                                                                                        "Fatal asthma vs Healthy"="fatal_asthma", "Mild to Moderate asthma vs Healthy"="mild_to_moderate", 
+                                                                                                                                                        "Severe asthma vs Healthy"="severe_asthma"))),                                                                                           
+                                                                                           conditionalPanel(condition = "output.Asthma_options==' '",
+                                                                                           actionButton("selectall_asthma","Select all"))),
+                                                                                           fluidRow(
+                                                                                           uiOutput("Other_options"), conditionalPanel(condition = "output.Other_options==' '",
+                                                                                           checkboxGroupInput(inputId = "Other", label = "", 
+                                                                                           choices=c("Asthma with Rhinitis vs Healthy"="asthma_and_rhinitis",
+                                                                                                      "Non-Allergic vs Allergic Asthma"="non_allergic_asthma",
+                                                                                                      "Obese Asthma vs Normal-weight Asthma"="obese_asthma"))),
+                                                                                           conditionalPanel(condition = "output.Other_options==' '",
+                                                                                           actionButton("selectall_other","Select all")))),
+                                                                                    column(3, 
+                                                                                           fluidRow(checkboxGroupInput(inputId="Treatment", label=strong("Treatment:"), 
                                                                                                                           choices = c("Beta-agonist treatment"="BA", 
                                                                                                                                       "Glucocorticoid treatment" = "GC", 
                                                                                                                                       "Smoking"="smoking", 
