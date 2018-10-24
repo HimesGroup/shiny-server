@@ -1,6 +1,7 @@
 library(shiny)
 library(shinythemes)
 library(shinyWidgets)
+#Install ui libraries in path /usr/local/lib/R/site-library
 ###
 #
 ui <- shinyUI(fluidPage(theme = shinytheme("lumen"), 
