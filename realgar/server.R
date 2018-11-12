@@ -4,6 +4,8 @@
 # cat(file=stderr(), as.character(Sys.time()),"packages start\n")
 # use this type of command to easily see dataset loading time in RStudio  
 # currently 3 seconds from "start package load" to "finish gene_locations load"
+#rlang version 0.2.1
+
 
 .libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/") # else have problems with Gviz package not being found
 
@@ -91,7 +93,11 @@ heatmap_colors <-  inferno # heatmap colors - used in p-value plot
 
 # server
 server <- shinyServer(function(input, output, session) {
-    
+  
+    observe({
+      showNotification("Libraries are loading...",type='message')
+    })
+  
    all_genes <- unique(all_genes)
    genes <- reactive({selectizeInput("current", "Official Gene Symbol or SNP ID:", all_genes, selected="GAPDH", width="185px", options = list(create = TRUE))})
    output$genesAvail <- renderUI({genes()})
