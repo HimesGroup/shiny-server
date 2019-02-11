@@ -14,7 +14,7 @@ library(shinyjs)
 library(mapview)
 library(data.table)
 
-app.data <- read.csv("./databases/all_data.csv", header = FALSE, quote = "", stringsAsFactors = F)
+app.data <- read.csv("/home/blanca/data/sapphire/all_data.csv", header = FALSE, quote = "", stringsAsFactors = F)
 app.data <- data.table::setnames(app.data, old = colnames(app.data), new = gsub("\"", "", as.character(app.data[1,])))[c(2:397789,397791:nrow(app.data)),]
 #Necessary to do this this way for R to read in the full data frame
 #Doing so messes with the titles though, so this is the way to fix it
@@ -62,7 +62,7 @@ f.units <- function(z){
   return(paste(titles.df[index, 3]))
 }
 
-our.sensors <- read.csv("./databases/LIMEA_AIRBEAM_SUMMARY.csv", header = TRUE, stringsAsFactors = FALSE)$AirBeamID[1:15]
+our.sensors <- read.csv("/home/blanca/data/sapphire/LIMEA_AIRBEAM_SUMMARY.csv", header = TRUE, stringsAsFactors = FALSE)$AirBeamID[1:15]
 our.sensors <- paste0("AirBeam:", our.sensors)
 
 sensor.names <- names(table(app.data$Sensor.ID))
