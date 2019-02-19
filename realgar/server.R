@@ -284,7 +284,7 @@ server <- shinyServer(function(input, output, session) {
     })
     
     #Treatment
-    treatment_choices <- c("Beta-agonist treatment"="BA", "Glucocorticoid treatment" = "GC", "Smoking"="smoking", "Vitamin D treatment"="vitD")
+    treatment_choices <- c("Beta-agonist treatment"="BA", "Phosphodiesterase inhibitor"="PDE", "Glucocorticoid treatment" = "GC", "Smoking"="smoking", "Vitamin D treatment"="vitD")
     
     observe({
         if(input$selectall_treatment == 0) return(NULL) 
@@ -517,7 +517,7 @@ server <- shinyServer(function(input, output, session) {
     
     # GC
     data_GC <- reactive({ output.tableforplot_GC = output.tableforplot()
-    output.tableforplot_GC = output.tableforplot_GC[output.tableforplot_GC$App %in% c("GC", "BA", "smoking", "vitD"),]
+    output.tableforplot_GC = output.tableforplot_GC[output.tableforplot_GC$App %in% c("GC", "BA", "smoking", "vitD","PDE"),]
     output.tableforplot_GC[rev(rownames(output.tableforplot_GC)),]})
     
     
