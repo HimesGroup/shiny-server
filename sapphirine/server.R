@@ -1,6 +1,5 @@
 
 .libPaths("/home/avantika/R/x86_64-pc-linux-gnu-library/3.4/") #mapview dependencies
-
 library(shiny)
 library(lubridate)
 library(dplyr)
@@ -17,7 +16,6 @@ library(shinyjs)
 library(mapview)
 
 source("global.R")
-
 
 #Define server logic
 server <- function(input, output){
