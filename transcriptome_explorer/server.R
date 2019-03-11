@@ -4,41 +4,49 @@ library(ggplot2)
 library(data.table)
 library(magrittr)
 library(dplyr)
+library(feather)
 
 #Enable Browser Mode on Errors for Debugging Purposes
 #options(error = browser)
 
 #Load data files - gene names and dataset info
 # "lcte" appended to beginning of filename stands for "lung cell transcriptome explorer"
-sras <- fread("../databases/lcte_dataset_info.csv") %>% tbl_df
-all_genes <- fread("../databases/lcte_gene_names.csv") %>% tbl_df
-unfiltered_genes <- fread("../databases/lcte_sleuth_unfiltered_genes.csv") %>% tbl_df
+sras <- read_feather("/srv/shiny-server/databases/asthmagenes_deseq2/lcte_dataset_info_asm.feather") %>% tbl_df
+all_genes <- read_feather("/srv/shiny-server/databases/lcte_gene_names.feather") %>% tbl_df
+unfiltered_genes <- read_feather("/srv/shiny-server/databases/lcte_sleuth_unfiltered_genes.feather") %>% tbl_df
+#all_genes <- read_feather("/srv/shiny-server/databases/Gene_names.feather")
 
-#sleuth output: fold changes, pvalues, conditions - for data table beneath plot
+#deseq2 results : log2FC, padj and conditions- for datatable 
 de <- list()
-de[["SRP005411"]] <- fread("../databases/SRP005411_full_sleuth.txt", sep = " ") %>% tbl_df
-de[["SRP043162"]] <- fread("../databases/SRP043162_full_sleuth.txt", sep = " ") %>% tbl_df
-de[["SRP033351"]] <- fread("../databases/SRP033351_full_sleuth.txt", sep = " ") %>% tbl_df
+de[["SRP033351"]] <- read_feather("/srv/shiny-server/databases/asthmagenes_deseq2/SRP033351/SRP033351_de.feather") %>% tbl_df
+de[["SRP043162"]] <- read_feather("/srv/shiny-server/databases/asthmagenes_deseq2/SRP043162/SRP043162_de.feather") %>% tbl_df
+de[["SRP098649"]] <- read_feather("/srv/shiny-server/databases/asthmagenes_deseq2/SRP098649/SRP098649_de.feather") %>% tbl_df
+de[["SRP005411"]] <- read_feather("/srv/shiny-server/databases/asthmagenes_deseq2/SRP005411/SRP005411_de.feather") %>% tbl_df
 
-#kallisto results - by-transcript TPMs, used for the plots
+#Deseq2 count results - by gene for plots
 tpms <- list()
-tpms[["SRP005411"]] <- fread("../databases/SRP005411_full_kallisto.txt", sep = " ") %>% tbl_df
-tpms[["SRP043162"]] <- fread("../databases/SRP043162_full_kallisto.txt", sep = " ") %>% tbl_df
-tpms[["SRP033351"]] <- fread("../databases/SRP033351_full_kallisto.txt", sep = " ") %>% tbl_df
+tpms[["SRP033351"]] <- read_feather("/srv/shiny-server/databases/asthmagenes_deseq2/SRP033351/SRP033351_pheno+counts.feather") %>% tbl_df
+tpms[["SRP043162"]] <- read_feather("/srv/shiny-server/databases/asthmagenes_deseq2/SRP043162/SRP043162_pheno+counts.feather") %>% tbl_df
+tpms[["SRP098649"]] <- read_feather("/srv/shiny-server/databases/asthmagenes_deseq2/SRP098649/SRP098649_pheno+counts.feather") %>% tbl_df
+tpms[["SRP005411"]] <- read_feather("/srv/shiny-server/databases/asthmagenes_deseq2/SRP005411/SRP005411_pheno+counts.feather") %>% tbl_df
+
 
 # make a list of gene symbols in all datasets for checking whether gene symbol entered is valid - used later on
-sleuth_filtered_genes <- unique(c(de$SRP005411$ext_gene, de$SRP043162$ext_gene, de$SRP033351$ext_gene))
+deseq2_filtered_genes <- unique(c(de$SRP005411$gene_symbol, de$SRP043162$gene_symbol, de$SRP033351$gene_symbol, de$SRP005411$gene_symbol))
 
 server <- shinyServer(function(input, output, session) {
     
-    updateSelectizeInput(session, "gene", choices=all_genes$name, selected="GAPDH", server=TRUE)
+    #updateSelectizeInput(session, "gene", choices=all_genes$name, selected="GAPDH", server=TRUE)
+    genes <- reactive({selectizeInput("gene", "Official Gene Symbol:", all_genes, selected="GAPDH", width="185px", options = list(create = TRUE))})
+    output$genesAvail <- renderUI({genes()})
     
-    curr_gene <- reactive({gsub(" ", "", toupper(input$gene), fixed = TRUE)})
+    #gene <- reactive({toString(input$gene)})
+    curr_gene <- reactive({gsub(" ", "", toupper(toString(input$gene)), fixed = TRUE)})
     
     #used to make situation-specific error messages
     in_all <- reactive({if (!(curr_gene() %in% all_genes$name)) {FALSE} else {TRUE}})  # wrong symbol was input
     in_unfiltered <- reactive({if ((curr_gene() %in% all_genes$name) & !(curr_gene() %in% unfiltered_genes$x)) {FALSE} else {TRUE}}) # gene not in database
-    in_sleuth_filtered <- reactive({if ((curr_gene() %in% unfiltered_genes$x) & !(curr_gene() %in% sleuth_filtered_genes)) {FALSE} else {TRUE}}) # didn't pass sleuth filter
+    in_deseq2_filtered <- reactive({if ((curr_gene() %in% unfiltered_genes$x) & !(curr_gene() %in% deseq2_filtered_genes)) {FALSE} else {TRUE}}) # didn't pass sleuth filter
     
     output$gene <- renderPrint({
       curr_gene()
@@ -65,47 +73,51 @@ server <- shinyServer(function(input, output, session) {
       validate(need(curr_gene() != "", "Please enter a gene id")) # no gene symbol was input
       validate(need(in_all() != FALSE, "Please enter a valid gene id.")) # invalid gene symbol was input
       validate(need(in_unfiltered() != FALSE, "This gene is not in the reference database.")) # gene not in database
-      validate(need(in_sleuth_filtered() != FALSE, "No transcripts for this gene passed the sleuth filter (at least 53% of the replicates must have 5+ reads).")) # gene did not pass sleuth filter
+      validate(need(in_deseq2_filtered() != FALSE, "Gene did not pass our DESeq2 filter (total counts should be greater than 10).")) # gene did not pass sleuth filter
       
       # This may be because less than , or all of the gene .
         x <- sras %>% 
             filter(Tissue == input$tissue) %$% 
             SRA_ID
         
-        curr_data <- tpms[[x]] %>%
-            filter(ext_gene == curr_gene()) 
+        curr_data <- tpms[[x]] %>% filter(gene_symbol == curr_gene()) 
         
-        if (nrow(curr_data) > 0) {
-            
-            curr_data$average_tpm <- vector(length=nrow(curr_data))
-            
-            for (i in 1:nrow(curr_data)) {
-                curr_data$average_tpm[i] <- mean(curr_data[which(curr_data$target_id == curr_data$target_id[i]),]$tpm)
-            }
-            
-            curr_data <- curr_data %>%
-                filter(average_tpm > 1)
-        }    
+        # if (nrow(curr_data) > 0) {
+        #     
+        #     # curr_data$average_tpm <- vector(length=nrow(curr_data))
+        #     # 
+        #     # for (i in 1:nrow(curr_data)) {
+        #     #     curr_data$average_tpm[i] <- mean(curr_data[which(curr_data$target_id == curr_data$target_id[i]),]$tpm)
+        #     # }
+        #     # 
+        #     # curr_data <- curr_data %>%
+        #     #     filter(average_tpm > 1)
+        #   
+        #    curr_data
+        #}    
         
         in_filtered <- reactive({if (nrow(curr_data) == 0) {FALSE} else {TRUE}}) # didn't pass sleuth filter
-        validate(need(in_filtered() != FALSE, "All transcripts for this gene had very low expression (average TPM < 1).")) # gene did not pass our filter
+        #validate(need(in_filtered() != FALSE, "All transcripts for this gene had very low expression (average TPM < 1).")) # gene did not pass our filter
         
         if (nrow(curr_data) > 0) { # this iteration of curr_data has already been filtered to only have average_tpm > 1
-            gene_plot <- ggplot(curr_data, aes(x = condition, y = tpm, fill=condition)) + 
+            gene_plot <- ggplot(curr_data, aes(x = Status, y = value, fill=Status)) + 
                 geom_boxplot(outlier.colour=NA, lwd=0.2, color="grey18") + 
                 stat_boxplot(geom ='errorbar', color="grey18") + 
-                geom_jitter(size=0.8, width=0.2) +
-                facet_wrap(~target_id) + 
+                geom_jitter(aes(shape=Donor),size=1, width=0.2) +
+                scale_shape_manual(values=seq(0,length(curr_data$Donor))) + 
+                facet_wrap(~Gene) + 
                 guides(fill=FALSE) + 
                 theme_bw() +  
                 labs(title=curr_gene()) + 
-                labs(x="condition") + labs(y="TPM") + 
+                labs(x="condition") + labs(y="Normalized Read Count") + 
                 theme(text = element_text(size=9), 
                       strip.text.x = element_text(size = 10), 
                       axis.text.x = element_text(angle = 90, hjust = 1, size=12),
                       axis.text.y = element_text(size=9),
                       title = element_text(size=12),
                       axis.title.x = element_text(size=12),
+                      legend.text=element_text(size=9),
+                      #axis.title.x = element_blank(),
                       axis.title.y = element_text(size=12))
             if (nrow(curr_data) > 0) {gene_plot}
         }
@@ -131,11 +143,11 @@ server <- shinyServer(function(input, output, session) {
             browser()
         }
         
-        sras %>% filter(Tissue == input$tissue) %$% de[[SRA_ID]] %>% subset(ext_gene %in% curr_gene()) %>%  
-            arrange(-b, qval) %>%   
-            mutate(b=round(b, digits=2), qval=format(qval, scientific=TRUE, digits=3)) %>% 
-            dplyr::select(target_id, Comparison, b, qval) %>% #rearrange columns in desired order
-            dplyr::rename(`Transcript`=target_id, `Beta value`=b, `Q-value`=qval)
+        sras %>% filter(Tissue == input$tissue) %$% de[[SRA_ID]] %>% subset(gene_symbol %in% curr_gene()) %>%  
+            arrange(-log2FoldChange, padj) %>%   
+            mutate(log2FoldChange=round(log2FoldChange, digits=2), padj=format(padj, scientific=TRUE, digits=3)) %>% 
+            dplyr::select(Gene, Comparison,log2FoldChange, padj) %>% #rearrange columns in desired order
+            dplyr::rename(`Gene`= Gene, `LogFC`= log2FoldChange, `Q-value`= padj)
         #removed p-values from the table, since we had originally saved two of the datasets without p-values to save space
         
     }, options=list(paging=FALSE, searching=FALSE)
@@ -144,7 +156,7 @@ server <- shinyServer(function(input, output, session) {
     #R logo for user interface 
     output$logo <- renderImage({ 
       return(list(
-        src = "../databases/www/bigorb.png",
+        src = "/srv/shiny-server/databases/www/bigorb.png",
         height=38.7*1.5,
         width=42.7*1.5,
         filetype = "image/png",
