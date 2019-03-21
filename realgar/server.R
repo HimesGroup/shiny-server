@@ -109,6 +109,7 @@ server <- shinyServer(function(input, output, session) {
                                  snp_TAGC[which(snp_TAGC$snp==gsub(" ", "", tolower(current()), fixed=TRUE)), c("snp", "end", "symbol")])
             gene_locations_unique <- gene_locations[which(!duplicated(gene_locations$symbol)),]
             all_matches <- merge(all_matches, gene_locations_unique[,c("symbol", "start")], by="symbol")
+            print(all_matches)
             all_matches$dist <- abs(all_matches$start - all_matches$end) # here, "end" is snp position, "start" is gene start 
             unique(all_matches$symbol[which(all_matches$dist==min(all_matches$dist))]) # choose the gene symbol whose start is the smallest absolute distance away
         } else { 
@@ -284,7 +285,7 @@ server <- shinyServer(function(input, output, session) {
     })
     
     #Treatment
-    treatment_choices <- c("Beta-agonist treatment"="BA", "Phosphodiesterase inhibitor"="PDE", "Glucocorticoid treatment" = "GC", "Smoking"="smoking", "Vitamin D treatment"="vitD")
+    treatment_choices <- c("β2-agonist"="BA", "Phosphodiesterase inhibitor"="PDE", "Glucocorticoid" = "GC", "Smoking"="smoking", "Vitamin D"="vitD")
     
     observe({
         if(input$selectall_treatment == 0) return(NULL) 
@@ -779,7 +780,7 @@ server <- shinyServer(function(input, output, session) {
         
         forestplot(tabletext, title = title, tableplot, zero = 1, 
                    xlab = "Fold Change", boxsize = boxsize, col = fpColors(zero="black"), 
-                   lwd.ci = 2, xticks = xticks, colgap=unit(4,"mm"),
+                   lwd.ci = 2, xticks = xticks, colgap=unit(4,"mm"),graphwidth = unit(12, "cm") ,
                    is.summary = if (nrow(dat)>1) {c(TRUE,rep(FALSE,nrow(dat)-1),TRUE)} else {c(TRUE,rep(FALSE,nrow(dat)))}, 
                    # need if-else in case only one dataset selected - else it would look like a summary row
                    lineheight = unit(19.7/size_par, "cm"), mar = unit(c(5,0,0,5),"mm"), fn.ci_norm = color_fn,
@@ -895,7 +896,7 @@ server <- shinyServer(function(input, output, session) {
         #tfbs and snp tracks - only present for some genes
         
         #TFBS 
-        if (nrow(tfbs_subs) > 0) {tfbs_track <- Gviz::AnnotationTrack(tfbs_subs, name="GR binding", fill = tfbs_subs$color, col=NULL, feature = tfbs_subs$score, grid=TRUE, col.grid="darkgrey")}
+        if (nrow(tfbs_subs) > 0) {tfbs_track <- Gviz::AnnotationTrack(tfbs_subs, name="TF binding", fill = tfbs_subs$color, col=NULL, feature = tfbs_subs$score, grid=TRUE, col.grid="darkgrey")}
         
         # GRASP SNPs track
         if (nrow(snp_subs) > 0) { 
