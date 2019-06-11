@@ -30,7 +30,7 @@ source("/srv/shiny-server/realgar/utilities/name_convert.R")
 #Alldata_Info <- readRDS("/srv/shiny-server/databases/Microarray_data_infosheet_R.RDS")
 #Alldata_Info <- read_feather("/srv/shiny-server/databases/Microarray_data_infosheet_R.feather")
 
-Alldata_Info <- read_feather("/home/avantika/original/Microarray_data_infosheet_R.feather")
+Alldata_Info <- read_feather("/mnt/volume_nyc1_01/data/Microarray_data_infosheet_latest_R.feather")
 
 #then split off into gene expression and GWAS dataset info - else forest plot text columns get messed up
 GWAS_Dataset_Info <- Alldata_Info[which(Alldata_Info$App == "GWAS"),]
