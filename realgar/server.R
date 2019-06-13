@@ -11,6 +11,8 @@
 
 library(shiny)
 library(dplyr)
+library(ggplot2)
+library(cowplot)
 library(data.table)
 library(forestplot) 
 library(lattice)
@@ -26,7 +28,10 @@ source("/srv/shiny-server/realgar/utilities/name_convert.R")
 #
 # load descriptions of all gene expression and GWAS datasets
 #Alldata_Info <- readRDS("/srv/shiny-server/databases/Microarray_data_infosheet_R.RDS")
-Alldata_Info <- read_feather("/srv/shiny-server/databases/Microarray_data_infosheet_R.feather")
+#Alldata_Info <- read_feather("/srv/shiny-server/databases/Microarray_data_infosheet_R.feather")
+
+Alldata_Info <- read_feather("/mnt/volume_nyc1_01/data/Microarray_data_infosheet_latest_R.feather")
+
 #then split off into gene expression and GWAS dataset info - else forest plot text columns get messed up
 GWAS_Dataset_Info <- Alldata_Info[which(Alldata_Info$App == "GWAS"),]
 Dataset_Info <- Alldata_Info[which(!(Alldata_Info$App == "GWAS")),]
@@ -93,9 +98,9 @@ heatmap_colors <-  inferno # heatmap colors - used in p-value plot
 
 # server
 server <- shinyServer(function(input, output, session) {
-   all_genes <- unique(all_genes)
-   genes <- reactive({selectizeInput("current", "Official Gene Symbol or SNP ID:", all_genes, selected="GAPDH", width="185px", options = list(create = TRUE))})
-   output$genesAvail <- renderUI({genes()})
+   #all_genes <- unique(all_genes)
+   #genes <- reactive({selectizeInput("current", "Official Gene Symbol or SNP ID:", all_genes, selected="GAPDH", width="185px", options = list(create = TRUE))})
+   output$genesAvail <- renderUI({selectizeInput("current", "Official Gene Symbol or SNP ID:", all_genes, selected="GAPDH", width="185px", options = list(create = TRUE))})
    
    output$loadProxy <- renderUI({NULL})
    
@@ -128,8 +133,8 @@ server <- shinyServer(function(input, output, session) {
     #################################################################################
     
     #STissue
-    stissue_choices <-c("Airway smooth muscle"="ASM", "Bronchial epithelium"="BE","Bronchoalveolar lavage"="BAL",
-                        "Lens epithelium" = "LEC","Nasal epithelium"="NE","Small airway epithelium"="SAE","Whole lung"="Lung","Skeletal muscle myotubes"="myotubes")
+    stissue_choices <-c("Airway smooth muscle"="ASM", "Bronchial epithelium"="BE","Lens epithelium" = "LEC","BEAS-2B" = "BEAS-2B",
+                        "Nasal epithelium"="NE","Small airway epithelium"="SAE","Whole lung"="Lung","Skeletal muscle myotubes"="myotubes")
     
     output$STissue_options <- reactive({if("Structural" %in% input$Tissue){' '} else {NULL}})
     
@@ -146,9 +151,9 @@ server <- shinyServer(function(input, output, session) {
     
     #BTissue
     
-    btissue_choices <-c("CD4"="CD4", "CD8"="CD8", "MCF10A-Myc" = "MCF10A-Myc",
-                        "Lymphoblastoid cell" = "LCL","Macrophage" = "MACRO", 
-                        "Peripheral blood mononuclear cell"="PBMC","White blood cell"="WBC","Whole Blood"="Blood")
+    btissue_choices <-c("CD4"="CD4", "CD8"="CD8", "MCF10A-Myc" = "MCF10A-Myc","CD3" = "CD3",
+                        "Lymphoblastoid cell" = "LCL","Macrophage" = "MACRO",  
+                        "Peripheral blood mononuclear cell"="PBMC","White blood cell"="WBC","Whole blood"="Blood")
     
     output$BTissue_options <- reactive({if("Blood" %in% input$Tissue) {' '} else {NULL}})
     
@@ -222,70 +227,87 @@ server <- shinyServer(function(input, output, session) {
     #Disease types: Asthma types, COPD, Other
     
     #Asthma-Affection Status
-    asthma_choices <- c("Allergic asthma vs Healthy"="allergic_asthma", "Asthma vs Healthy"="asthma",
-                        "Fatal asthma vs Healthy"="fatal_asthma", "Mild to Moderate asthma vs Healthy"="mild_to_moderate", 
-                        "Severe asthma vs Healthy"="severe_asthma")
+    asthma_choices <- c("Allergic asthma vs healthy"="allergic_asthma", "Asthma vs healthy"="asthma",
+     "Fatal asthma vs healthy"="fatal_asthma", "Mild to moderate asthma vs healthy"="mild_to_moderate_asthma","Severe asthma vs healthy"="severe_asthma",
+     "Mild asthma with rhinitis vs healthy"="rhinitis_mild_asthma","Severe asthma with rhinitis vs healthy"="rhinitis_severe_asthma",
+     "Non-allergic asthma vs healthy"="non_allergic_asthma")
     
-    output$Asthma_options <- reactive({if("Asthma-Affection Status" %in% input$Asthma) {' '} else {NULL}})
-    
+    #output$Asthma_options <- reactive({if("Asthma-Affection Status" %in% input$Asthma) {' '} else {NULL}})
     
     observe({
       if(input$selectall_asthma == 0) return(NULL) 
       else if (input$selectall_asthma%%2 == 0) {
-        updateCheckboxGroupInput(session, "AsthmaAF", "", choices=asthma_choices, selected=asthma_choices)
-        updateActionButton(session, "selectall_asthma", label="Unselect all")
-      } else {
-        updateCheckboxGroupInput(session,"AsthmaAF","", choices=asthma_choices)
+        updateCheckboxGroupInput(session, "Asthma", label="Condition:", choices=asthma_choices)
         updateActionButton(session, "selectall_asthma", label="Select all")
+      }
+      else {
+        updateCheckboxGroupInput(session,"Asthma",label="Condition:", choices=asthma_choices, selected = asthma_choices)
+        updateActionButton(session, "selectall_asthma", label="Unselect all")
       }})
     
     
-    #Asthma-Endotypes
-    other_choices <- c("Asthma with Rhinitis vs Healthy"="asthma_and_rhinitis",
-                       "Non-Allergic vs Allergic Asthma"="non_allergic_asthma",
-                       "Obese Asthma vs Normal-weight Asthma"="obese_asthma")
-    
-    output$Other_options <- reactive({if("Asthma-Endotypes" %in% input$Asthma) {' '} else {NULL}})
-    
-    observe({
-      if(input$selectall_other == 0) return(NULL) 
-      else if (input$selectall_other%%2 == 0) {
-        updateCheckboxGroupInput(session, "Other", "", choices=other_choices, selected=other_choices)
-        updateActionButton(session, "selectall_other", label="Unselect all")
-      } else {
-        updateCheckboxGroupInput(session,"Other", "", choices=other_choices)
-        updateActionButton(session, "selectall_other", label="Select all")
-      }})
-    
-    #All Diseases
-    choices2 = c("Asthma-Affection Status","Asthma-Endotypes")
-    
-    observe({
-      if ("Asthma-Endotypes" %in% input$Asthma) {
-        #updatePickerInput(session, "Asthma", choices = choices2, selected = input$Asthma)
-        updateCheckboxGroupInput(session, "Other", "", choices=other_choices, selected=other_choices)
-        updateActionButton(session, "selectall_other", label="Unselect all")
-      } else {
-        #updatePickerInput(session, "Asthma", choices = choices2, selected = input$Asthma)
-        updateCheckboxGroupInput(session, "Other", "", choices=other_choices)
-        updateActionButton(session, "selectall_other", label="Select all")
-      }
-    })
-    
-    observe({
-      if ("Asthma-Affection Status" %in% input$Asthma) {
-        #updatePickerInput(session, "Asthma", choices = choices2, selected = input$Asthma)
-        updateCheckboxGroupInput(session, "AsthmaAF", "", choices=asthma_choices, selected=asthma_choices)
-        updateActionButton(session, "selectall_asthma", label="Unselect all")
-      } else {
-        #updatePickerInput(session, "Asthma", choices = choices2, selected = input$Asthma)
-        updateCheckboxGroupInput(session, "AsthmaAF", "", choices=asthma_choices)
-        updateActionButton(session, "selectall_asthma", label="Select all")
-      }
-    })
-    
+    # #Asthma-Affection Status
+    # asthma_choices <- c("Allergic asthma vs healthy"="allergic_asthma", "Asthma vs healthy"="asthma","Asthma with rhinitis vs healthy"="asthma_and_rhinitis",
+    #                     "Fatal asthma vs healthy"="fatal_asthma", "Mild to moderate asthma vs healthy"="mild_to_moderate","Severe asthma vs healthy"="severe_asthma")
+    # 
+    # output$Asthma_options <- reactive({if("Asthma-Endotypes" %in% input$Asthma) {' '} else {NULL}})
+    # 
+    # observe({
+    #   if(input$selectall_asthma == 0) return(NULL) 
+    #   else if (input$selectall_asthma%%2 == 0) {
+    #     updateCheckboxGroupInput(session, "AsthmaAF", "", choices=asthma_choices, selected=asthma_choices)
+    #     updateActionButton(session, "selectall_asthma", label="Unselect all")
+    #   } else {
+    #     updateCheckboxGroupInput(session,"AsthmaAF","", choices=asthma_choices)
+    #     updateActionButton(session, "selectall_asthma", label="Select all")
+    #   }})
+    # 
+    # 
+    # #Asthma-Endotypes
+    # other_choices <- c("Asthma vs healthy"="childhood_asthma","Severe asthma vs healthy"="childhood_severe_asthma","Mild asthma with rhinitis vs healthy"="childhood_rhinitis_mild_asthma",
+    #                    "Severe asthma with rhinitis vs healthy"="childhood_rhinitis_severe_asthma","Allergic asthma vs healthy"="childhood_allergic_asthma","Non-allergic asthma vs healthy"="childhood_non_allergic_asthma")
+    # 
+    # output$Other_options <- reactive({if("Childhood Asthma-Endotypes" %in% input$Asthma) {' '} else {NULL}})
+    # 
+    # observe({
+    #   if(input$selectall_other == 0) return(NULL) 
+    #   else if (input$selectall_other%%2 == 0) {
+    #     updateCheckboxGroupInput(session, "Other", "", choices=other_choices, selected=other_choices)
+    #     updateActionButton(session, "selectall_other", label="Unselect all")
+    #   } else {
+    #     updateCheckboxGroupInput(session,"Other", "", choices=other_choices)
+    #     updateActionButton(session, "selectall_other", label="Select all")
+    #   }})
+    # 
+    # #All Diseases
+    # choices2 = c("Adult Asthma-Endotypes","Childhood Asthma-Endotypes")
+    # 
+    # observe({
+    #   if ("Childhood Asthma-Endotypes" %in% input$Asthma) {
+    #     #updatePickerInput(session, "Asthma", choices = choices2, selected = input$Asthma)
+    #     updateCheckboxGroupInput(session, "Other", "", choices=other_choices, selected=other_choices)
+    #     updateActionButton(session, "selectall_other", label="Unselect all")
+    #   } else {
+    #     #updatePickerInput(session, "Asthma", choices = choices2, selected = input$Asthma)
+    #     updateCheckboxGroupInput(session, "Other", "", choices=other_choices)
+    #     updateActionButton(session, "selectall_other", label="Select all")
+    #   }
+    # })
+    # 
+    # observe({
+    #   if ("Asthma-Endotypes" %in% input$Asthma) {
+    #     #updatePickerInput(session, "Asthma", choices = choices2, selected = input$Asthma)
+    #     updateCheckboxGroupInput(session, "AsthmaAF", "", choices=asthma_choices, selected=asthma_choices)
+    #     updateActionButton(session, "selectall_asthma", label="Unselect all")
+    #   } else {
+    #     #updatePickerInput(session, "Asthma", choices = choices2, selected = input$Asthma)
+    #     updateCheckboxGroupInput(session, "AsthmaAF", "", choices=asthma_choices)
+    #     updateActionButton(session, "selectall_asthma", label="Select all")
+    #   }
+    # })
+    # 
     #Treatment
-    treatment_choices <- c("β2-agonist"="BA", "Phosphodiesterase inhibitor"="PDE", "Glucocorticoid" = "GC", "Smoking"="smoking", "Vitamin D"="vitD")
+    treatment_choices <- c("β2-agonist"="BA", "Phosphodiesterase inhibitor"="PDE","Smoking"="smoking", "Vitamin D"="vitD","Glucocorticoid" = "GC")
     
     observe({
         if(input$selectall_treatment == 0) return(NULL) 
@@ -336,12 +358,20 @@ server <- shinyServer(function(input, output, session) {
         #Dataset_Info2 = subset(Dataset_Info,(((Dataset_Info$Tissue %in% input$Tissue) | (Dataset_Info$Asthma %in% input$Treatment)) & Dataset_Info$App == "GC")) 
         ## Dataset_Info2 = subset(Dataset_Info, (((Dataset_Info$Tissue %in% input$Tissue) & ((Dataset_Info$Asthma %in% input$Treatment) | (Dataset_Info$App %in% input$Treatment)))))
         #Dataset_Info = rbind(Dataset_Info1, Dataset_Info2) # this separates GC and asthma data
-        Dataset_Info_Tissue = subset(Dataset_Info, Dataset_Info$Tissue %in% c(input$STissue,input$BTissue,input$CTissue)) 
-        Dataset_Info_Asthma = subset(Dataset_Info, Dataset_Info$Asthma %in% c(input$AsthmaAF,input$Other) | Dataset_Info$Asthma %in% input$Treatment)
+        Dataset_Info_Tissue = subset(Dataset_Info, Dataset_Info$Tissue %in% c(input$STissue,input$BTissue,input$CTissue))
+        
+        #To avoid selection of all tissues on getting an empty dataframe inspite of non-null selections
+        if(is.null(input$Asthma)| is.null(input$Status)){Dataset_Info_A = subset(Dataset_Info, Dataset_Info$Asthma %in% input$Asthma | Dataset_Info$Status %in% input$Status)}
+        else {Dataset_Info_A = subset(Dataset_Info, Dataset_Info$Asthma %in% input$Asthma & Dataset_Info$Status %in% input$Status)}
+        if(is.null(input$Treatment)| is.null(input$Experiment)){Dataset_Info_B = subset(Dataset_Info, Dataset_Info$Asthma %in% input$Treatment | Dataset_Info$Experiment %in% input$Experiment)}
+        else {Dataset_Info_B = subset(Dataset_Info, Dataset_Info$Asthma %in% input$Treatment & Dataset_Info$Experiment %in% input$Experiment)}
+       
+        Dataset_Info_Asthma = rbind(Dataset_Info_A,Dataset_Info_B)
+        
         if ((nrow(Dataset_Info_Tissue)==0)|(nrow(Dataset_Info_Asthma)==0)) {Dataset_Info1=rbind(Dataset_Info_Tissue,Dataset_Info_Asthma)}
         else {Dataset_Info1=subset(Dataset_Info_Tissue,Dataset_Info_Tissue$Unique_ID%in%Dataset_Info_Asthma$Unique_ID)}
         Dataset_Info1
-    })
+    }) %>% debounce(1000)
     
     # print out further available options based on the current selected items
     
@@ -354,18 +384,22 @@ server <- shinyServer(function(input, output, session) {
         sort(sapply(as.character(x),function(x){nameconvert(x)}))
       }
       
-      input_tissues = c(input$STissue,input$BTissue,input$CTissue)
-      input_asthma = c(input$AsthmaAF, input$Other)
+      input_tissues <- c(input$STissue,input$BTissue,input$CTissue)
+      #input_asthma <- reactive({c(input$Asthma, input$Status)})
+      #input_treatment <- reactive({c(input$Treatment,input$model)})
       
-      if (is.null(input_tissues)&is.null(input_asthma)&is.null(input$Treatment)) {text="Please select at least one data type"}
-      else if (is.null(input_tissues)&(!(is.null(input_asthma)&is.null(input$Treatment)))) {
-        avail_tissue=unique(Dataset_Info$Tissue[Dataset_Info$Asthma %in% input_asthma|Dataset_Info$Asthma %in% input$Treatment])
+      if (is.null(input_tissues)&is.null(input$Asthma)&is.null(input$Treatment)) {text="Please select at least one data type"}
+      #else if(!is.null(input$Asthma)&is.null(input$Status)) {text = "Please select atleast one age group."}
+      #else if(!is.null(input$Treatment)&is.null(input$Experiment)) {text = "Please select atleast one experiment design."}
+      else if (is.null(input_tissues)&(!(is.null(input$Asthma)&is.null(input$Treatment)))) {
+        avail_tissue=unique(Dataset_Info$Tissue[Dataset_Info$Asthma %in% input$Asthma & Dataset_Info$Status %in% input$Status | 
+                                                  Dataset_Info$Asthma %in% input$Treatment & Dataset_Info$Experiment %in% input$Experiment])
         avail_tissue_fullname <- convname_func(avail_tissue)
         text=paste0("Based on the asthma endotype(s) and/or treatment(s) selected, these tissue(s) are available: ", paste(avail_tissue_fullname,collapse=", "),".")
       }
-      else if ((!is.null(input_tissues))&(is.null(input_asthma)|is.null(input$Treatment))) {
+      else if ((!is.null(input_tissues))&(is.null(input$Asthma)|is.null(input$Treatment))) {
         avail_asthma=unique(Dataset_Info$Asthma[(Dataset_Info$Tissue %in% input_tissues)&(Dataset_Info$App == "asthma")])
-        avail_GC=unique(Dataset_Info$Asthma[(Dataset_Info$Tissue %in% input_asthma)&(Dataset_Info$App == "GC")])
+        avail_GC=unique(Dataset_Info$Asthma[(Dataset_Info$Tissue %in% input_tissues)&(Dataset_Info$App == "GC")])
         if (length(avail_asthma)>0) {avail_asthma_fullname <- convname_func(avail_asthma)} else {avail_asthma_fullname<-NULL}
         if (length(avail_GC)>0) {avail_GC_fullname <- convname_func(avail_GC)} else {avail_GC_fullname <- NULL}
         text=paste0("Based on the tissue(s) selected, these asthma endotype(s) and/or treatment(s) are available: ", paste(c(avail_asthma_fullname,avail_GC_fullname),collapse=", "),".")
@@ -373,6 +407,7 @@ server <- shinyServer(function(input, output, session) {
         text=""
       }
       text})
+    
     output$avail_choice = renderText(avail_text())
     
     # disable the notavailable function
@@ -512,12 +547,14 @@ server <- shinyServer(function(input, output, session) {
     ###################################
     
     # asthma
-    data_Asthma <- reactive({ output.tableforplot_asthma = output.tableforplot() 
+    data_Asthma <- reactive({ 
+    output.tableforplot_asthma = output.tableforplot() 
     output.tableforplot_asthma = output.tableforplot_asthma[output.tableforplot_asthma$App == "asthma",]
     output.tableforplot_asthma[rev(rownames(output.tableforplot_asthma)),]})
     
     # GC
-    data_GC <- reactive({ output.tableforplot_GC = output.tableforplot()
+    data_GC <- reactive({ 
+    output.tableforplot_GC = output.tableforplot()
     output.tableforplot_GC = output.tableforplot_GC[output.tableforplot_GC$App %in% c("GC", "BA", "smoking", "vitD","PDE"),]
     output.tableforplot_GC[rev(rownames(output.tableforplot_GC)),]})
     
@@ -658,8 +695,8 @@ server <- shinyServer(function(input, output, session) {
     
     # obtain intermediate asthma data for table output and forest plots
     data3_Asthma <- reactive({
-        interdata_func(data2_Asthma(),meta_Asthma())
-    })
+      interdata_func(data2_Asthma(),meta_Asthma())
+    }) 
     
     # output table for asthma
     tableforgraph_Asthma <- reactive({
@@ -676,8 +713,8 @@ server <- shinyServer(function(input, output, session) {
     
     # obtain intermediate GC data for table output and forest plots
     data3_GC <- reactive({
-        interdata_func(data2_GC(),meta_GC())
-    })
+      interdata_func(data2_GC(),meta_GC())
+    }) 
     
     # output table for GC
     tableforgraph_GC <- reactive({
@@ -699,118 +736,182 @@ server <- shinyServer(function(input, output, session) {
     
     # Function: "forestplot_func" 
     # Forest plots
-    
     forestplot_func <- function(dat) {
-        
-        validate(need(nrow(dat) != 0, "Please choose a dataset."))
-        
-        # select columns for forest plot text
-        if ("asthma"%in%dat$App) {
-            text_temp <- dat[,c("GEO_ID","Long_tissue_name","Asthma","Q Value")]
-        } else {
-            text_temp <- dat[,c("GEO_ID","Long_tissue_name","Treatment","Q Value")]
-        }
-        # create an empty dataset for forestplot text
-        tabletext <- data.frame(matrix(nrow=1, ncol=4))
-        # assign column names same as the original data
-        names(tabletext) <- names(text_temp)
-        # create first line for forestplot text
-        if ("asthma"%in%dat$App) {
-            tabletext[1,] <- c("GEO ID", "Tissue", "Endotype", "Q Value")
-        } else {
-            tabletext[1,] <- c("GEO ID", "Tissue", "Treatment", "Q Value")
-        }
-        # add text for individual study result
-        tabletext <- rbind(tabletext,text_temp)
-        
-        # convert all columns into character
-        tabletext <- tabletext %>% mutate_all(as.character)
-        
-        # assign variables to meta-analysis result row
-        if (nrow(dat)>1) {
-            tabletext[nrow(tabletext),c("GEO_ID")] <- ""
-            tabletext[nrow(tabletext),c("Long_tissue_name")] <- ""
-            tabletext[nrow(tabletext),3] <- "Effect size-based integration" # "Asthma" or "Treatment" is in column 3
-        }
-        
-        # remove double quote
-        options(useFancyQuotes = FALSE)
-        tabletext <- gsub('"', '', sapply(tabletext, dQuote))
-        
-        # table with fold changes for plot
-        tableplot <- rbind(c(NA,NA,NA,NA),dat[,c("Fold Change","Lower_bound_CI","Upper_bound_CI")])	
-        
-        # function to color forestplot lines and boxes by -log10 of adjusted pvalue - always relative to the max of 8
-        color_fn <- local({
-            i <- 0
-            breaks <- c(seq(0,8,by=0.001), Inf) # this sets max universally at 8 (else highest one OF THE SUBSET would be the max)
-            b_clrs <- l_clrs <- inferno(8002)[as.numeric(cut(dat$neglogofP, breaks = breaks))] #8002 is length(breaks) - ensures there are enough colors
-            
-            function(..., clr.line, clr.marker){
-                i <<- i + 1
-                fpDrawNormalCI(..., clr.line = l_clrs[i], clr.marker = b_clrs[i])
-            }
-        })
-        
-        xticks = seq(from = min(0.9, min(dat$Lower_bound_CI)), to = max(max(dat$Upper_bound_CI),1.2), length.out = 5)
-        
-        #hrzl_lines are borders between rows... made wide enough to be a background
-        size_par <- max(6, nrow(dat)) #else plot scaling messed up when fewer than 5 datasets selected
-        hrzl_lines <- vector("list", nrow(tabletext)+1)
-        # hrzl_lines[[2]] <- gpar(lwd=350/size_par, lineend="butt", columns=5, col="#BDB6B0")
-        for (i in setdiff(c(3:(length(hrzl_lines)-1)),c(1))) {hrzl_lines[[i]]  <- if(nrow(dat)==1) {
-            gpar(lwd=100, lineend="butt", columns=5, col="#BDB6B0")
-        } else {
-            gpar(lwd=1000/size_par, lineend="butt", columns=5, col="#BDB6B0")}
-        }
-        hrzl_lines[[1]] <- gpar(lwd=1000/size_par, lineend="butt", columns=5, col="#00FFFF00")   # #00FFFF00 is transparent - else plot background overlaps with title
-        hrzl_lines[[length(hrzl_lines)]] <- gpar(lwd=150/size_par, lineend="butt", columns=5, col="#ffffff")
-        
-        # adjust dot size based on sample size
-        if (nrow(dat)>1) {
-            total <- as.numeric(dat$Total)
-            boxsize=c(0,0.1*log10(total)) # 0 for the header line
-        } else {boxsize=0.2} # boxsize = 0.2 default
-        
-        if ("asthma"%in%dat$App) {
-            title <- paste0("Asthma vs. Non-asthma for ", curr_gene())
-        } else {
-            title <- paste0("Treatment vs. Control for ", curr_gene())
-        }
-        
-        forestplot(tabletext, title = title, tableplot, zero = 1, 
-                   xlab = "Fold Change", boxsize = boxsize, col = fpColors(zero="black"), 
-                   lwd.ci = 2, xticks = xticks, colgap=unit(4,"mm"),graphwidth = unit(12, "cm") ,
-                   is.summary = if (nrow(dat)>1) {c(TRUE,rep(FALSE,nrow(dat)-1),TRUE)} else {c(TRUE,rep(FALSE,nrow(dat)))}, 
-                   # need if-else in case only one dataset selected - else it would look like a summary row
-                   lineheight = unit(19.7/size_par, "cm"), mar = unit(c(5,0,0,5),"mm"), fn.ci_norm = color_fn,
-                   txt_gp = fpTxtGp(cex = 1.2, xlab = gpar(cex = 1.35), ticks = gpar(cex = 1.2), title = gpar(cex = 1.45)),
-                   hrzl_lines=hrzl_lines)
+      
+      validate(need(nrow(dat) != 0, "No entries available for your selections. Please choose other options.")) #Generate a error message when no data available for selected options.
+
+      # create an empty dataset for forestplot text
+      tabletext <- data.frame(matrix(nrow=1, ncol=4))
+      
+      if ("asthma"%in%dat$App) {
+        text_temp <- dat[,c("GEO_ID","Long_tissue_name","Asthma","Q Value")]
+      } else {
+        text_temp <- dat[,c("GEO_ID","Long_tissue_name","Treatment","Q Value")]
+      }
+      
+      # assign column names same as the original data
+      names(tabletext) <- names(text_temp) <- c("GEO_ID","Long_tissue_name","Condition","Q Value")
+      tabletext[1,] <- c("GEO ID", "Tissue", "Condition", "Q-Value")
+      
+      text_temp$GEO_ID <- as.character(text_temp$GEO_ID)
+      text_temp$Long_tissue_name <- as.character(text_temp$Long_tissue_name)
+      
+      # assign variables to meta-analysis result row
+      if (nrow(dat)>1) {
+        text_temp[nrow(dat),c("GEO_ID")] <- " "
+        text_temp[nrow(dat),c("Long_tissue_name")] <- " "
+        text_temp[nrow(dat),3] <- "Effect size-based integration =   " # "Asthma" or "Treatment" is in column 3
+      }
+      
+      #Change to factor
+      text_temp <- text_temp %>% mutate_all(as.factor)
+      
+      #List of alphabets - if forestplot gives overlap/height scaling error : add more combinations to list alphabets
+      mix = paste(letters,LETTERS)
+      alph1 = append(letters, LETTERS)
+      alphabets <- append(alph1,mix)
+      
+      #Text table
+      # add text for individual study result
+      tablevector <- as.vector(as.matrix(rbind(tabletext,text_temp)))
+      levels<-alphabets[1:(nrow(text_temp)+1)]
+      x<-levels
+      for (j in 1:(ncol(text_temp)-1)){x<-append(x,levels)}
+      table <- data.frame(V0 = factor(x, rev(levels)), V05 = rep(c(1,1.5,2.7,3.7),each=nrow(text_temp)+1),V1=tablevector)
+      
+      # remove double quote
+      options(useFancyQuotes = FALSE)
+      
+      
+      ##G1 plot1
+      g1 <- ggplot(table, aes(x = V05, y = V0, label = format(V1, nsmall = 1))) +
+        geom_text(size = 4.4, hjust=0, vjust=0.5,
+        fontface = ifelse(table$V1 %in% c("Effect size-based integration =   ","GEO ID","Tissue","Condition","Q-Value")|table$V1 == table$V1[nrow(table)], 2, 1)) + 
+        theme_bw() +
+        geom_segment(y=nrow(dat)+1.5,yend=nrow(dat)+1.5,x=1,xend=4.0) +
+        geom_segment(y=nrow(dat)+0.5,yend=nrow(dat)+0.5,x=1,xend=4.0) +
+        theme(panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank(),
+              panel.border = element_blank(),
+              axis.text.x = element_blank(),
+              axis.text.y = element_blank(),
+              axis.ticks = element_blank(),
+              plot.margin = unit(c(0, 0, 0, 0), "cm"), 
+              plot.title = element_text(size=20, hjust=0.5, vjust=0.5))+
+        labs(x="",y="") + #+ xlim(-0.5, 4) 
+        coord_cartesian(xlim=c(0, 3.8)) #1,4.5
+      
+      #Forest plot
+      # table with fold changes for plot
+      tableplot <- rbind(c(NA,NA,NA,NA),dat[,c("Fold Change","Lower_bound_CI","Upper_bound_CI")])	
+      no_of_values <- nrow(dat)+1
+      tableplot <- data.frame(sapply(tableplot, as.numeric))
+      tableplot$group <-table$V0[1:no_of_values]
+      
+      #X-ticks
+      xticks = seq(from = min(0.9, min(dat$Lower_bound_CI)), to = max(max(dat$Upper_bound_CI),1.2), length.out = 5)
+      
+      #Colors
+      library(viridis)
+      breaks <- c(seq(0,8,by=0.001), Inf) # this sets max universally at 8 (else highest one OF THE SUBSET would be the max)
+      b_clrs <- l_clrs <- inferno(8002)[as.numeric(cut(dat$neglogofP, breaks = breaks))] #8002 is length(breaks) - ensures there are enough colors
+      colors <- append(NA,b_clrs)
+      tableplot$neglogofP2 <- append(NA,dat$neglogofP)
+      
+      #Point
+      point<-c(NA)
+      if (nrow(dat)>1){
+        for (i in 2:(nrow(dat))){point<-append(point,15)}
+        point <- append(point,18)
+      }else{ point<-append(point,15)}
+      
+      #Box size
+      if (nrow(dat)>1) {
+        total <- as.numeric(dat$Total)
+        boxsize=c(0,2*log10(total)) # 0 for the header line
+      } else {boxsize=2} # boxsize = 2 default
+      
+      
+      #Theme
+      theme_set(theme_bw())
+      
+      theme_update(
+        axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_rect(fill="#BDB6B0"),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.x = element_text(size=16),
+        plot.margin = unit(c(0,0,0,0), "lines"),
+        axis.text=element_text(size=10)
+      )
+      
+      ##G2 Plot 2
+      g2 <- ggplot(tableplot,aes(Fold.Change,group)) + geom_point(aes(fill=neglogofP2),size=boxsize, shape=point, colour = colors, na.rm=TRUE)+
+        geom_errorbarh(aes(xmax = tableplot$Upper_bound_CI, xmin = tableplot$Lower_bound_CI), height = 0.15, colour=colors ,na.rm=TRUE) +
+        geom_vline(xintercept = 1, linetype = "longdash") + scale_x_continuous(breaks = xticks) + labs(x= "Fold Change",y="",fill="-log(Qvalue)") +
+        #guides(fill=FALSE)
+        scale_fill_gradientn(colours=inferno(8002),limits=c(0,8),breaks = seq(0,8)) + guides(fill = guide_colourbar(barheight = 10)) 
+      
+      #Legend size
+      if (nrow(dat) > 5) {g2 <- g2 + theme(legend.text = element_text(size=10),legend.title = element_text(size=14))}
+      else {g2 <- g2 + theme(legend.text = element_text(size=8),legend.title = element_text(size=12))}
+      
+      #Add title if specified  
+      title <- ggdraw() + draw_label(paste0("Transcriptomic Results for ", curr_gene()),fontface = 'bold')
+      
+      fplot <- plot_grid(g1,g2,ncol=2,rel_widths = c(2.3,1),align = "h") #rel_widths #align="h",axis="tblr",
+      plot_grid(title,fplot,ncol = 1, rel_heights = c(0.1, 1))
+      
+    }
+    
+    #1 PX = 0.0104166653543 in.
+    getHeight_func <- function(dat){
+      height=25 #27 optimum
+      height<- 150 + height*(abs(nrow(dat)-2)) #Title: 3x + pcomb object (5px) #110
+      return(height)
     }
     
     # asthma forestplot
     
+    getHeightAsthma <- reactive({
+      getHeight_func(data3_Asthma())
+    })
+    
     forestplot_asthma <- reactive({
         forestplot_func(data3_Asthma())
-    })
+    }) 
     
     # GC forestplot
     
-    forestplot_GC <- reactive({
-        forestplot_func(data3_GC())
+    getHeightGC <- reactive({
+      getHeight_func(data3_GC())
     })
     
-    output$forestplot_asthma = renderPlot({forestplot_asthma()}, height=650)
-    output$forestplot_GC = renderPlot({forestplot_GC()}, height=650)
+    forestplot_GC <- reactive({
+      forestplot_func(data3_GC())
+    }) 
     
-    output$color_scale1 <- output$color_scale2 <- renderImage({ #need two separate output names - else it fails (can't output same thing twice?)
-        return(list(
-            src = "/srv/shiny-server/databases/www/color_scale_vertical.png",
-            height=550,
-            width=59,
-            filetype = "image/png",
-            alt = "color_scale"))}, deleteFile = FALSE)
+    output$forestplot_asthma = renderPlot({forestplot_asthma()}, height=getHeightAsthma)
+    output$forestplot_GC = renderPlot({forestplot_GC()}, height=getHeightGC)
     
+    # output$color_scale1 <- output$color_scale2 <- renderImage({ #need two separate output names - else it fails (can't output same thing twice?)
+    #     return(list(
+    #         src = "/srv/shiny-server/databases/www/color_scale_vertical.png",
+    #         height=650, #550
+    #         width=59,
+    #         filetype = "image/png",
+    #         alt = "color_scale"))}, deleteFile = FALSE)
+    
+    output$color_scale1 <- renderImage({ 
+      return(list(
+        src = "/srv/shiny-server/databases/www/color_scale_horizontal.png",
+        height=109*1.05,
+        width=1015*1.05,
+        filetype = "image/png",
+        alt = "color_scale"))}, deleteFile = FALSE)
     
     ###############################
     ## Gene, SNP and TFBS tracks ##
