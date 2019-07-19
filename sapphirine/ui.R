@@ -1,3 +1,5 @@
+#.libPaths("/usr/local/lib/R/site-library/")
+
 library(shiny)
 library(lubridate)
 library(dplyr)
@@ -18,12 +20,12 @@ source("global.R")
 #Define user interface
 ui <- fluidPage(
   
-  titlePanel("Sensor-based Analysis of Polution in the Philadelphia Region (SAPPhiRe)"),
+  titlePanel("Sensor-based Analysis of Polution in the Philadelphia Region with Information on Neighborhoods and the Environment (SAPPhiRINE)"),
   
   fluidRow(
     
     column(12,
-           tags$p("SAPPhiRe is an interactive geospatial-analysis tool that allows users to visualize pollution data throughout Philadelphia as recorded by portable sensors.
+           tags$p("SAPPhiRINE is an interactive geospatial-analysis tool that allows users to visualize pollution data throughout Philadelphia as recorded by portable sensors.
                   We include data downloaded from Aircasting's CrowdMap, data downloaded from the PurpleAir website, and data collected independently with our own sensors."),
            tags$p("Adjust the parameters below to your desired values, then click \"Go\" to display the corresponding map.
                   On the map below, click on a bin to view the data corresponding to the region it encompasses as well as to your selected parameters.

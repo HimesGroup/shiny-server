@@ -1,4 +1,6 @@
-.libPaths("/home/rebecca/R/x86_64-pc-linux-gnu-library/3.4/")
+#.libPaths("/home/rebecca/R/x86_64-pc-linux-gnu-library/3.4/")
+.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/")
+
 library(leaflet)
 
 shinyUI(fluidPage(theme = "bootstrap.css",
