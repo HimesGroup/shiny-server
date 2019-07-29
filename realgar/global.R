@@ -61,6 +61,9 @@ Dataset_Info$PMID <- as.character(Dataset_Info$PMID) #else next line does not wo
 Dataset_Info[is.na(Dataset_Info$PMID), "PMID"] <- ""
 Dataset_Info$Report <- as.character(c("QC"))
 
+##BA_PDE dataset
+BA_PDE_Info <- Dataset_Info %>% dplyr::filter(Asthma == "BA_PDE")
+
 #load info for gene tracks: gene locations, TFBS, SNPs, etc.
 tfbs <- read_feather("/srv/shiny-server/databases/tfbs_for_app.feather") #TFBS data from ENCODE - matched to gene ids using bedtools
 snp <- read_feather("/srv/shiny-server/databases/grasp_output_for_app.feather") #SNP data from GRASP - matched to gene ids using bedtools
