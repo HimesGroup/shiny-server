@@ -68,7 +68,7 @@ colnames(weighted_current_varschd) <- c("MMSA", "YEAR", "CHD", "<$25,000", "$25,
 weighted_current_flushot_prev <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_Flushot_w_counts_leaflet.feather")
 weighted_current_flushot_prev$Flushot_percent <- weighted_current_flushot_prev$Flushot*100
 
-weighted_current_varsflushot <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_variables_flushot_leaflet.feather")
+weighted_current_varsflushot <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_variables_Flushot_leaflet.feather")
 colnames(weighted_current_varsflushot) <- c("MMSA", "YEAR", "Flushot", "<$25,000", "$25,000-$75,000", ">$75,000", 
                                         "Male", "Female", "White", "Asian/Pacific Islander",
                                         "Black", "Hispanic", "American Indian/Alaskan Native",
