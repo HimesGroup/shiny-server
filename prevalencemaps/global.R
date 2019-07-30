@@ -26,7 +26,7 @@ library(jtools)
 # location_min_sf <- st_as_sf(location_min, sf_column_name = )
 # st_write(location_min_sf, "C:/Users/llesz/Documents/diseasemaps/databases/location_min_sf.shp")
 #location_min_sf<-st_read("C:/Users/llesz/Documents/diseasemaps/databases/location_min_sf.shp")
-location_min_sf <- st_read("/srv/shiny-server/databases/prevalencemaps")
+location_min_sf <- st_read("/srv/shiny-server/databases/prevalencemaps/location_min_sf.shp")
 
 #getting names of MMSAs as options
 weighted_asthma_prev <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_asthma_w_counts_leaflet.feather")
