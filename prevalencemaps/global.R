@@ -35,7 +35,7 @@ matches <- match(mmsas$MMSA, location_min_sf$CBSAFP)
 namatches<-matches[!is.na(matches)]
 polynames <- as.character(location_min_sf[namatches,]$NAME)
 polynames_final <- data.frame(polynames[!is.na(polynames)])
-write_feather(polynames_final, "/srv/shiny-server/databases/prevalencemaps/mmsa_names.feather")
+#write_feather(polynames_final, "/srv/shiny-server/databases/prevalencemaps/mmsa_names.feather")
 mmsa_names <- read_feather("/srv/shiny-server/databases/prevalencemaps/mmsa_names.feather")
 mmsa_names$x <- as.character(mmsa_names$polynames..is.na.polynames..)
 polynamesnumbers<-cbind(mmsa_names, location_min_sf[namatches,]$CBSAFP)
