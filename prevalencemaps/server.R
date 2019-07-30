@@ -1,3 +1,6 @@
+.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/")
+source("/srv/shiny-server/prevalencemaps/global.R")
+
 function(input, output, clientData, session) {
   
   observe({
