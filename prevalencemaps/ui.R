@@ -1,3 +1,6 @@
+library(shiny)
+library(Widgets)
+library(shinydashboard)
 sidebar <- dashboardSidebar(
   sidebarMenu(id = "sidebarmenu",
     menuItem("Introduction", tabName = "Introduction", icon = icon("square")),
