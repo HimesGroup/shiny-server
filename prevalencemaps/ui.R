@@ -4,37 +4,38 @@ library(shinydashboard)
 sidebar <- dashboardSidebar(
   sidebarMenu(id = "sidebarmenu",
     menuItem("Introduction", tabName = "Introduction", icon = icon("square")),
-    menuItem("MMSA-Specific Input", tabName = "MMSA-Specific Input", icon = icon("square")),
-      conditionalPanel("input.sidebarmenu == 'MMSA-Specific Input'",
-                       selectInput("control_disease", "Condition of Interest:", 
-                                   choices=c("Asthma" = "Asthma","CHD" = "CHD", "Flushot"= "Flushot")),
-      
-                       selectInput("var", "Year:",
-                                   c("2007" = "2007", "2008" = "2008", "2009" = "2009",
-                                     "2010" = "2010", "2011" = "2011", "2012" = "2012",
-                                     "2013" = "2013", "2014" = "2014", "2015" = "2015",
-                                     "2016" = "2016", "2017" = "2017",
-                                     "2007-2017 (all years)" = "2007-2017 (all years)",
-                                     "2007-2010" = "2007-2010",
-                                     "2011-2017" = "2011-2017"), selected = "2007-2017 (all years)"),
-      
-                       selectInput("mmsa_input", "MMSA:",
-                                  choices = mmsa_names$x)),
     menuItem("Map of MMSA Data", tabName = "Map", icon = icon("square")),
     menuItem("MMSA-Specific Graphs", tabName = "MMSAGraph", icon = icon("square")),
     menuItem("US Bivariate Graphs", tabName = "Bivariate", icon = icon("square")),
-    menuItem("US Multivariate Graphs", tabName = "Multivariate", icon = icon("square"))
+    menuItem("US Multivariate Graphs", tabName = "Multivariate", icon = icon("square")),
+    menuItem("US Regional Graphs", tabName = "Regional", icon = icon("square"))
   )
 )
 
 body<-dashboardBody(
   tabItems(
     tabItem(tabName = "Introduction",
-                   includeHTML("/srv/shiny-server/databases/prevalencemaps/introprevalencemaps.html")
+                   includeHTML("C:/Users/llesz/Documents/diseasemaps/introprevalencemaps.html")
     ),
-    tabItem(tabName = "MMSA-Specific Input"
-            ),
     tabItem(tabName = "Map",
+            fluidRow(
+              column(4,
+                     selectInput("control_diseasemap", "Condition of Interest:", 
+                                 choices=c("Asthma" = "Asthma","CHD" = "CHD", "Flushot"= "Flushot"))
+                     ),
+              column(4,
+                     selectInput("varmap", "Year:",
+                                 c("2007" = "2007", "2008" = "2008", "2009" = "2009",
+                                   "2010" = "2010", "2011" = "2011", "2012" = "2012",
+                                   "2013" = "2013", "2014" = "2014", "2015" = "2015",
+                                   "2016" = "2016", "2017" = "2017",
+                                   "2007-2017 (all years)" = "2007-2017 (all years)",
+                                   "2007-2010" = "2007-2010",
+                                   "2011-2017" = "2011-2017"), selected = "2007-2017 (all years)")),
+              column(4,
+                     selectInput("mmsa_inputmap", "MMSA:",
+                                 choices = mmsa_names$x))
+            ),
             fluidRow(        
               column(12,
                      box(width=NULL,
@@ -45,6 +46,24 @@ body<-dashboardBody(
                      ))
             )),
     tabItem(tabName = "MMSAGraph",
+            fluidRow(
+              column(4,
+                     selectInput("control_disease", "Condition of Interest:", 
+                                 choices=c("Asthma" = "Asthma","CHD" = "CHD", "Flushot"= "Flushot"))
+              ),
+              column(4,
+                     selectInput("var", "Year:",
+                                 c("2007" = "2007", "2008" = "2008", "2009" = "2009",
+                                   "2010" = "2010", "2011" = "2011", "2012" = "2012",
+                                   "2013" = "2013", "2014" = "2014", "2015" = "2015",
+                                   "2016" = "2016", "2017" = "2017",
+                                   "2007-2017 (all years)" = "2007-2017 (all years)",
+                                   "2007-2010" = "2007-2010",
+                                   "2011-2017" = "2011-2017"), selected = "2007-2017 (all years)")),
+              column(4,
+                     selectInput("mmsa_input", "MMSA:",
+                                 choices = mmsa_names$x))
+            ),
             fluidRow(
               column(12,
                      h5(textOutput("graphinfo"), align="center"))
@@ -67,7 +86,7 @@ body<-dashboardBody(
               ))),
     tabItem(tabName = "Bivariate",
             fluidRow(
-              box(width=6, height = 350, h2("Bivariate Relationships"),
+              box(width=5, height = 350, h2("Bivariate Relationships"),
                   selectInput("control_disease2",
                               "Condition of Interest:",
                               choices=c("Asthma" = "Asthma","CHD" = "CHD", "Flushot"= "Flushot")
@@ -78,16 +97,16 @@ body<-dashboardBody(
                   selectInput("variableyear1", "Years:",
                               choices=c("2007-2017"="2007_2017","2007-2010"="2007_2010","2011-2017"="2011_2017"))
                   ),
-              box(width=6,
+              box(width=7,
                   plotOutput("graph", height = 350))
             ),
             fluidRow(
               box(width=12,h4("Regression Output with Odds Ratios"),
-                  verbatimTextOutput("summary"))
+                  tableOutput("summary"))
             )),
     tabItem(tabName = "Multivariate",        
     fluidRow(
-              box(width=6,height = 400,h2("Multivariable Relationships"),
+              box(width=5,height = 400,h2("Multivariable Relationships"),
                   selectInput("control_disease3",
                               "Condition of Interest:",
                               choices=c("Asthma" = "Asthma","CHD" = "CHD", "Flushot"= "Flushot")),
@@ -100,15 +119,32 @@ body<-dashboardBody(
                   selectInput("variableyear2", "Years:",
                               choices=c("2007-2017"="2007_2017","2007-2010"="2007_2010","2011-2017"="2011_2017"))
                   ),
-              box(width=6,
+              box(width=7,
                   plotOutput("multigraph", height=400))
               ),
     fluidRow(
       box(width=12,
           h4("Regression Output with Odds Ratios"),
-          verbatimTextOutput("summarymulti"))
+          tableOutput("summarymulti"))
     )
-            )
+            ),
+    tabItem(tabName = "Regional",
+            fluidRow(
+              box(width=5,h2("Relationships Across Regions"),
+                  selectInput("control_disease4",
+                              "Condition of Interest:",
+                              choices=c("Asthma" = "Asthma", "CHD" = "CHD", "Flushot"= "Flushot")),
+                  selectInput("variable2",
+                              "Variable of Interest:",
+                              choices=c("BMI"="BMI","Smoker"="Smoker","Education"="Education","Income"="Income",
+                                        "Race"="Race")),
+                  selectInput("variableyear3", "Years:",
+                              choices=c("2007-2017"="2007_2017","2007-2010"="2007_2010","2011-2017"="2011_2017"))
+              
+                  ),
+                box(width=7,
+                    plotOutput("regiongraph"))
+            ))
     )
 )
   
