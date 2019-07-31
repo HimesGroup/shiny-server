@@ -45,7 +45,7 @@ function(input, output, clientData, session) {
     )
     
     brfss_year <- reactive({
-      switch(paste(input$control_disease,input$var,sep=" "),
+      switch(paste(input$control_diseasemap,input$varmap,sep=" "),
              "Asthma 2007" = filter(weighted_current_asthma_prev, YEAR==paste(input$var)),
              "Asthma 2008" = filter(weighted_current_asthma_prev, YEAR==paste(input$var)),
              "Asthma 2009" = filter(weighted_current_asthma_prev, YEAR==paste(input$var)),
@@ -142,7 +142,7 @@ function(input, output, clientData, session) {
     
     #making the map
     output$map <- renderLeaflet({
-      percent_map(brfss_year(), c_dis)
+      percent_map(brfss_year(), input$control_diseasemap)
     })
     
     observe({
@@ -188,6 +188,25 @@ function(input, output, clientData, session) {
     }
     })
     
+    #making the regional graph
+    des.year3 <- reactive ({ if(input$variableyear3=="2007_2017"){
+      des2007_2017
+    } else if (input$variableyear3=="2007_2010"){
+      des2007_2010
+    } else {
+      des2011_2017
+    }
+    })
+    
+    current.all.year3 <- reactive ({ if(input$variableyear3=="2007_2017"){
+      current.all2007_2017
+    } else if (input$variableyear3=="2007_2010"){
+      current.all2007_2010
+    } else {
+      current.all2011_2017
+    }
+    })
+    
     #Multivariate
     output$multigraph <- renderPlot({ current.all.year2() %>% 
       filter(!is.na(BMI)) %>%
@@ -201,7 +220,7 @@ function(input, output, clientData, session) {
       theme(axis.ticks.x = element_blank())
     })
     
-      output$summarymulti <- renderPrint ({ 
+      mm <- reactive ({ 
         fit <- svyglm(as.formula(paste(input$control_disease3,"~",input$factors,"*",
                     input$multivariable)), design=des.year2(), family=binomial(), 
                     data=current.all.year2())
@@ -210,6 +229,11 @@ function(input, output, clientData, session) {
         mm<-e[-1,-3]
         mm
       })
+      
+      output$summarymulti <- renderTable( 
+        mm(),
+        striped=TRUE, rownames=TRUE, colnames=TRUE
+      )
       
     #Bivariate
     f.c_dis2<-as.factor(input$control_disease2)
@@ -224,16 +248,33 @@ function(input, output, clientData, session) {
       theme(axis.text.x=element_text(hjust=1))
     })
     
-    output$summary <- renderPrint({ 
-      fit <- svyglm(reformulate(input$variable,input$control_disease2), 
-                    design=des.year(), family=binomial(), 
-                    data=current.all.year()) 
-      jz<-summ(fit, exp=TRUE)
-      truth<-jz$coeftable
-      b<-truth[-1,-3]
-      b   
+    b<-reactive({
+        jz <- summ(svyglm(as.formula(paste(input$control_disease2,"~",input$variable)), 
+                      design=des.year(), family=binomial(), 
+                      data=current.all.year()), exp=TRUE)
+        truth<-jz$coeftable[-1,-3]
+        truth
     })
-      
+    
+    output$summary <- renderTable( 
+      b(),
+      striped=TRUE, rownames=TRUE, colnames=TRUE
+    )
+    
+    #Regionality
+    output$regiongraph <- renderPlot ({ current.all.year3() %>% 
+        filter(!is.na(BMI)) %>%
+        filter(!is.na(Region)) %>%
+        ggplot(aes_string(x=paste(input$control_disease4), fill=(paste(input$variable2)), weights = "MMSAWT")) + 
+        scale_x_discrete(paste(input$control_disease4)) +
+        facet_grid(rows="Region") +
+        ggtitle(paste(input$control_disease4, "Prevalence Across U.S Regions")) +
+        scale_fill_discrete(name=paste(input$variable2)) + 
+        theme(axis.text.x=element_text(hjust=1)) + ylab("") +
+        geom_bar(position="fill") +
+        theme(axis.text.x=element_text(hjust=1))
+    })
+    
     #making the plots
     mmsa.click <- reactive ({
       as.character(mmsa_names[match(input$mmsa_input, 
