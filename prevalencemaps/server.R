@@ -45,7 +45,7 @@ function(input, output, clientData, session) {
     )
     
     brfss_year <- reactive({
-      switch(paste(input$control_diseasemap,input$varmap,sep=" "),
+      switch(paste(input$control_disease,input$var,sep=" "),
              "Asthma 2007" = filter(weighted_current_asthma_prev, YEAR==paste(input$var)),
              "Asthma 2008" = filter(weighted_current_asthma_prev, YEAR==paste(input$var)),
              "Asthma 2009" = filter(weighted_current_asthma_prev, YEAR==paste(input$var)),
@@ -142,24 +142,15 @@ function(input, output, clientData, session) {
     
     #making the map
     output$map <- renderLeaflet({
-      percent_map(brfss_year(), input$control_diseasemap)
+      percent_map(brfss_year(), c_dis)
     })
-    
+    gc()
     observe({
       input$reset_button
       leafletProxy("map") %>% setView(lat = 39, lng = -94, zoom = 3)
     })
     
     #making the bivariate graph
-    des.year <- reactive ({ if(input$variableyear1=="2007_2017"){
-      des2007_2017
-    } else if (input$variableyear1=="2007_2010"){
-      des2007_2010
-    } else {
-      des2011_2017
-    }
-    })
-    
     current.all.year <- reactive ({ if(input$variableyear1=="2007_2017"){
       current.all2007_2017
     } else if (input$variableyear1=="2007_2010"){
@@ -170,15 +161,6 @@ function(input, output, clientData, session) {
     })
     
     #making the multivariate graph
-    des.year2 <- reactive ({ if(input$variableyear2=="2007_2017"){
-      des2007_2017
-    } else if (input$variableyear2=="2007_2010"){
-      des2007_2010
-    } else {
-      des2011_2017
-    }
-    })
-    
     current.all.year2 <- reactive ({ if(input$variableyear2=="2007_2017"){
       current.all2007_2017
     } else if (input$variableyear2=="2007_2010"){
@@ -189,15 +171,6 @@ function(input, output, clientData, session) {
     })
     
     #making the regional graph
-    des.year3 <- reactive ({ if(input$variableyear3=="2007_2017"){
-      des2007_2017
-    } else if (input$variableyear3=="2007_2010"){
-      des2007_2010
-    } else {
-      des2011_2017
-    }
-    })
-    
     current.all.year3 <- reactive ({ if(input$variableyear3=="2007_2017"){
       current.all2007_2017
     } else if (input$variableyear3=="2007_2010"){
@@ -219,21 +192,21 @@ function(input, output, clientData, session) {
       theme(axis.text.x=element_text(hjust=1)) + ylab("") +
       theme(axis.ticks.x = element_blank())
     })
-    
-      mm <- reactive ({ 
-        fit <- svyglm(as.formula(paste(input$control_disease3,"~",input$factors,"*",
-                    input$multivariable)), design=des.year2(), family=binomial(), 
-                    data=current.all.year2())
-        k<-summ(fit, exp=TRUE)
-        e<-k$coeftable
-        mm<-e[-1,-3]
-        mm
-      })
+    gc()
+     # mm <- reactive ({ 
+      #  fit <- svyglm(as.formula(paste(input$control_disease3,"~",input$factors,"*",
+       #             input$multivariable)), design=des.year2(), family=binomial(), 
+        #            data=current.all.year2())
+      #  k<-summ(fit, exp=TRUE)
+      #  e<-k$coeftable
+      #  mm<-e[-1,-3]
+      #  mm
+      #})
       
-      output$summarymulti <- renderTable( 
-        mm(),
-        striped=TRUE, rownames=TRUE, colnames=TRUE
-      )
+      #output$summarymulti <- renderTable( 
+      #  mm(),
+      #  striped=TRUE, rownames=TRUE, colnames=TRUE
+      #)
       
     #Bivariate
     f.c_dis2<-as.factor(input$control_disease2)
@@ -247,19 +220,19 @@ function(input, output, clientData, session) {
       geom_bar( position="fill") +
       theme(axis.text.x=element_text(hjust=1))
     })
+  gc()
+ #   b<-reactive({
+ #       jz <- summ(svyglm(as.formula(paste(input$control_disease2,"~",input$variable)), 
+ #                     design=des.year(), family=binomial(), 
+ #                     data=current.all.year()), exp=TRUE)
+ #       truth<-jz$coeftable[-1,-3]
+ #       truth
+  #  })
     
-    b<-reactive({
-        jz <- summ(svyglm(as.formula(paste(input$control_disease2,"~",input$variable)), 
-                      design=des.year(), family=binomial(), 
-                      data=current.all.year()), exp=TRUE)
-        truth<-jz$coeftable[-1,-3]
-        truth
-    })
-    
-    output$summary <- renderTable( 
-      b(),
-      striped=TRUE, rownames=TRUE, colnames=TRUE
-    )
+ #   output$summary <- renderTable( 
+ #     b(),
+ #     striped=TRUE, rownames=TRUE, colnames=TRUE
+ #   )
     
     #Regionality
     output$regiongraph <- renderPlot ({ current.all.year3() %>% 
@@ -274,7 +247,7 @@ function(input, output, clientData, session) {
         geom_bar(position="fill") +
         theme(axis.text.x=element_text(hjust=1))
     })
-    
+   gc()
     #making the plots
     mmsa.click <- reactive ({
       as.character(mmsa_names[match(input$mmsa_input, 
@@ -289,7 +262,7 @@ function(input, output, clientData, session) {
     
       
       disease_percent_raw <- reactive ({ if( length(mmsas.click())==1 & !is.na(mmsas.click()) ) 
-        return(brfss_year()[which(brfss_year()$MMSA == as.numeric(paste(mmsas.click()))), 5]) 
+        return(brfss_year()[which(brfss_year()$MMSA == as.numeric(paste(mmsas.click()[[1]]))), 5]) 
         return("") })
       
       disease_percent <- reactive ({ if(paste(disease_percent_raw())!="numeric(0)") return(paste0(as.character(round(disease_percent_raw(), 2)), "%"))
@@ -298,7 +271,7 @@ function(input, output, clientData, session) {
 
     sample_size <- reactive({ ifelse(!is.null(mmsas.click()) & !is.na(mmsas.click()), paste0(" (N = ", formatC(brfss_year()[match(mmsas.click(), brfss_year()$MMSA), "count"], format = "d", big.mark=","), ")"), "") })
 
-      output$info <- renderText({ if(length(mmsa.click()) == 1 & (disease_percent()) != "")  
+      output$mapinfo <- renderText({ if(length(mmsa.click()) == 1 & (disease_percent()) != "")  
         paste0("Weighted ", c_dis, " Prevalence in ", input$mmsa_input, " in ", input$var,": ", disease_percent(), sample_size()) 
        else if (!is.na(mmsa.click())) paste0( mmsa.click() , ": No data for this MMSA/year") 
        else  
@@ -313,7 +286,7 @@ function(input, output, clientData, session) {
             paste0("") })
       
   
-    mmsa_yearly_dat <- reactive ({ if(!is.null(as.numeric(paste(mmsas.click())))) return(full_dat()[which(full_dat()$MMSA == as.numeric(paste(mmsas.click()))),]) else return(data.frame(0)) })
+    mmsa_yearly_dat <- reactive ({ if(!is.na(as.numeric(paste(mmsas.click()[[1]])))) return(full_dat()[which(full_dat()$MMSA == as.numeric(paste(mmsas.click()[[1]]))),]) else return(data.frame(0)) })
 
       bmi <- reactive({ melt(select(mmsa_yearly_dat(), 3, 14, 15, 16, 17), id.vars=c_dis) })
       race <- reactive({ melt(select(mmsa_yearly_dat(), 3, 9, 10, 11, 12, 13), id.vars=c_dis) })

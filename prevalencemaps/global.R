@@ -50,7 +50,7 @@ colnames(weighted_current_varschd) <- c("MMSA", "YEAR", "CHD", "<$25,000", "$25,
 weighted_current_flushot_prev <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_Flushot_w_counts_leaflet.feather")
 weighted_current_flushot_prev$Flushot_percent <- weighted_current_flushot_prev$Flushot*100
 
-weighted_current_varsflushot <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_variables_flushot_leaflet.feather")
+weighted_current_varsflushot <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_variables_Flushot_leaflet.feather")
 colnames(weighted_current_varsflushot) <- c("MMSA", "YEAR", "Flushot", "<$25,000", "$25,000-$75,000", ">$75,000", 
                                             "Male", "Female", "White", "Asian/Pacific Islander",
                                             "Black", "Hispanic", "American Indian/Alaskan Native",
@@ -59,11 +59,7 @@ colnames(weighted_current_varsflushot) <- c("MMSA", "YEAR", "Flushot", "<$25,000
                                             "Less than high school", "High school", "Some college or more",
                                             "18-24", "25-34", "35-44", "45-54", "55-64", "65+")
 
-current.all<-read_feather("/srv/shiny-server/databases/prevalencemaps/current_all.feather")
-current.all2007_2017<-read_feather("/srv/shiny-server/databases/prevalencemaps/current_all2007_2017.feather")
-current.all2007_2010<-read_feather("/srv/shiny-server/databases/prevalencemaps/current_all2007_2010.feather")
-current.all2011_2017<-read_feather("/srv/shiny-server/databases/prevalencemaps/current_all2011_2017.feather")
-
-des2007_2017<-readRDS("/srv/shiny-server/databases/prevalencemaps/des2007_2017.rds")
-des2007_2010<-readRDS("/srv/shiny-server/databases/prevalencemaps/des2007_2010.rds")
-des2011_2017<-readRDS("/srv/shiny-server/databases/prevalencemaps/des2011_2017.rds")
+current.all<-readRDS("/srv/shiny-server/databases/prevalencemaps/current_all.RDS")
+current.all2007_2017<-readRDS("/srv/shiny-server/databases/prevalencemaps/current_all2007_2017.RDS")
+current.all2007_2010<-readRDS("/srv/shiny-server/databases/prevalencemaps/current_all2007_2010.RDS")
+current.all2011_2017<-readRDS("/srv/shiny-server/databases/prevalencemaps/current_all2011_2017.RDS")
