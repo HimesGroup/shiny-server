@@ -19,8 +19,9 @@ shinyUI(fluidPage(theme = "bootstrap.css",
                   headerPanel("Pollution-Associated Risk Geospatial Analysis SITE (PARGASITE)"
                   ),
                   mainPanel(
-                    leafletOutput("map", width = "100%"),
+                    leafletOutput("map", width = "100%",height= 600),
                     p("Data source: United States Environmental Protection Agency (EPA). <aqs.epa.gov/aqsweb/airdata.download_files.html>")),
+                    
                   br(),
                   sidebarPanel(
                     h4("Map View"),
@@ -37,7 +38,7 @@ shinyUI(fluidPage(theme = "bootstrap.css",
                     p(textOutput("notes")),
                     h5(textOutput("latlong")),
                     h5(textOutput("pollutant_val")),
-                    br(),
+                    hr(),
                     h4("Upload dataset to get corresponding pollution estimates"),
                     p("The file returned will have a column for each pollutant; the value will be an average of monthly estimates over the specified time period."),
                     fluidRow(
@@ -64,11 +65,14 @@ shinyUI(fluidPage(theme = "bootstrap.css",
                                                choices = c("2005":"2017"),
                                                selected = "2015",
                                                multiple = FALSE))),
-                    fileInput("user_file", "Choose .csv file with Latitude and Longitude columns",
+                    h5(p("Choose .csv file with Latitude and Longitude columns. A sample input file can be downloaded",downloadLink("downloadData", "here."))),
+                    fileInput("user_file", " ",
                               multiple = FALSE,
                               accept = c("text/csv",
                                          "text/comma-separated-values,
                                          text/plain",
                                          ".csv")),
-                    downloadButton("finalDownload", "Download"))
+                    downloadButton("finalDownload", "Download"),hr(),
+                    h6(p("Greenblatt RE, Himes BE. Facilitating Inclusion of Geocoded Pollution Data into Health Studies. AMIA Jt Summits Transl Sci Proc. 2019;2019:553–561.(PMID:",
+                       a("31259010",href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6568125/",target="_blank"),").", a("GITHUB",href="https://github.com/HimesGroup/pargasite",target="_blank")," repository.")))
 ))
