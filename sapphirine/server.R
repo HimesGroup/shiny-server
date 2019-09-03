@@ -304,6 +304,8 @@ server <- function(input, output, session){
     })
   })
   
+  #Measurement selected - reactive element
+  measure <- reactive({input$int.map_groups[[2]]})
   
   observeEvent(input$int.map_groups, {
     
@@ -311,102 +313,96 @@ server <- function(input, output, session){
       clearControls() %>%
       removeMarker(c("null1", "null2", "null3")) %>%
       clearPopups()
-
+    
     if("Measurement value" %in% input$int.map_groups && !"Measurement density" %in% input$int.map_groups){
       
-      for(i in c(4, 1:3, 5:length(all.measures))){ #Ensures that default is PM2.5, the 4th item
+      suffix <- f.suffix(measure())
+      map.layer <- eval(parse(text = paste0("map.layer", suffix)))
+      legend.title <- toString(f.titles(measure()))
+      
+      if(measure() %in% all.measures){
         
-        suffix <- f.suffix(all.measures[i])
-        map.layer <- eval(parse(text = paste0("map.layer", suffix)))
-        legend.title <- toString(f.titles(all.measures[i]))
+        if(all(is.na(values(map.layer)))){
+          map %>%
+            clearImages() %>%
+            addLabelOnlyMarkers(
+              lng = -75.15, lat = 40.00,
+              label = "No data",
+              layerId = "null1",
+              labelOptions = labelOptions(noHide = TRUE,
+                                          style = list(
+                                            "color" = "red",
+                                            "font-size" = "20px",
+                                            "font-family" = "serif",
+                                            "border-color" = "rgba(0,0,0,1)"
+                                          )))
+        }
         
-        if(all.measures[i] %in% input$int.map_groups){
+        else{
           
-          if(all(is.na(values(map.layer)))){
-            map %>%
-              clearImages() %>%
-              addLabelOnlyMarkers(
-                lng = -75.15, lat = 40.00,
-                label = "No data",
-                layerId = "null1",
-                labelOptions = labelOptions(noHide = TRUE,
-                                            style = list(
-                                              "color" = "red",
-                                              "font-size" = "20px",
-                                              "font-family" = "serif",
-                                              "border-color" = "rgba(0,0,0,1)"
-                                            )))
-          }
+          pal <- eval(parse(text = paste0("pal", suffix)))
+          leg.pal <- eval(parse(text = paste0("leg.pal", suffix)))
+          vals <- values(map.layer)
+          vals <- c(0, vals, f.top(max(vals, na.rm = TRUE)))
           
-          else{
-            
-            pal <- eval(parse(text = paste0("pal", suffix)))
-            leg.pal <- eval(parse(text = paste0("leg.pal", suffix)))
-            vals <- values(map.layer)
-            vals <- c(0, vals, f.top(max(vals, na.rm = TRUE)))
-            
-            map %>%
-              clearImages() %>%
-              removeMarker("null1") %>%
-              addRasterImage(map.layer, colors = pal, opacity = 0.8, method = "ngb") %>%
-              addLegend(pal = leg.pal, values = vals, opacity = 1,
-                        title = legend.title, position = "topright",
-                        labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))) %>%
-              showGroup(c(all.measures[i], "Measurement value")) %>%
-              hideGroup(c(all.measures[which(all.measures != all.measures[i])], "Measurement density"))
-          }
+          map %>%
+            clearImages() %>%
+            removeMarker("null1") %>%
+            addRasterImage(map.layer, colors = pal, opacity = 0.8, method = "ngb") %>%
+            addLegend(pal = leg.pal, values = vals, opacity = 1,
+                      title = legend.title, position = "topright",
+                      labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))) %>%
+            showGroup(c(input$int.map_groups, "Measurement value")) %>%
+            hideGroup(c(all.measures[which(all.measures != measure())], "Measurement density"))
         }
       }
+      #}
     }
     
     else if("Measurement density" %in% input$int.map_groups && !"Measurement value" %in% input$int.map_groups){
       
-      for(i in c(4, 1:3, 5:length(sensor.measures))){
+      if(measure() %in% sensor.measures){
         
-        suffix <- f.suffix(sensor.measures[i])
+        suffix <- f.suffix(measure())
         map.layer <- eval(parse(text = paste0("map.layer", suffix, ".dlog")))
-        legend.title <- toString(f.titles.d(sensor.measures[i]))
+        legend.title <- toString(f.titles.d(measure()))
         
-        if(sensor.measures[i] %in% input$int.map_groups){
-          
-          if(all(is.na(values(map.layer)))){
-            map %>%
-              clearImages() %>%
-              addLabelOnlyMarkers(
-                lng = -75.15, lat = 40.00,
-                label = "No data",
-                layerId = "null1",
-                labelOptions = labelOptions(noHide = TRUE,
-                                            style = list(
-                                              "color" = "red",
-                                              "font-size" = "20px",
-                                              "font-family" = "serif",
-                                              "border-color" = "rgba(0,0,0,1)"
-                                            )))
-          }
-          
-          else{
-            
-            pal <- eval(parse(text = paste0("pal", suffix, ".d")))
-            leg.pal <- eval(parse(text = paste0("leg.pal", suffix, ".d")))
-            vals <- values(map.layer)
-            vals <- c(0, vals, f.top(max(vals, na.rm = TRUE)))
-            
-            map %>%
-              clearImages() %>%
-              removeMarker("null1") %>%
-              addRasterImage(map.layer, colors = pal, opacity = 0.8, method = "ngb") %>%
-              addLegend(pal = leg.pal, values = vals, opacity = 1,
-                        title = legend.title, position = "topright",
-                        labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))) %>%
-              showGroup(c(sensor.measures[i], "Measurement density")) %>%
-              hideGroup(c(all.measures[which(all.measures != all.measures[i])], "Measurement value"))
-          }
+        if(all(is.na(values(map.layer)))){
+          map %>%
+            clearImages() %>%
+            addLabelOnlyMarkers(
+              lng = -75.15, lat = 40.00,
+              label = "No data",
+              layerId = "null1",
+              labelOptions = labelOptions(noHide = TRUE,
+                                          style = list(
+                                            "color" = "red",
+                                            "font-size" = "20px",
+                                            "font-family" = "serif",
+                                            "border-color" = "rgba(0,0,0,1)"
+                                          )))
         }
-      }
-      
-      if("Crime" %in% input$int.map_groups || "Poverty" %in% input$int.map_groups || 
-         "Traffic" %in% input$int.map_groups){
+        
+        else{
+          
+          pal <- eval(parse(text = paste0("pal", suffix, ".d")))
+          leg.pal <- eval(parse(text = paste0("leg.pal", suffix, ".d")))
+          vals <- values(map.layer)
+          vals <- c(0, vals, f.top(max(vals, na.rm = TRUE)))
+          
+          map %>%
+            clearImages() %>%
+            removeMarker("null1") %>%
+            addRasterImage(map.layer, colors = pal, opacity = 0.8, method = "ngb") %>%
+            addLegend(pal = leg.pal, values = vals, opacity = 1,
+                      title = legend.title, position = "topright",
+                      labFormat = labelFormat(transform = function(x) sort(x, decreasing = TRUE))) %>%
+            showGroup(c(measure(), "Measurement density")) %>%
+            hideGroup(c(all.measures[which(all.measures != measure())], "Measurement value"))
+        }
+        
+        #Check for crime, poverty and traffic
+      } else if(measure() %in% other.measures){ 
         map %>%
           clearImages() %>%
           addLabelOnlyMarkers(
