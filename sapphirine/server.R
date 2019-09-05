@@ -29,8 +29,7 @@ server <- function(input, output, session){
     #Accounts for fact that time is subsetted by the hour  
     
     map.data <- app.data %>%
-      subset(Day %in% input$dates[1]:input$dates[2]) %>%
-      subset(Time %in% mins[grep(input$times[1], mins) : upper.ind])
+      dplyr::filter(Day %in% input$dates[1]:input$dates[2],Time %in% mins[grep(input$times[1], mins) : upper.ind]) 
     #Subsets data by user-selected date range and time-range
     #Removes rows containing NAs for selected measurement type
     
