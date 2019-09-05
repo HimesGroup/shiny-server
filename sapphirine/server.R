@@ -33,7 +33,7 @@ server <- function(input, output, session){
     #Subsets data by user-selected date range and time-range
     #Removes rows containing NAs for selected measurement type
     
-    sensor.data <- subset(map.data, Sensor.ID %in% c(input$sensors.hl, input$sensors.o))
+    sensor.data <- map.data %>% dplyr::filter(Sensor.ID %in% c(input$sensors.hl, input$sensors.o))
 
     #Value map layers:
     
