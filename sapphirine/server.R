@@ -88,11 +88,12 @@ server <- function(input, output, session){
     
     #Content
     total_length <- seq(1,length(values(map.layer.pm2.5)))
-    lat_lon <- lapply(total_length, function(i) paste0("<b>",
-                                                       "Lat rng: [", "<b style = \"color:DimGray\">", format(round(lats[i] - step.size.y/2, 5), nsmall = 5), "</b>", ", ",
-                                                       "<b style = \"color:DimGray\">", format(round(lats[i] + step.size.y/2, 5), nsmall = 5), "</b>", "]", "<br/>",
-                                                       "Lon rng: [", "<b style = \"color:DimGray\">", format(round(lons[i] - step.size.x/2, 5), nsmall = 5), "</b>", ", ",
-                                                       "<b style = \"color:DimGray\">", format(round(lons[i] + step.size.x/2, 5), nsmall = 5), "</b>", "]", "<br/>"))
+    lat_lon <- vector()
+    lat_lon <- paste0("<b>",
+                      "Lat rng: [", "<b style = \"color:DimGray\">",gsub(" ", "", format(round(lats[total_length] - step.size.y/2, 5), nsmall = 5), fixed = TRUE), "</b>", ", ",
+                      "<b style = \"color:DimGray\">",gsub(" ", "", format(round(lats[total_length] + step.size.y/2, 5), nsmall = 5), fixed = TRUE), "</b>", "]", "<br/>",
+                      "Lon rng: [", "<b style = \"color:DimGray\">",gsub(" ", "", format(round(lons[total_length] - step.size.x/2, 5), nsmall = 5), fixed = TRUE), "</b>", ", ",
+                      "<b style = \"color:DimGray\">",gsub(" ", "", format(round(lons[total_length] + step.size.x/2, 5), nsmall = 5), fixed = TRUE), "</b>", "]", "<br/>") 
     
     #Temperature
     templ <- vector()
