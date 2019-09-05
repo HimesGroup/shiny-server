@@ -52,7 +52,7 @@ server <- function(input, output, session){
       }
     }
     
-    crime.data <- subset(app.data, !is.na(app.data$Crime))
+    crime.data <- app.data %>% dplyr::filter(!is.na(Crime))
     assign("map.layer.c", rasterize(crime.data[,3:2], r, crime.data$Crime, fun = sum, na.rm = TRUE), 
            envir = .GlobalEnv)
     
