@@ -34,6 +34,9 @@ server <- function(input, output, session){
     #Removes rows containing NAs for selected measurement type
     
     sensor.data <- map.data %>% dplyr::filter(Sensor.ID %in% c(input$sensors.hl, input$sensors.o))
+    
+    #Remove big objects and clear memory -------------
+    rm(map.data)
 
     #Value map layers:
     crime.data <- app.data %>% dplyr::filter(!is.na(Crime))
@@ -155,6 +158,9 @@ server <- function(input, output, session){
     
     #Final content
     content <- paste0(lat_lon,templ,humidl,pm1l,pm2.5l,pm10l,crimel,povl,trafl)
+    
+    #Remove big objects -------------
+    rm(lat_lon,templ,humidl,pm1l,pm2.5l,pm10l,crimel,povl,trafl)
     
     #Indicies for removing popups with all NA
     inds.df <- cbind(values(map.layer.t),
