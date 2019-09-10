@@ -29,31 +29,17 @@ server <- function(input, output, session){
     #Accounts for fact that time is subsetted by the hour  
     
     map.data <- app.data %>%
-      subset(Day %in% input$dates[1]:input$dates[2]) %>%
-      subset(Time %in% mins[grep(input$times[1], mins) : upper.ind])
+      dplyr::filter(Day %in% input$dates[1]:input$dates[2],Time %in% mins[grep(input$times[1], mins) : upper.ind]) 
     #Subsets data by user-selected date range and time-range
     #Removes rows containing NAs for selected measurement type
     
-    sensor.data <- subset(map.data, Sensor.ID %in% c(input$sensors.hl, input$sensors.o))
+    sensor.data <- map.data %>% dplyr::filter(Sensor.ID %in% c(input$sensors.hl, input$sensors.o))
+    
+    #Remove big objects and clear memory -------------
+    rm(map.data)
 
     #Value map layers:
-    
-    for(i in 1:length(sensor.measures)){
-      suffix <- f.suffix(sensor.measures[i])
-      measure.data <- subset(sensor.data, !is.na(sensor.data[,sensor.measures[i]]))
-      if(nrow(measure.data) > 0){
-        assign(paste0("map.layer", suffix),
-               rasterize(measure.data[,3:2], r, measure.data[,sensor.measures[i]], fun = mean, na.rm = TRUE),
-               envir = .GlobalEnv)
-      }
-      else{
-        assign(paste0("map.layer", suffix),
-               rasterize(data.frame(NA, NA), r, na.rm = TRUE),
-               envir = .GlobalEnv)
-      }
-    }
-    
-    crime.data <- subset(app.data, !is.na(app.data$Crime))
+    crime.data <- app.data %>% dplyr::filter(!is.na(Crime))
     assign("map.layer.c", rasterize(crime.data[,3:2], r, crime.data$Crime, fun = sum, na.rm = TRUE), 
            envir = .GlobalEnv)
     
@@ -77,10 +63,16 @@ server <- function(input, output, session){
       if(nrow(measure.data) > 0){
         assign("density.raster", 
                rasterize(measure.data[,3:2], r, measure.data$Count, fun = sum, na.rm = TRUE))
+        assign(paste0("map.layer", suffix),
+               rasterize(measure.data[,3:2], r, measure.data[,sensor.measures[i]], fun = mean, na.rm = TRUE),
+               envir = .GlobalEnv)
       }
       else{
         assign("density.raster",
                rasterize(data.frame(NA, NA), r, na.rm = TRUE))
+        assign(paste0("map.layer", suffix),
+               rasterize(data.frame(NA, NA), r, na.rm = TRUE),
+               envir = .GlobalEnv)
       }       
       assign(paste0("map.layer", suffix, ".d"), density.raster, envir = .GlobalEnv)
       assign(paste0("map.layer", suffix, ".dlog"), 
@@ -89,11 +81,12 @@ server <- function(input, output, session){
     
     #Content
     total_length <- seq(1,length(values(map.layer.pm2.5)))
-    lat_lon <- lapply(total_length, function(i) paste0("<b>",
-                                                       "Lat rng: [", "<b style = \"color:DimGray\">", format(round(lats[i] - step.size.y/2, 5), nsmall = 5), "</b>", ", ",
-                                                       "<b style = \"color:DimGray\">", format(round(lats[i] + step.size.y/2, 5), nsmall = 5), "</b>", "]", "<br/>",
-                                                       "Lon rng: [", "<b style = \"color:DimGray\">", format(round(lons[i] - step.size.x/2, 5), nsmall = 5), "</b>", ", ",
-                                                       "<b style = \"color:DimGray\">", format(round(lons[i] + step.size.x/2, 5), nsmall = 5), "</b>", "]", "<br/>"))
+    lat_lon <- vector()
+    lat_lon <- paste0("<b>",
+                      "Lat rng: [", "<b style = \"color:DimGray\">",gsub(" ", "", format(round(lats[total_length] - step.size.y/2, 5), nsmall = 5), fixed = TRUE), "</b>", ", ",
+                      "<b style = \"color:DimGray\">",gsub(" ", "", format(round(lats[total_length] + step.size.y/2, 5), nsmall = 5), fixed = TRUE), "</b>", "]", "<br/>",
+                      "Lon rng: [", "<b style = \"color:DimGray\">",gsub(" ", "", format(round(lons[total_length] - step.size.x/2, 5), nsmall = 5), fixed = TRUE), "</b>", ", ",
+                      "<b style = \"color:DimGray\">",gsub(" ", "", format(round(lons[total_length] + step.size.x/2, 5), nsmall = 5), fixed = TRUE), "</b>", "]", "<br/>") 
     
     #Temperature
     templ <- vector()
@@ -165,6 +158,9 @@ server <- function(input, output, session){
     
     #Final content
     content <- paste0(lat_lon,templ,humidl,pm1l,pm2.5l,pm10l,crimel,povl,trafl)
+    
+    #Remove big objects -------------
+    rm(lat_lon,templ,humidl,pm1l,pm2.5l,pm10l,crimel,povl,trafl)
     
     #Indicies for removing popups with all NA
     inds.df <- cbind(values(map.layer.t),
