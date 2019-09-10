@@ -36,22 +36,6 @@ server <- function(input, output, session){
     sensor.data <- map.data %>% dplyr::filter(Sensor.ID %in% c(input$sensors.hl, input$sensors.o))
 
     #Value map layers:
-    
-    for(i in 1:length(sensor.measures)){
-      suffix <- f.suffix(sensor.measures[i])
-      measure.data <- subset(sensor.data, !is.na(sensor.data[,sensor.measures[i]]))
-      if(nrow(measure.data) > 0){
-        assign(paste0("map.layer", suffix),
-               rasterize(measure.data[,3:2], r, measure.data[,sensor.measures[i]], fun = mean, na.rm = TRUE),
-               envir = .GlobalEnv)
-      }
-      else{
-        assign(paste0("map.layer", suffix),
-               rasterize(data.frame(NA, NA), r, na.rm = TRUE),
-               envir = .GlobalEnv)
-      }
-    }
-    
     crime.data <- app.data %>% dplyr::filter(!is.na(Crime))
     assign("map.layer.c", rasterize(crime.data[,3:2], r, crime.data$Crime, fun = sum, na.rm = TRUE), 
            envir = .GlobalEnv)
@@ -76,10 +60,16 @@ server <- function(input, output, session){
       if(nrow(measure.data) > 0){
         assign("density.raster", 
                rasterize(measure.data[,3:2], r, measure.data$Count, fun = sum, na.rm = TRUE))
+        assign(paste0("map.layer", suffix),
+               rasterize(measure.data[,3:2], r, measure.data[,sensor.measures[i]], fun = mean, na.rm = TRUE),
+               envir = .GlobalEnv)
       }
       else{
         assign("density.raster",
                rasterize(data.frame(NA, NA), r, na.rm = TRUE))
+        assign(paste0("map.layer", suffix),
+               rasterize(data.frame(NA, NA), r, na.rm = TRUE),
+               envir = .GlobalEnv)
       }       
       assign(paste0("map.layer", suffix, ".d"), density.raster, envir = .GlobalEnv)
       assign(paste0("map.layer", suffix, ".dlog"), 
