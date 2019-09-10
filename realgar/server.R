@@ -8,9 +8,7 @@
 
 .libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/")
 library(Gviz)
-source("/srv/shiny-server/realgar/global.R")
-#source("/home/avantika/shiny-server/realgar/global.R")
-
+#source("/srv/shiny-server/realgar/global.R")
 
 # server
 server <- shinyServer(function(input, output, session) {
