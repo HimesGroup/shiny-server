@@ -178,7 +178,7 @@ forestplot_func <- function(dat, ptitle,curr_gene) {
   ##G1 plot1 - datatable
   g1 <- ggplot(table, aes(x = V05, y = V0, label = format(V1, nsmall = 1))) +
     geom_text(size = 4.4, hjust=0, vjust=0.5,
-              fontface = ifelse(table$V1 %in% c("Effect size-based integration =   ","GEO ID","Tissue","Condition","Q-Value")|table$V1 == table$V1[nrow(table)], 2, 1)) + 
+              fontface = ifelse(table$V1 %in% c("Effect size-based integration =   ","GEO ID","Tissue","Condition","Q-Value")|table$V1 == table$V1[nrow(table)] & table$V0 == table$V0[nrow(table)], 2, 1)) + 
     theme_bw() +
     geom_segment(y=nrow(dat)+1.5,yend=nrow(dat)+1.5,x=0,xend=1.1) + #x=1, xend=4.0 #x=0,xend=1.2
     geom_segment(y=nrow(dat)+0.5,yend=nrow(dat)+0.5,x=0,xend=1.1) +
