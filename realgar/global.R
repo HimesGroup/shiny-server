@@ -42,6 +42,16 @@ treatment_choices <- c("β2-agonist"="BA",
 #GWAS options
 gwas_choices <- c("EVE"="snp_eve_subs","Ferreira"="snp_fer_subs","GABRIEL"="snp_gabriel_subs","GRASP"="snp_subs","TAGC"="snp_TAGC_subs")
 
+#Gene list
+all_genes <- read_feather("../databases/gene_list.feather")
+gene_list <- as.vector(all_genes$V1)
+rm(all_genes)
+
+#Gene choices
+genec <- read_feather("../databases/Sig_gene_list.feather")
+gene_choices <- as.vector(genec$V1)
+rm(genec)
+
 
 ####################
 ## READ IN FILES ##
@@ -53,6 +63,9 @@ Alldata_Info <- read_feather("/mnt/volume_nyc1_01/data/Microarray_data_infosheet
 #then split off into gene expression and GWAS dataset info - else forest plot text columns get messed up
 GWAS_Dataset_Info <- Alldata_Info[which(Alldata_Info$App == "GWAS"),]
 Dataset_Info <- Alldata_Info[which(!(Alldata_Info$App == "GWAS")),]
+
+#Remove big data ---
+rm(Alldata_Info)
 
 #load and name GEO microarray and RNA-Seq datasets
 for (i in na.omit(Dataset_Info$Unique_ID)) {assign(i, read_feather(paste0("/srv/shiny-server/databases/results_feather_files/", i, ".feather")))}
@@ -72,8 +85,7 @@ snp_gabriel <- read_feather("/srv/shiny-server/databases/gabriel_data_realgar.fe
 snp_fer <- read_feather("/srv/shiny-server/databases/allerg_GWAS_data_realgar.feather") #SNP data from Ferreira - already in hg19 - matched to gene ids using bedtools
 snp_TAGC <- read_feather("/srv/shiny-server/databases/TAGC_data_realgar.feather") #SNP data from TAGC - already in hg19 - matched to gene ids using bedtools
 gene_locations <- fread("/srv/shiny-server/databases/gene_positions.txt", header = TRUE, stringsAsFactors = FALSE) #gene location & transcript data from GENCODE
-chrom_bands <- read_feather("/srv/shiny-server/databases/chrom_bands.feather") #chromosome band info for ideogram - makes ideogram load 25 seconds faster
-all_genes <- read_feather("/srv/shiny-server/databases/Gene_names.feather")
+#all_genes <- read_feather("/srv/shiny-server/databases/Gene_names.feather")
 #unlike all other files, gene_locations is faster with fread than with readRDS (2s load, vs 4s)
 
 
@@ -114,11 +126,11 @@ output.table <- data.frame() # initiate output table - used later in output.tabl
 heatmap_colors <-  inferno # heatmap colors - used in p-value plot
 
 # make a list of gene symbols in all datasets for checking whether gene symbol entered is valid - used for GeneSymbol later on
-genes_avail <- vector()
-for (i in ls()[grep("GSE", ls())]) {
-  gene_names <- as.character(levels(get(i)$Gene))
-  genes_avail <- unique(c(genes_avail, gene_names))
-}
+# genes_avail <- vector()
+# for (i in ls()[grep("GSE", ls())]) {
+#   gene_names <- as.character(levels(get(i)$Gene))
+#   genes_avail <- unique(c(genes_avail, gene_names))
+# }
 
 ##########################
 ## FORESTPLOT FUNCTION ##

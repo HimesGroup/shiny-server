@@ -13,8 +13,7 @@ library(Gviz)
 # server
 server <- shinyServer(function(input, output, session) {
   
-  all_genes <- unique(all_genes)
-  genes <- reactive({selectizeInput("current", "Official Gene Symbol or SNP ID:", all_genes, selected="GAPDH", width="185px", options = list(create = TRUE))})
+  genes <- reactive({selectizeInput("current", "Official Gene Symbol or SNP ID:", gene_choices[1:200], selected="GAPDH", width="185px", options = list(create = TRUE))})
   output$genesAvail <- renderUI({genes()})
   
   output$loadProxy <- renderUI({NULL})
@@ -40,7 +39,7 @@ server <- shinyServer(function(input, output, session) {
   })  
 
   
-  GeneSymbol <- reactive({if (curr_gene() %in% genes_avail) {TRUE} else {FALSE}})  #used later to generate error message when a wrong gene symbol is input
+  GeneSymbol <- reactive({if (curr_gene() %in% gene_list) {TRUE} else {FALSE}})  #used later to generate error message when a wrong gene symbol is input
   
   ################################################
   ## reactive UI for EVE & TAGC p-value options ##
