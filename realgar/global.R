@@ -206,7 +206,7 @@ forestplot_func <- function(dat, ptitle,curr_gene) {
   #Colors
   library(viridis)
   breaks <- c(seq(0,8,by=0.001), Inf) # this sets max universally at 8 (else highest one OF THE SUBSET would be the max)
-  b_clrs <- l_clrs <- inferno(8002)[as.numeric(cut(dat$neglogofP, breaks = breaks))] #8002 is length(breaks) - ensures there are enough colors
+  b_clrs  <- inferno(8002)[findInterval(dat$neglogofP, breaks)] #8002 is length(breaks) - ensures there are enough colors
   colors <- append(NA,b_clrs)
   tableplot$neglogofP2 <- append(NA,dat$neglogofP)
   
