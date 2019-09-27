@@ -121,21 +121,21 @@ server <- shinyServer(function(input, output, session) {
     #Dataset_Info2 = subset(Dataset_Info,(((Dataset_Info$Tissue %in% input$Tissue) | (Dataset_Info$Asthma %in% input$Treatment)) & Dataset_Info$App == "GC")) 
     ## Dataset_Info2 = subset(Dataset_Info, (((Dataset_Info$Tissue %in% input$Tissue) & ((Dataset_Info$Asthma %in% input$Treatment) | (Dataset_Info$App %in% input$Treatment)))))
     #Dataset_Info = rbind(Dataset_Info1, Dataset_Info2) # this separates GC and asthma data
-    Dataset_Info_Tissue = subset(Dataset_Info, Dataset_Info$Tissue %in% input$Tissue)
+    Dataset_Info_Tissue <- subset(Dataset_Info, Dataset_Info$Tissue %in% input$Tissue)
     
     #To avoid selection of all tissues on getting an empty dataframe inspite of non-null selections
-    if(is.null(input$Asthma)| is.null(input$Status)){Dataset_Info_A = subset(Dataset_Info, Dataset_Info$Asthma %in% input$Asthma | Dataset_Info$Status %in% input$Status)}
-    else {Dataset_Info_A = subset(Dataset_Info, Dataset_Info$Asthma %in% input$Asthma & Dataset_Info$Status %in% input$Status)}
-    if(is.null(input$Treatment)| is.null(input$Experiment)){Dataset_Info_B = subset(Dataset_Info, Dataset_Info$Asthma %in% input$Treatment | Dataset_Info$Experiment %in% input$Experiment)}
-    else {Dataset_Info_B = subset(Dataset_Info, Dataset_Info$Asthma %in% input$Treatment & Dataset_Info$Experiment %in% input$Experiment)}
+    if(is.null(input$Asthma)| is.null(input$Status)){Dataset_Info_A <- subset(Dataset_Info, Dataset_Info$Asthma %in% input$Asthma | Dataset_Info$Status %in% input$Status)}
+    else {Dataset_Info_A <- subset(Dataset_Info, Dataset_Info$Asthma %in% input$Asthma & Dataset_Info$Status %in% input$Status)}
+    if(is.null(input$Treatment)| is.null(input$Experiment)){Dataset_Info_B <- subset(Dataset_Info, Dataset_Info$Asthma %in% input$Treatment | Dataset_Info$Experiment %in% input$Experiment)}
+    else {Dataset_Info_B <- subset(Dataset_Info, Dataset_Info$Asthma %in% input$Treatment & Dataset_Info$Experiment %in% input$Experiment)}
     
-    Dataset_Info_Asthma = rbind(Dataset_Info_A,Dataset_Info_B)
+    Dataset_Info_Asthma <- rbind(Dataset_Info_A,Dataset_Info_B)
     
-    if ((nrow(Dataset_Info_Tissue)==0)|(nrow(Dataset_Info_Asthma)==0)) {Dataset_Info1=rbind(Dataset_Info_Tissue,Dataset_Info_Asthma)}
-    else {Dataset_Info1=subset(Dataset_Info_Tissue,Dataset_Info_Tissue$Unique_ID%in%Dataset_Info_Asthma$Unique_ID)}
+    if ((nrow(Dataset_Info_Tissue)==0)|(nrow(Dataset_Info_Asthma)==0)) {Dataset_Info1 <- rbind(Dataset_Info_Tissue,Dataset_Info_Asthma)}
+    else {Dataset_Info1 <- subset(Dataset_Info_Tissue,Dataset_Info_Tissue$Unique_ID%in%Dataset_Info_Asthma$Unique_ID)}
     
     #BA_PDE
-    if(length(setdiff(c("BA","PDE"),input$Treatment))==0 && "invitro" %in% Dataset_Info1$Experiment){Dataset_Info1 = rbind(Dataset_Info1,BA_PDE_Info)}
+    if(length(setdiff(c("BA","PDE"),input$Treatment))==0 && "invitro" %in% Dataset_Info1$Experiment){Dataset_Info1 <- rbind(Dataset_Info1,BA_PDE_Info)}
     
     #Return
     Dataset_Info1
@@ -158,14 +158,19 @@ server <- shinyServer(function(input, output, session) {
   
   
   
-  GEO_Dataset <- reactive({paste0("<a href='",  GEO_data()$GEO_ID_link, "' target='_blank'>",GEO_data()$GEO_ID,"</a>")})
-  GEO_PMID <- reactive({paste0("<a href='",  GEO_data()$PMID_link, "' target='_blank'>",GEO_data()$PMID,"</a>")})
-  GEO_Description <- reactive({GEO_data()$Description})
-  GEO_Report <- reactive({paste0("<a href='",  GEO_data()$QC_link, "' target='_blank'>",GEO_data()$Report,"</a>")})
-  
+  # GEO_Dataset <- reactive({paste0("<a href='",  GEO_data()$GEO_ID_link, "' target='_blank'>",GEO_data()$GEO_ID,"</a>")})
+  # GEO_PMID <- reactive({paste0("<a href='",  GEO_data()$PMID_link, "' target='_blank'>",GEO_data()$PMID,"</a>")})
+  # GEO_Description <- reactive({GEO_data()$Description})
+  # GEO_Report <- reactive({paste0("<a href='",  GEO_data()$QC_link, "' target='_blank'>",GEO_data()$Report,"</a>")})
+  # 
   
   GEO_links <- reactive({
-      df <- data.frame(GEO_Dataset(), GEO_PMID(),GEO_Report(), GEO_Description())
+      GEO_Dataset <- paste0("<a href='",  GEO_data()$GEO_ID_link, "' target='_blank'>",GEO_data()$GEO_ID,"</a>")
+      GEO_PMID <- paste0("<a href='",  GEO_data()$PMID_link, "' target='_blank'>",GEO_data()$PMID,"</a>")
+      GEO_Description <- GEO_data()$Description
+      GEO_Report <- paste0("<a href='",  GEO_data()$QC_link, "' target='_blank'>",GEO_data()$Report,"</a>")
+      
+      df <- data.frame(GEO_Dataset, GEO_PMID,GEO_Report, GEO_Description)
       colnames(df) <- c("Dataset", "PMID", "Report","Description")
       df
   })
@@ -179,11 +184,13 @@ server <- shinyServer(function(input, output, session) {
     df
   })
   
-  GWAS_Dataset <- reactive({paste0("<a href='",  GWAS_data()$Link, "' target='_blank'>",GWAS_data()$Dataset,"</a>")})
-  GWAS_Description <- reactive({GWAS_data()$Description})
+  # GWAS_Dataset <- reactive({paste0("<a href='",  GWAS_data()$Link, "' target='_blank'>",GWAS_data()$Dataset,"</a>")})
+  # GWAS_Description <- reactive({GWAS_data()$Description})
   
   GWAS_links <- reactive ({
-    df <- data.frame(GWAS_Dataset(), GWAS_Description())
+    GWAS_Dataset <- paste0("<a href='",  GWAS_data()$Link, "' target='_blank'>",GWAS_data()$Dataset,"</a>")
+    GWAS_Description <- GWAS_data()$Description
+    df <- data.frame(GWAS_Dataset, GWAS_Description)
     colnames(df) <- c("Dataset", "Description")
     df
   })
@@ -246,8 +253,8 @@ server <- shinyServer(function(input, output, session) {
                                     Lower_bound_CI = 2^(lower), 
                                     Upper_bound_CI = 2^(upper)) 
       
-      output.table <- output.table[order(output.table$Fold_Change, output.table$Upper_bound_CI),]
-     
+      #output.table <- output.table[order(output.table$Fold_Change, output.table$Upper_bound_CI),]
+      output.table <- output.table %>% dplyr::arrange(desc(Fold_Change),desc(Upper_bound_CI))
   })
   
   
@@ -257,15 +264,19 @@ server <- shinyServer(function(input, output, session) {
   
   # asthma
   data_Asthma <- reactive({ 
-  output.tableforplot_asthma = output.tableforplot() 
-  output.tableforplot_asthma = output.tableforplot_asthma[output.tableforplot_asthma$App == "asthma",]
-  output.tableforplot_asthma[rev(rownames(output.tableforplot_asthma)),]})
+  output.tableforplot_asthma <- output.tableforplot() %>% filter(App == "asthma")
+  # output.tableforplot_asthma = output.tableforplot() 
+  # output.tableforplot_asthma = output.tableforplot_asthma[output.tableforplot_asthma$App == "asthma",]
+  # output.tableforplot_asthma[rev(rownames(output.tableforplot_asthma)),]
+  })
   
   # GC
   data_GC <- reactive({ 
-  output.tableforplot_GC = output.tableforplot()
-  output.tableforplot_GC = output.tableforplot_GC[output.tableforplot_GC$App %in% c("GC", "BA", "smoking", "vitD","PDE"),]
-  output.tableforplot_GC[rev(rownames(output.tableforplot_GC)),]})
+  output.tableforplot_GC <- output.tableforplot() %>% filter(App %in% c("GC", "BA", "smoking", "vitD","PDE"))
+  # output.tableforplot_GC = output.tableforplot()
+  # output.tableforplot_GC = output.tableforplot_GC[output.tableforplot_GC$App %in% c("GC", "BA", "smoking", "vitD","PDE"),]
+  # output.tableforplot_GC[rev(rownames(output.tableforplot_GC)),]
+  })
   
   
   ###################################
