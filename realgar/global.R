@@ -85,6 +85,7 @@ snp_gabriel <- read_feather("/srv/shiny-server/databases/gabriel_data_realgar.fe
 snp_fer <- read_feather("/srv/shiny-server/databases/allerg_GWAS_data_realgar.feather") #SNP data from Ferreira - already in hg19 - matched to gene ids using bedtools
 snp_TAGC <- read_feather("/srv/shiny-server/databases/TAGC_data_realgar.feather") #SNP data from TAGC - already in hg19 - matched to gene ids using bedtools
 gene_locations <- fread("/srv/shiny-server/databases/gene_positions.txt", header = TRUE, stringsAsFactors = FALSE) #gene location & transcript data from GENCODE
+chrom_bands <- read_feather("/srv/shiny-server/databases/chrom_bands.feather") #chromosome band info for ideogram - makes ideogram load 25 seconds faster
 #all_genes <- read_feather("/srv/shiny-server/databases/Gene_names.feather")
 #unlike all other files, gene_locations is faster with fread than with readRDS (2s load, vs 4s)
 
