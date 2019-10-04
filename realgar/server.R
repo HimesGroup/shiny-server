@@ -135,7 +135,7 @@ server <- shinyServer(function(input, output, session) {
     else {Dataset_Info1 <- subset(Dataset_Info_Tissue,Dataset_Info_Tissue$Unique_ID%in%Dataset_Info_Asthma$Unique_ID)}
     
     #BA_PDE
-    if(length(setdiff(c("BA","PDE"),input$Treatment))==0 && "invitro" %in% Dataset_Info1$Experiment){Dataset_Info1 <- rbind(Dataset_Info1,BA_PDE_Info)}
+    if(length(setdiff(c("BA","PDE"),input$Treatment))==0 && "invitro" %in% Dataset_Info1$Experiment && "BEAS-2B" %in% input$Tissue){Dataset_Info1 <- rbind(Dataset_Info1,BA_PDE_Info)}
     
     #Return
     Dataset_Info1
