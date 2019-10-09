@@ -54,7 +54,7 @@ ui <- shinyUI(fluidPage(theme = shinytheme("lumen"),
                                                                                               "Note that p-values from the p-value-based and effect size-based methods are not adjusted for multiple corrections in this app, ",
                                                                                               "so we suggest that users apply a stringent threshold of multiple corrections corresponding to 25,000 genes (i.e. 2x10-6). ",
                                                                                               "For the rank-based method, an analytic rank product is provided instead of the permutated empirical p-value, ",
-                                                                                              "so we suggest users refer to the rank score when prioritizing the genes for functional validation. For more information, you can check the About tab."),
+                                                                                              "so we suggest users refer to the rank score when prioritizing the genes for functional validation. For more information, you can check the References tab."),
                                                                                             
                                                                                             column(12, withSpinner(plotOutput(outputId="forestplot_asthma",width="1000px", height="auto"),color= "#9E443A"), align="center"), #1355px #1250
                                                                                                 column(12, textOutput("asthma_pcomb_text"), align="center"), # output combined p-values

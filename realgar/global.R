@@ -87,11 +87,4 @@ BA_PDE_Info <- Dataset_Info %>% dplyr::filter(Asthma == "BA_PDE")
 #from feather files ---
 chrom_bands <- read_feather("/srv/shiny-server/databases/chrom_bands.feather") #chromosome band info for ideogram - makes ideogram load 25 seconds faster
 
-# heatmap colors - used in p-value plot --
-heatmap_colors <-  inferno 
-
-
-
-
-
 
