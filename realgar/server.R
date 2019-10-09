@@ -6,37 +6,29 @@
 # currently 3 seconds from "start package load" to "finish gene_locations load"
 #rlang version 0.2.1
 
-.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/")
-library(Gviz)
-#source("/srv/shiny-server/realgar/global.R")
+#detach("package:Gviz", unload=TRUE)
+library(Gviz, quietly = T)
 
 # server
 server <- shinyServer(function(input, output, session) {
   
-  genes <- reactive({selectizeInput("current", "Official Gene Symbol or SNP ID:", gene_choices[1:200], selected="GAPDH", width="185px", options = list(create = TRUE))})
-  output$genesAvail <- renderUI({genes()})
-  
+  ## Loading proxy
   output$loadProxy <- renderUI({NULL})
   
-  current <- reactive({toString(input$current)})
-  curr_gene <- reactive({
-    if (gsub(" ", "", tolower(current()), fixed=TRUE) %in% c(snp$snp, snp_eve$snp, snp_gabriel$snp, snp_fer$snp, snp_TAGC$snp)) { #if SNP ID is entered, convert internally to nearest gene symbol  
-      all_matches <- rbind(rbind(snp[which(snp$snp==gsub(" ", "", tolower(current()), fixed=TRUE)), c("snp", "end", "symbol")], 
-                                 snp_eve[which(snp_eve$snp==gsub(" ", "", tolower(current()), fixed=TRUE)), c("snp", "end", "symbol")]), 
-                           snp_gabriel[which(snp_gabriel$snp==gsub(" ", "", tolower(current()), fixed=TRUE)), c("snp", "end", "symbol")],
-                           snp_fer[which(snp_fer$snp==gsub(" ", "", tolower(current()), fixed=TRUE)), c("snp", "end", "symbol")],
-                           snp_TAGC[which(snp_TAGC$snp==gsub(" ", "", tolower(current()), fixed=TRUE)), c("snp", "end", "symbol")])
-      gene_locations_unique <- gene_locations[which(!duplicated(gene_locations$symbol)),]
-      all_matches <- merge(all_matches, gene_locations_unique[,c("symbol", "start")], by="symbol")
-      print(all_matches)
-      all_matches$dist <- abs(all_matches$start - all_matches$end) # here, "end" is snp position, "start" is gene start 
-      unique(all_matches$symbol[which(all_matches$dist==min(all_matches$dist))]) # choose the gene symbol whose start is the smallest absolute distance away
-    } else { 
-      # if it is not in the list of snps, it is a gene id OR a snp that is not associated with asthma
-      # in the latter case it will not show up in the list of genes & user gets an "enter valid gene/snp id" message
-      gsub(" ", "", toupper(current()), fixed = TRUE) #make uppercase, remove spaces
-    }
-  })  
+  
+  ## Get current gene or gene near selected SNP ID
+   curr_gene <- reactive({
+     current <- toString(input$current)
+     if (gsub(" ", "", tolower(current), fixed=TRUE) %in% c(get_snp("snp"),get_snp("snp_eve"),get_snp("snp_gabriel"),get_snp("snp_fer"),get_snp("snp_TAGC"))){ #if SNP ID is entered, convert internally to nearest gene symbol
+       rsid <- gsub(" ", "", tolower(current), fixed=TRUE)
+       all_matches <- rbind(rbind(get_matches(rsid,"snp"),get_matches(rsid,"snp_eve"),get_matches(rsid,"snp_gabriel"),get_matches(rsid,"snp_fer"),get_matches(rsid,"snp_TAGC")))
+       join_gene_snp(all_matches)
+     } else {
+       # if it is not in the list of snps, it is a gene id OR a snp that is not associated with asthma
+       # in the latter case it will not show up in the list of genes & user gets an "enter valid gene/snp id" message
+       gsub(" ", "", toupper(current), fixed = TRUE) #make uppercase, remove spaces
+     }
+   })
 
   
   GeneSymbol <- reactive({if (curr_gene() %in% gene_list) {TRUE} else {FALSE}})  #used later to generate error message when a wrong gene symbol is input
@@ -46,13 +38,17 @@ server <- shinyServer(function(input, output, session) {
   ################################################
   
   #if either EVE or TAGC SNPs selected, display the phrase "GWAS display options:"
-  output$GWAS_text <- reactive({if("snp_eve_subs" %in% input$which_SNPs | "snp_TAGC_subs" %in% input$which_SNPs){"GWAS display options:"} else {""}})
+  output$GWAS_text <- reactive({if("snp_eve_subs" %in% input$which_SNPs | "snp_TAGC_subs" %in% input$which_SNPs){"GWAS display options:"} else {" "}})
   
   #if EVE SNPs selected, display option to choose population
-  output$eve_options <- reactive({if("snp_eve_subs" %in% input$which_SNPs) {"-----------------------------------"} else {""}})
+  output$eve_options <- renderUI({if("snp_eve_subs" %in% input$which_SNPs) {selectInput("which_eve_pvals", "Which EVE p-values to use?", 
+                                                                                        list("All subjects"="meta_P", "African American"="meta_P_AA","European American"="meta_P_EA", "Latino"="meta_P_LAT"), 
+                                                                                        selected="meta_P")} else {NULL}})
   
   #if TAGC SNPs selected, display option to choose population
-  output$TAGC_options <- reactive({if("snp_TAGC_subs" %in% input$which_SNPs) {"-----------------------------------"} else {""}})
+  output$TAGC_options <- renderUI({if("snp_TAGC_subs" %in% input$which_SNPs) {selectInput("which_TAGC_pvals", "Which TAGC p-values to use?", 
+                                                                                          list("Multiancestry"="p_ran_multi", "European ancestry"="p_ran_euro"), 
+                                                                                          selected="p_ran_multi")} else {NULL}})
   
     
   #################################################################################
@@ -135,7 +131,7 @@ server <- shinyServer(function(input, output, session) {
     else {Dataset_Info1 <- subset(Dataset_Info_Tissue,Dataset_Info_Tissue$Unique_ID%in%Dataset_Info_Asthma$Unique_ID)}
     
     #BA_PDE
-    if(length(setdiff(c("BA","PDE"),input$Treatment))==0 && "invitro" %in% Dataset_Info1$Experiment && "BEAS-2B" %in% input$Tissue){Dataset_Info1 <- rbind(Dataset_Info1,BA_PDE_Info)}
+    if(length(setdiff(c("BA","PDE"),input$Treatment))==0 && "invitro" %in% Dataset_Info1$Experiment){Dataset_Info1 <- rbind(Dataset_Info1,BA_PDE_Info)}
     
     #Return
     Dataset_Info1
@@ -156,21 +152,14 @@ server <- shinyServer(function(input, output, session) {
                                paste0("http://public.himeslab.org/realgar_qc/",GEO_ID,"_QC_RnaSeqReport.html"), 
                                paste0("http://public.himeslab.org/realgar_qc/",GEO_ID,"_QC_report.html")))})
   
-  
-  
-  # GEO_Dataset <- reactive({paste0("<a href='",  GEO_data()$GEO_ID_link, "' target='_blank'>",GEO_data()$GEO_ID,"</a>")})
-  # GEO_PMID <- reactive({paste0("<a href='",  GEO_data()$PMID_link, "' target='_blank'>",GEO_data()$PMID,"</a>")})
-  # GEO_Description <- reactive({GEO_data()$Description})
-  # GEO_Report <- reactive({paste0("<a href='",  GEO_data()$QC_link, "' target='_blank'>",GEO_data()$Report,"</a>")})
-  # 
+
   
   GEO_links <- reactive({
       GEO_Dataset <- paste0("<a href='",  GEO_data()$GEO_ID_link, "' target='_blank'>",GEO_data()$GEO_ID,"</a>")
       GEO_PMID <- paste0("<a href='",  GEO_data()$PMID_link, "' target='_blank'>",GEO_data()$PMID,"</a>")
-      GEO_Description <- GEO_data()$Description
       GEO_Report <- paste0("<a href='",  GEO_data()$QC_link, "' target='_blank'>",GEO_data()$Report,"</a>")
       
-      df <- data.frame(GEO_Dataset, GEO_PMID,GEO_Report, GEO_Description)
+      df <- data.frame(GEO_Dataset, GEO_PMID, GEO_Report, GEO_data()$Description)
       colnames(df) <- c("Dataset", "PMID", "Report","Description")
       df
   })
@@ -184,17 +173,13 @@ server <- shinyServer(function(input, output, session) {
     df
   })
   
-  # GWAS_Dataset <- reactive({paste0("<a href='",  GWAS_data()$Link, "' target='_blank'>",GWAS_data()$Dataset,"</a>")})
-  # GWAS_Description <- reactive({GWAS_data()$Description})
-  
   GWAS_links <- reactive ({
     GWAS_Dataset <- paste0("<a href='",  GWAS_data()$Link, "' target='_blank'>",GWAS_data()$Dataset,"</a>")
-    GWAS_Description <- GWAS_data()$Description
-    df <- data.frame(GWAS_Dataset, GWAS_Description)
+    df <- data.frame(GWAS_Dataset, GWAS_data()$Description)
     colnames(df) <- c("Dataset", "Description")
     df
   })
-  
+
   
   #table output for "Datasets Loaded" tab
   output$GEO_table <- DT::renderDataTable(GEO_links(),  
@@ -215,46 +200,22 @@ server <- shinyServer(function(input, output, session) {
   
   #select and modify data used for plots and accompanying table
   output.tableforplot <- reactive({
-      validate(need(nrow(UserDataset_Info()) != 0, "Please choose at least one dataset.")) #Generate a error message when no data is loaded.
-      validate(need(curr_gene() != "", "Please enter a gene symbol or SNP ID.")) #Generate a error message when no gene id is input.
-      
-      #select data for the gene currently selected
-      data_filter <- function(x){
-        x <- x %>%
-          dplyr::filter(Gene==curr_gene()) %>%
-          dplyr::select(logFC, P.Value, adj.P.Val, SD, rank) %>% 
-          dplyr::filter(P.Value==min(P.Value)) %>%
-          dplyr::mutate(lower = logFC - 2*SD, upper = logFC + 2*SD)
-      }
-      
-      #get data for given gene for each study selected
-      for (i in UserDataset_Info()$Unique_ID){
-          curr.gene.data=get(i,environment())
-          Total = UserDataset_Info() %>% dplyr::filter(Unique_ID == i) %>% select(Total) # This 'Total' is total sample size and can be used to combine p-values
-          data_type = UserDataset_Info() %>% dplyr::filter(Unique_ID == i) %>% select(App) #This 'data_type' can be used to separate asthma and GC data. 
+    validate(need(nrow(UserDataset_Info()) != 0, "Please choose at least one dataset.")) #Generate a error message when no data is loaded.
+    validate(need(curr_gene() != "", "Please enter a gene symbol or SNP ID.")) #Generate a error message when no gene id is input.
+    
+    gene <- paste0('"',curr_gene(),'"')
+    query <- paste0("SELECT * FROM REALGAR WHERE Gene = ",gene)
+    res <- dbSendQuery(ngs_db, query)
+    out.table <- dbFetch(res)
+    dbClearResult(res)
+    
+    # Generate error message if the gene symbol is not right.
+    validate(need(GeneSymbol() != FALSE, "Please enter a valid gene symbol or SNP ID."))
 
-          #use data_filter function from above to filter curr.gene.data
-          if (any(GeneSymbol())) {
-              
-              curr.gene.data <- data_filter(curr.gene.data)
-              
-              if(nrow(curr.gene.data) > 0) {
-                  curr.gene.data <- curr.gene.data[order(curr.gene.data$P.Value,-abs(curr.gene.data$logFC)),][1,] # if multiple probes have the same smallest p-values, select the one with largest effect
-                  curr.gene.data <- cbind(data_type, Unique_ID=i, curr.gene.data, Total)
-                  #append curr.gene.data to all the other data that needs to be included in the levelplots
-                  output.table <- rbind(output.table, curr.gene.data)}}}
-      
-      #preparing the data for levelplots
-      #calculate the fold change, order by fold change for levelplots
-      validate(need(GeneSymbol() != FALSE, "Please enter a valid gene symbol or SNP ID.")) # Generate error message if the gene symbol is not right.
-      
-      output.table <- dplyr::mutate(output.table, Fold_Change=2^(logFC), 
-                                    neglogofP=(-log10(adj.P.Val)), #note that this is taking -log10 of adjusted p-value
-                                    Lower_bound_CI = 2^(lower), 
-                                    Upper_bound_CI = 2^(upper)) 
-      
-      #output.table <- output.table[order(output.table$Fold_Change, output.table$Upper_bound_CI),]
-      output.table <- output.table %>% dplyr::arrange(desc(Fold_Change),desc(Upper_bound_CI))
+    out.table <- out.table %>%
+                          filter(Unique_ID %in% UserDataset_Info()$Unique_ID) %>%
+                          dplyr::rename(adj.P.Val = adjPVal,P.Value = PValue) %>%
+                          arrange(desc(Fold_Change),desc(Upper_bound_CI))
   })
   
   
@@ -265,17 +226,11 @@ server <- shinyServer(function(input, output, session) {
   # asthma
   data_Asthma <- reactive({ 
   output.tableforplot_asthma <- output.tableforplot() %>% filter(App == "asthma")
-  # output.tableforplot_asthma = output.tableforplot() 
-  # output.tableforplot_asthma = output.tableforplot_asthma[output.tableforplot_asthma$App == "asthma",]
-  # output.tableforplot_asthma[rev(rownames(output.tableforplot_asthma)),]
   })
   
   # GC
   data_GC <- reactive({ 
   output.tableforplot_GC <- output.tableforplot() %>% filter(App %in% c("GC", "BA", "smoking", "vitD","PDE"))
-  # output.tableforplot_GC = output.tableforplot()
-  # output.tableforplot_GC = output.tableforplot_GC[output.tableforplot_GC$App %in% c("GC", "BA", "smoking", "vitD","PDE"),]
-  # output.tableforplot_GC[rev(rownames(output.tableforplot_GC)),]
   })
   
   
@@ -503,32 +458,51 @@ server <- shinyServer(function(input, output, session) {
   
   #filter data for selected gene
   gene_subs <- reactive({
-    gene_subs_temp <- unique(filter(gene_locations, symbol==curr_gene()))
-    gene_subs_temp <- gene_subs_temp[!(duplicated(gene_subs_temp$exon)),]})
-  tfbs_subs <- reactive({unique(filter(tfbs, symbol==curr_gene()))})
+    gene_subs_temp <- get_query_db("gene_locations",curr_gene())
+    gene_subs_temp <- gene_subs_temp[!(duplicated(gene_subs_temp$exon)),]
+    })
+  
+  tfbs_subs <- reactive({
+    tfbs_db <- get_query_db("tfbs",curr_gene())
+    unique(tfbs_db)
+    })
+  
   snp_subs <- reactive({
-    if(("snp_subs" %in% input$which_SNPs)) {unique(filter(snp, symbol==curr_gene()))} 
+    if(("snp_subs" %in% input$which_SNPs)) {
+      snp_db <- get_query_db("snp",curr_gene())
+      unique(snp_db)
+      } 
     else {data.frame(matrix(nrow = 0, ncol = 0))}}) #only non-zero if corresponding checkbox is selected - but can't have "NULL" - else get "argument is of length zero" error
+  
   snp_eve_subs <- reactive({
     if(("snp_eve_subs" %in% input$which_SNPs)) {
-      snp_eve_temp <- snp_eve[which((snp_eve$symbol==curr_gene()) & (!is.na(unlist(snp_eve[,paste0("color_", input$which_eve_pvals)])))),] 
       #need the second filter criterion because otherwise will output snp names & otherwise blank if NA pvalues
+      snp_eve <- get_query_db("snp_eve",curr_gene())
+      which_eve_pval <- paste0("color_",input$which_eve_pvals) #Column selected
+      snp_eve_temp <- snp_eve %>% filter(!is.na(which_eve_pval))
       if (nrow(snp_eve_temp) > 0) {snp_eve_temp} else {data.frame(matrix(nrow = 0, ncol = 0))} #since pval_selector might remove all rows 
     } else {data.frame(matrix(nrow = 0, ncol = 0))}
   }) #only non-zero if corresponding checkbox is selected - but can't have "NULL" - else get "argument is of length zero" error
   
   snp_gabriel_subs <- reactive({
-    if(("snp_gabriel_subs" %in% input$which_SNPs)) {unique(filter(snp_gabriel, symbol==curr_gene()))}
+    if(("snp_gabriel_subs" %in% input$which_SNPs)) {
+      snp_gabriel_db <- get_query_db("snp_gabriel",curr_gene())
+      unique(snp_gabriel_db)
+      }
     else {data.frame(matrix(nrow = 0, ncol = 0))}}) #only non-zero if corresponding checkbox is selected - but can't have "NULL" - else get "argument is of length zero" error
   
   snp_fer_subs <- reactive({
-    if(("snp_fer_subs" %in% input$which_SNPs)) {unique(filter(snp_fer, symbol==curr_gene()))}
+    if(("snp_fer_subs" %in% input$which_SNPs)) {
+      snp_fer_db <- get_query_db("snp_fer",curr_gene())
+      unique(snp_fer_db)
+      }
     else {data.frame(matrix(nrow = 0, ncol = 0))}}) #only non-zero if corresponding checkbox is selected - but can't have "NULL" - else get "argument is of length zero" error
   
   snp_TAGC_subs <- reactive({
     if(("snp_TAGC_subs" %in% input$which_SNPs)) {
-      snp_TAGC_temp <- snp_TAGC[which((snp_TAGC$symbol==curr_gene()) & (!is.na(unlist(snp_TAGC[,paste0("color_", input$which_TAGC_pvals)])))),]  
-      #need the second filter criterion because otherwise will output snp names & otherwise blank if NA pvalues
+      snp_TAGC <- get_query_db("snp_TAGC",curr_gene())
+      which_TAGC_pval <- paste0("color_",input$which_TAGC_pvals) #Column selected
+      snp_TAGC_temp <- snp_TAGC %>% filter(!is.na(which_TAGC_pval))
       if (nrow(snp_TAGC_temp) > 0) {snp_TAGC_temp} else {data.frame(matrix(nrow = 0, ncol = 0))} #since pval_selector might remove all rows 
     } else {data.frame(matrix(nrow = 0, ncol = 0))}
   }) #only non-zero if corresponding checkbox is selected - but can't have "NULL" - else get "argument is of length zero" error
@@ -591,8 +565,10 @@ server <- shinyServer(function(input, output, session) {
     
     # EVE SNPs track
     if (nrow(snp_eve_subs) > 0) {
-      pval_choice <- reactive({input$which_eve_pvals})  #pval_choice is responsible for dynamically coloring snps based on user selection of population
-      snp_eve_track <- Gviz::AnnotationTrack(snp_eve_subs, name="SNPs (EVE)", fill = unlist(snp_eve_subs[, paste0("color_", pval_choice())]), col=NULL, feature=snp_eve_subs$snp, grid=TRUE, col.grid="darkgrey")
+      tval_choice <- reactive({input$which_eve_pvals})  #pval_choice is responsible for dynamically coloring snps based on user selection of population
+      if (!is.null(tval_choice())){
+      snp_eve_track <- Gviz::AnnotationTrack(snp_eve_subs, name="SNPs (EVE)", fill = unlist(snp_eve_subs[, paste0("color_", tval_choice())]), col=NULL, feature=snp_eve_subs$snp, grid=TRUE, col.grid="darkgrey")
+      } else {snp_eve_track <- Gviz::AnnotationTrack(NULL)}
       
       #rough estimate of number of stacks there will be in SNP track - for track scaling
       if (nrow(snp_eve_subs) > 1) {
@@ -602,7 +578,9 @@ server <- shinyServer(function(input, output, session) {
         snp_eve_subs_temp$dist <- as.numeric(snp_eve_subs_temp$start) - as.numeric(snp_eve_subs_temp$start_prev)
         snp_eve_size_init <- 1.5 + as.numeric(nrow(snp_eve_subs[which(snp_eve_subs$dist < snp_eve_range/10),])) + 0.3*length(unique(gene_subs$transcript))
       } else {snp_eve_size_init <- 1.4 + 0.05*length(unique(gene_subs$transcript)) + 0.015*nrow(snp_eve_subs)}
-    } else {snp_eve_size_init <- 1.4 + 0.05*length(unique(gene_subs$transcript)) + 0.015*nrow(snp_eve_subs)}
+    }
+    
+    else {snp_eve_size_init <- 1.4 + 0.05*length(unique(gene_subs$transcript)) + 0.015*nrow(snp_eve_subs)}
     
     # GABRIEL SNPs track
     if (nrow(snp_gabriel_subs) > 0) {
@@ -635,7 +613,9 @@ server <- shinyServer(function(input, output, session) {
     # TAGC SNPs track
     if (nrow(snp_TAGC_subs) > 0) {
       pval_choice <- reactive({input$which_TAGC_pvals})  #pval_choice is responsible for dynamically coloring snps based on user selection of population
+      if (!is.null(pval_choice())){
       snp_TAGC_track <- Gviz::AnnotationTrack(snp_TAGC_subs, name="SNPs (TAGC)", fill = unlist(snp_TAGC_subs[, paste0("color_", pval_choice())]), col=NULL, feature=snp_TAGC_subs$snp, grid=TRUE, col.grid="darkgrey")
+      } else {snp_TAGC_track <- Gviz::AnnotationTrack(NULL)}
       
       #rough estimate of number of stacks there will be in SNP track - for track scaling
       if (nrow(snp_TAGC_subs) > 1) {
