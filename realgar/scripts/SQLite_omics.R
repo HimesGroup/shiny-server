@@ -10,7 +10,7 @@ library(feather)
 #### SET UP Database #####
 #path = "/mnt/volume_nyc1_01/data/"
 # load descriptions of all gene expression and GWAS datasets
-Alldata_Info <- read_feather("Microarray_data_infosheet_latest_R.feather")
+Alldata_Info <- read_feather("/mnt/volume_nyc1_01/data/Microarray_data_infosheet_latest_R.feather")
 
 #then split off into gene expression and GWAS dataset info - else forest plot text columns get messed up
 GWAS_Dataset_Info <- Alldata_Info[which(Alldata_Info$App == "GWAS"),]
@@ -48,7 +48,7 @@ data_filter <- function(x){
 
 # Read feather files
 # Format for database
-# Write to database
+# Write to database #takes around 10 minutes
 for (i in f){
   d = read_feather(paste0(path, i,".feather"))
   names(d) <- gsub("[.]","",names(d))
