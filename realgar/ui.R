@@ -115,7 +115,7 @@ ui <- shinyUI(fluidPage(theme = shinytheme("lumen"),
                          Published 2018 Dec 5. (PMID:", a("30815178).",href="https://www.ncbi.nlm.nih.gov/pubmed/30815178", target="_blank"),
                                                      "You can refer to the code",a("here.",href="https://github.com/HimesGroup/raved", target="_blank")),
                                                    #Footer
-                                                   tags$footer(img(src="https://www.rstudio.com/wp-content/uploads/2014/04/shiny-400x464.png", height=124*.65, width=110.4*.65), 
+                                                   tags$footer(img(src="http://public.himeslab.org/rstudio-shiny-logo.png", height=124*.65, width=110.4*.65), 
                                                                "Created with RStudio's ", a("Shiny", href="http://www.rstudio.com/shiny", target="_blank"),
                                                                p("This app was created by Maya Shumyatcher, Mengyuan Kan, Avantika Diwadkar and Blanca Himes at the ", a("Himes Lab.", href="http://himeslab.org/", target="_blank")),style = footstyle)))))
                                                                                                                                                                                                                                    
