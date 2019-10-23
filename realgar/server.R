@@ -739,7 +739,9 @@ server <- shinyServer(function(input, output, session) {
   
   #Plot height for downloading plot
   plotHeight <- function(dat){
-    if (nrow(dat) <= 10){
+    if (nrow(dat) <= 3){
+      height = 2
+    }else if (nrow(dat) %in% seq(4,10)){
       height = 5
     } else {
       height = getHeight_func(dat)*px_to_inch
