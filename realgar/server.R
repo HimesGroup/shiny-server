@@ -740,7 +740,7 @@ server <- shinyServer(function(input, output, session) {
   #Plot height for downloading plot
   plotHeight <- function(dat){
     if (nrow(dat) <= 3){
-      height = 2
+      height = 3
     }else if (nrow(dat) %in% seq(4,10)){
       height = 5
     } else {
@@ -752,14 +752,14 @@ server <- shinyServer(function(input, output, session) {
   output$asthma_fc_download <- downloadHandler(
     filename= function(){paste0("REALGAR_asthma_forestplot_", graphgene(), ".png")},
     content=function(file){
-      png(file, width=15, height=plotHeight(data3_Asthma()), units="in", res=300)
+      png(file, width=16, height=plotHeight(data3_Asthma()), units="in", res=300)
       print(forestplot_func(data3_Asthma(),"Asthma Transcriptomic Results for ",curr_gene()))
       dev.off()})
   
   output$GC_fc_download <- downloadHandler(
     filename= function(){paste0("REALGAR_treatment_forestplot_", graphgene(), ".png")},
     content=function(file){
-      png(file, width=15, height=plotHeight(data3_GC()), units="in", res=300)
+      png(file, width=16, height=plotHeight(data3_GC()), units="in", res=300)
       print(forestplot_func(data3_GC(),"Exposure Transcriptomic Results for ",curr_gene()))
       dev.off()})
   
