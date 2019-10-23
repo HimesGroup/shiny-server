@@ -10,7 +10,9 @@ library(feather)
 #### SET UP Database #####
 #path = "/mnt/volume_nyc1_01/data/"
 # load descriptions of all gene expression and GWAS datasets
-Alldata_Info <- read_feather("/mnt/volume_nyc1_01/data/Microarray_data_infosheet_latest_R.feather")
+#Alldata_Info <- read_feather("/mnt/volume_nyc1_01/data/Microarray_data_infosheet_latest_R.feather")
+#Alldata_Info <- read.csv("Microarray_data_infosheet_latest_R.csv")
+Alldata_Info <- read_feather("Microarray_data_infosheet_latest_R.feather")
 
 #then split off into gene expression and GWAS dataset info - else forest plot text columns get messed up
 GWAS_Dataset_Info <- Alldata_Info[which(Alldata_Info$App == "GWAS"),]
@@ -44,12 +46,18 @@ data_filter <- function(x){
                   Upper_bound_CI = 2^(upper)) 
 }
 
+#Filter out new feather files
+query <- paste0("SELECT Unique_ID FROM REALGAR")
+res <- dbSendQuery(db, query)
+fdata <- dbFetch(res)
+dbClearResult(res)
 
+#new files
+new_files <- setdiff(f,as.vector(na.omit(fdata$Unique_ID)))
 
-# Read feather files
-# Format for database
-# Write to database #takes around 10 minutes
-for (i in f){
+# Write new files to database 
+# Use f instead of new_files if you want to re-write the whole database. This will take around 10 minutes
+for (i in new_files){
   d = read_feather(paste0(path, i,".feather"))
   names(d) <- gsub("[.]","",names(d))
   data <- cbind(Unique_ID = i,d)
@@ -58,6 +66,7 @@ for (i in f){
   rm(data)
   dbWriteTable(conn=db, name="REALGAR", final_data, append=T, row.names=F)
 }
+
 
 #Check table
 dbListTables(db)
