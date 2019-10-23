@@ -82,35 +82,17 @@ forestplot_func <- function(dat, ptitle,curr_gene) {
   xticks = seq(from = min(0.9, min(dat$Lower_bound_CI)), to = max(max(dat$Upper_bound_CI),1.2), length.out = 5)
   xticks = round(xticks,2)
   
-  #Colors
+  #Colors: (inferno(8002) can be used)
   breaks <- c(seq(0,8,by=0.001), Inf) # this sets max universally at 8 (else highest one OF THE SUBSET would be the max)
-  b_clrs  <- inferno(8002)[findInterval(dat$neglogofP, breaks)] #8002 is length(breaks) - ensures there are enough colors
-  
-  #Blues
-  # blues = c(rep('#deebf7',1001),rep('#c6dbef',1001),rep('#9ecae1',1000),rep('#6baed6',1000),rep('#4292c6',1000),rep('#2171b5',1000),rep('#08519c',1000),rep('#08306b',1000))
-  # breaks <- c(seq(0,8, by=0.001),Inf)
-  # b_clrs  <- rev(blues)[findInterval(dat$neglogofP, breaks)]
-  
-  #Reds
-  # reds = c(rep("#fee0d2",1001),rep("#fcbba1",1001),rep("#fc9272",1000),rep("#fb6a4a",1000),rep("#ef3b2c",1000),rep("#cb181d",1000),rep("#a50f15",1000),rep("#67000d",1000))
-  # breaks <- c(seq(0,8, by=0.001),Inf)
-  # b_clrs  <- rev(reds)[findInterval(dat$neglogofP, breaks)]
-  
-  #Terrain
-  #breaks <- c(seq(0,8,by=0.001), Inf) # this sets max universally at 8 (else highest one OF THE SUBSET would be the max)
-  #b_clrs  <- rev(terrain.colors(8002))[findInterval(dat$neglogofP, breaks)]
-  
-  #Spectral
-  # spectral <- c("#9E0142","#D53E4F","#F46D43","#FDAE61","#ABDDA4","#66C2A5","#3288BD","#5E4FA2")
-  # breaks <- c(seq(0,8, by=1),Inf)
-  # b_clrs  <- spectral[findInterval(dat$neglogofP, breaks)]
+  reds = rev(c(rep("#F58178",1001),rep("#F26256",1001),rep("#EF3B2C",1000),rep("#BF2F23",1000),rep("#99261C",1000),rep("#7A1E16",1000),rep("#621812",1000), rep("#4E130E",1000)))
+  b_clrs  <- reds[findInterval(dat$neglogofP, breaks)] #8002 is length(breaks) - ensures there are enough colors
   
   #Colors
   colors <- append(NA,b_clrs)
   tableplot$neglogofP2 <- append(NA,dat$neglogofP)
   
   
-  #Point
+  #Point : (22 can be used to fill outline color)
   point<-c(NA)
   if (nrow(dat)>1){
     for (i in 2:(nrow(dat))){point<-append(point,15)}
@@ -120,8 +102,8 @@ forestplot_func <- function(dat, ptitle,curr_gene) {
   #Box size
   if (nrow(dat)>1) {
     total <- as.numeric(dat$Total)
-    boxsize=c(0,2*log10(total)) # 0 for the header line
-  } else {boxsize=2} # boxsize = 2 default
+    boxsize=c(0,2.5*log10(total)) # 0 for the header line
+  } else {boxsize=2.5} # boxsize = 2 default
   
   
   #Theme
@@ -131,8 +113,8 @@ forestplot_func <- function(dat, ptitle,curr_gene) {
     axis.line = element_line(colour = "black"),
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
-    panel.border = element_blank(),
-    panel.background = element_rect(fill="#DEDAD7"),  #DEDAD7 #F6F5F4 #f7f3ef #BDB6B0 ##ECECEC #E7E7E7 #C6C6C5
+    panel.border = element_rect(colour = "black"), #border around the plot
+    panel.background = element_rect(fill="#E7E7E7"),  #edebe9 #DEDAD7 #F6F5F4 #f7f3ef #BDB6B0 ##ECECEC #E7E7E7 #C6C6C5
     axis.text.y = element_blank(),
     axis.ticks.y = element_blank(),
     axis.title.x = element_text(size=16),
@@ -141,22 +123,26 @@ forestplot_func <- function(dat, ptitle,curr_gene) {
   )
   
   ##G2 Plot 2 - forestplot
-  #tableplot$Fold.Change <- round(tableplot$Fold.Change,2)
-  g2 <- ggplot(tableplot,aes(Fold.Change,group)) + geom_point(aes(fill=neglogofP2),size=boxsize, shape=point, colour = colors, na.rm=TRUE)+
-    geom_errorbarh(aes(xmax = tableplot$Upper_bound_CI, xmin = tableplot$Lower_bound_CI), height = 0.25, colour= colors ,na.rm=TRUE, size=0.7) + #0.15
-    geom_vline(xintercept = 1, linetype = "longdash") + scale_x_continuous(breaks = xticks) + labs(x= "Fold Change",y="",fill="-log(Qvalue)") +
-    #guides(fill=FALSE)
-    scale_fill_gradientn(colours=inferno(8002),limits=c(0,8),breaks = seq(0,8)) + guides(fill = guide_colourbar(barheight = 10)) 
+  g2 <- ggplot(tableplot,aes(Fold.Change,group)) + 
+    geom_errorbarh(aes(xmax = tableplot$Upper_bound_CI, xmin = tableplot$Lower_bound_CI), height = 0.40, 
+                   colour= ifelse(tableplot$group == tableplot$group[nrow(tableplot)] & tableplot$neglogofP2 == tableplot$neglogofP2[nrow(tableplot)],"#E7E7E7",colors),
+                   na.rm=TRUE, size=1.2) + #0.15 #removed error bar for the final integration
+    geom_point(aes(fill=neglogofP2),size=boxsize, shape=point, colour = colors, na.rm=TRUE)+
+    #geom_point(aes(fill=neglogofP2),size=boxsize, shape=point, colour= ifelse(tableplot$group == tableplot$group[nrow(tableplot)] & tableplot$neglogofP2 == tableplot$neglogofP2[nrow(tableplot)],colors,"black"), na.rm=TRUE)+
+    geom_vline(xintercept = 1, linetype = "longdash") + scale_x_continuous(breaks = xticks) + labs(x= "Fold Change",y="",fill="-log(Q-Value)") +
+    scale_fill_gradientn(colours=reds,limits=c(0,8),breaks = seq(0,8),oob=squish) + #squish from scales package manages values out of range
+    guides(fill = guide_colourbar(barheight = 10)) 
   
   #Legend size
   if (nrow(dat) > 5) {g2 <- g2 + theme(legend.text = element_text(size=10),legend.title = element_text(size=14))}
   else {g2 <- g2 + theme(legend.text = element_text(size=8),legend.title = element_text(size=12))}
   
   #Add title if specified  
-  title <- ggdraw() + draw_label(paste0(ptitle, curr_gene),fontface = 'bold')
+  title <- ggdraw() + draw_label(paste0(ptitle, curr_gene),fontface = 'bold') #Initialize title
   
   #Bind two plots together and then bind this with the title
-  fplot <- plot_grid(g1,g2,ncol=2,rel_widths = c(2.1,1.0),align = "h") #rel_widths #align="h",axis="tblr",
+  #fplot <- plot_grid(g1,g2,ncol=2,rel_widths = c(2.1,1.0),align = "h") #rel_widths #align="h",axis="tblr",
+  fplot <- plot_grid(g1,g2,ncol=2,rel_widths = c(2.1,1.3),align = "h") #increased width of forestplot
   plot_grid(title,fplot,ncol = 1, rel_heights = c(0.1, 1),align = "v")
   
 }
