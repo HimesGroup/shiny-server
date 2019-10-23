@@ -737,18 +737,28 @@ server <- shinyServer(function(input, output, session) {
   graphgene=reactive({curr_gene()})
   px_to_inch = 0.0104166653543
   
+  #Plot height for downloading plot
+  plotHeight <- function(dat){
+    if (nrow(dat) <= 10){
+      height = 5
+    } else {
+      height = getHeight_func(dat)*px_to_inch
+    }
+    return(height)
+  }
+  
   output$asthma_fc_download <- downloadHandler(
     filename= function(){paste0("REALGAR_asthma_forestplot_", graphgene(), ".png")},
     content=function(file){
-      png(file, width=15, height=getHeightAsthma()*px_to_inch, units="in", res=300)
-      print(forestplot_asthma())
+      png(file, width=15, height=plotHeight(data3_Asthma()), units="in", res=300)
+      print(forestplot_func(data3_Asthma(),"Asthma Transcriptomic Results for ",curr_gene()))
       dev.off()})
   
   output$GC_fc_download <- downloadHandler(
     filename= function(){paste0("REALGAR_treatment_forestplot_", graphgene(), ".png")},
     content=function(file){
-      png(file, width=15, height=getHeightGC()*px_to_inch, units="in", res=300)
-      print(forestplot_GC())
+      png(file, width=15, height=plotHeight(data3_GC()), units="in", res=300)
+      print(forestplot_func(data3_GC(),"Exposure Transcriptomic Results for ",curr_gene()))
       dev.off()})
   
   output$gene_tracks_download <- downloadHandler(
