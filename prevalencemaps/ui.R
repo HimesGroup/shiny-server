@@ -2,43 +2,43 @@
 library(shiny)
 library(shinyWidgets)
 library(shinydashboard)
-sidebar <- dashboardSidebar(
-  sidebarMenu(id = "sidebarmenu",
-    menuItem("Introduction", tabName = "Introduction", icon = icon("square")),
-    menuItem("Map of MMSA Data", tabName = "Map", icon = icon("square")),
-    menuItem("MMSA-Specific Graphs", tabName = "MMSAGraph", icon = icon("square")),
-    menuItem("US Bivariate Graphs", tabName = "Bivariate", icon = icon("square")),
-    menuItem("US Multivariate Graphs", tabName = "Multivariate", icon = icon("square")),
-    menuItem("US Regional Graphs", tabName = "Regional", icon = icon("square"))
-  )
-)
 
-body<-dashboardBody(
-  tabItems(
-    tabItem(tabName = "Introduction",
-                   includeHTML("/srv/shiny-server/databases/prevalencemaps/introprevalencemaps.html")
+#Setting up the visual interface for the app
+shinyUI(fluidPage(
+  titlePanel(h1("Prevalence Maps", align = "left")),
+  tabsetPanel(
+    tabPanel("Introduction",
+             includeHTML("/srv/shiny-server/databases/prevalencemaps/introprevalencemaps.html")
     ),
-    tabItem(tabName = "Map",
+    tabPanel("Map of MMSA Data",
+             #Setting controls for how the dropdown options work
+            tags$div(tags$style(HTML( ".selectize-dropdown, .selectize-dropdown.form-control{z-index:10000;}"))),
+            br(),
+            #Setting up the layout of the page for display of data
             fluidRow(
               column(4,
                      selectInput("control_disease", "Condition of Interest:", 
-                                 choices=c("Asthma" = "Asthma","CHD" = "CHD", "Flushot"= "Flushot"))
+                                 choices=c("Asthma" = "Asthma", "COPD" = "COPD", "CHD" = "CHD", "Diabetes"="Diabetes", 
+                                           "Average BMI" = "AVERAGE_BMI", "Average ADI" = "AVERAGE_ADI",
+                                           "Flushot Administration"= "`Flushot Administration`",
+                                           "Good or Better Health" = "`Good or Better Health`",
+                                           "Smokes" = "Smokes",
+                                           "Depressive Disorder" = "`Depressive Disorder`",
+                                           "Has Health Insurance" = "`Has Health Insurance`"))
                      ),
               column(4,
                      selectInput("var", "Year:",
-                                 c("2007" = "2007", "2008" = "2008", "2009" = "2009",
-                                   "2010" = "2010", "2011" = "2011", "2012" = "2012",
+                                 c("2011" = "2011", "2012" = "2012",
                                    "2013" = "2013", "2014" = "2014", "2015" = "2015",
                                    "2016" = "2016", "2017" = "2017",
-                                   "2007-2017 (all years)" = "2007-2017 (all years)",
-                                   "2007-2010" = "2007-2010",
-                                   "2011-2017" = "2011-2017"), selected = "2007-2017 (all years)")),
+                                   "2011-2017 (all years)" = "2011-2017 (all years)"
+                                   ), selected = "2011-2017 (all years)")),
               column(4,
                      selectInput("mmsa_input", "MMSA:",
                                  choices = mmsa_names$x))
             ),
             fluidRow(        
-              column(12,
+              column(12, 
                      box(width=NULL,
                          h5(textOutput("mapyearinfo"), align="center"),
                          leafletOutput("map"),
@@ -46,8 +46,30 @@ body<-dashboardBody(
                          h5(textOutput("mapinfo"), align="center")
                      ))
             )),
-    tabItem(tabName = "MMSAGraph",
+    tabPanel("MMSA-Specific Graphs",
+            br(),
             fluidRow(
+              tags$div(tags$style(HTML( ".selectize-dropdown, .selectize-dropdown.form-control{z-index:10000;}"))),
+              br(),
+                column(4,
+                       selectInput("control_diseaseg", "Condition of Interest:", 
+                                   choices=c("Asthma" = "Asthma", "COPD" = "COPD", "CHD" = "CHD", "Diabetes"="Diabetes", 
+                                             "Flushot Administration"= "`Flushot Administration`",
+                                             "Good or Better Health" = "`Good or Better Health`",
+                                             "Depressive Disorder" = "`Depressive Disorder`",
+                                             "Has Health Insurance" = "`Has Health Insurance`"))
+                ),
+                column(4,
+                       selectInput("varg", "Year:",
+                                   c("2011" = "2011", "2012" = "2012",
+                                     "2013" = "2013", "2014" = "2014", "2015" = "2015",
+                                     "2016" = "2016", "2017" = "2017",
+                                     "2011-2017 (all years)" = "2011-2017 (all years)"
+                                   ), selected = "2011-2017 (all years)")),
+                column(4,
+                       selectInput("mmsa_inputg", "MMSA:",
+                                   choices = mmsa_names$x)),
+              br(),
               column(12,
                      h5(textOutput("graphinfo"), align="center"))
             ),
@@ -67,83 +89,66 @@ body<-dashboardBody(
                          plotOutput("gender_plot", height = 140),
                          plotOutput("age_plot", height = 140))
               ))),
-    tabItem(tabName = "Bivariate",
+    tabPanel("US Bivariate Graphs",
             fluidRow(
-              box(width=5, height = 350, h2("Bivariate Relationships"),
+              box(width=3, height = 350, h2("Bivariate Relationships"),
                   selectInput("control_disease2",
                               "Condition of Interest:",
-                              choices=c("Asthma" = "Asthma","CHD" = "CHD", "Flushot"= "Flushot")
+                              choices=c("Asthma" = "Asthma", "COPD" = "COPD", "CHD" = "CHD", "Diabetes"="Diabetes", 
+                                        "Flushot Administration"= "`Flushot Administration`",
+                                        "Good or Better Health" = "`Good or Better Health`",
+                                        "Depressive Disorder" = "`Depressive Disorder`",
+                                        "Has Health Insurance" = "`Has Health Insurance`")
                   ),
                   selectInput("variable", "Variable of Interest:",
-                              choices = c("BMI"="BMI","Smoker"="Smoker","Education"="Education","Income"="Income",
-                                          "Race"="Race")),
-                  selectInput("variableyear1", "Years:",
-                              choices=c("2007-2017"="2007_2017","2007-2010"="2007_2010","2011-2017"="2011_2017"))
+                              choices = c("BMI"="BMI","Smokers"="Smokers","Education"="Education","Income"="Income",
+                                          "Race"="Race", "ADI Quintile" = "`ADI Quintile`"))
                   ),
-              box(width=7,
-                  plotOutput("graph", height = 350))
+              box(width=9,
+                  plotOutput("graph", height = 500))
             )),
-            #fluidRow(
-            #  box(width=12,h4("Regression Output with Odds Ratios"),
-            #      tableOutput("summary"))
-            #)
-    tabItem(tabName = "Multivariate",        
+    tabPanel("US Multivariate Graphs",        
     fluidRow(
-              box(width=5,height = 400,h2("Multivariable Relationships"),
+      br(),        
+      box(width=3,height = 500,h2("Multivariable Relationships"),
                   selectInput("control_disease3",
                               "Condition of Interest:",
-                              choices=c("Asthma" = "Asthma","CHD" = "CHD", "Flushot"= "Flushot")),
+                              choices=c("Asthma" = "Asthma", "COPD" = "COPD", "CHD" = "CHD", "Diabetes"="Diabetes", 
+                                        "Flushot Administration"= "`Flushot Administration`",
+                                        "Good or Better Health" = "`Good or Better Health`",
+                                        "Depressive Disorder" = "`Depressive Disorder`",
+                                        "Has Health Insurance" = "`Has Health Insurance`")),
                   selectInput("factors",
                               "Other Variables:",
-                              choices=c("BMI"="BMI","Smoker"="Smoker","Education"="Education","Income"="Income",
-                                        "Race"="Race","Flushot"="Flushot","Asthma"="Asthma","CHD"="CHD")),
+                              choices=c("BMI"="BMI","Smokers"="Smokers","Education"="Education","Income"="Income",
+                                        "Race"="Race","Flushot"="`Flushot Administration`", "ADI Quintile" = "`ADI Quintile`")),
                   selectInput("multivariable", "Stratifying Factor:",
-                              choices = c("Income"="Income","Race"="Race","Sex"="Sex")),
-                  selectInput("variableyear2", "Years:",
-                              choices=c("2007-2017"="2007_2017","2007-2010"="2007_2010","2011-2017"="2011_2017"))
-                  ),
-              box(width=7,
-                  plotOutput("multigraph", height=400))
-              )),
-  #  fluidRow(
-  #    box(width=12,
-  #        h4("Regression Output with Odds Ratios"),
-  #        tableOutput("summarymulti"))
-  #  )
-            
-    tabItem(tabName = "Regional",
-            fluidRow(
-              box(width=5,h2("Relationships Across Regions"),
+                              choices = c("Smokers"="Smokers","BMI"="BMI","Education"="Education",
+                                          "Income"="Income","Race"="Race","Sex"="Sex", "ADI Quintile" = "`ADI Quintile`"))
+                 ),
+              box(width=9,
+                  plotOutput("multigraph", height=600))
+             )
+     ),
+    tabPanel("US Regional Graphs",
+           br(),
+           fluidRow(
+              box(width=3,h2("Relationships Across Regions"),
                   selectInput("control_disease4",
                               "Condition of Interest:",
-                              choices=c("Asthma" = "Asthma", "CHD" = "CHD", "Flushot"= "Flushot")),
+                              choices=c("Asthma" = "Asthma", "COPD" = "COPD", "CHD" = "CHD", "Diabetes"="Diabetes", 
+                                        "Flushot Administration"= "`Flushot Administration`",
+                                        "Good or Better Health" = "`Good or Better Health`",
+                                        "Depressive Disorder" = "`Depressive Disorder`",
+                                        "Has Health Insurance" = "`Has Health Insurance`")),
                   selectInput("variable2",
                               "Variable of Interest:",
-                              choices=c("BMI"="BMI","Smoker"="Smoker","Education"="Education","Income"="Income",
-                                        "Race"="Race")),
-                  selectInput("variableyear3", "Years:",
-                              choices=c("2007-2017"="2007_2017","2007-2010"="2007_2010","2011-2017"="2011_2017"))
-              
+                              choices=c("BMI"="BMI","Smokers"="Smokers","Education"="Education","Income"="Income",
+                                        "Race"="Race",  "ADI Quintile" = "`ADI Quintile`"))
                   ),
-                box(width=7,
-                    plotOutput("regiongraph"))
+                box(width=9,
+                    plotOutput("regiongraph", height = 600))
             ))
     )
+  )
 )
-  
-
-
-  shinyUI(
-    dashboardPage(skin="black",dashboardHeader(title="Prevalence Maps"),
-                  dashboardSidebar(sidebar),
-                  dashboardBody(body),
-                  tags$script(src="gomap.js")
-                  )
-                
-                )
-  #add after body if want to add css and js code 
-  #,
-  # tags$head(
-  #   theme = "styles.css"
-  # ),
-  # tags$script(src="hoge.js")
