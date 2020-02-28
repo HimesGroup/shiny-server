@@ -56,7 +56,7 @@ weighted_current_flushot_prev <- read_feather("/srv/shiny-server/databases/preva
 weighted_current_flushot_prev$Flushot_percent <- weighted_current_flushot_prev$Flushot*100
 
 weighted_current_varsflushot <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_variables_Flushot_leaflet.feather")
-colnames(weighted_current_varsflushot) <- c("MMSA", "YEAR", "Flushot", "<$25,000", "$25,000-$75,000", ">$75,000", 
+colnames(weighted_current_varsflushot) <- c("MMSA", "YEAR", "`Flushot Administration`", "<$25,000", "$25,000-$75,000", ">$75,000", 
                                             "Male", "Female", "White", "Asian/Pacific Islander",
                                             "Black", "Hispanic", "American Indian/Alaskan Native",
                                             "Not overweight or obese", "Overweight", "Grade 1 Obese", "Grade 2 Obese", "Grade 3 Obese",
@@ -128,10 +128,10 @@ weighted_current_YNSMOKE_prev <- read_feather("/srv/shiny-server/databases/preva
 weighted_current_YNSMOKE_prev$YNSMOKE_percent <- weighted_current_YNSMOKE_prev$YNSMOKE*100
 
 weighted_current_bmin_prev <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_bmin_w_counts_leaflet.feather")
-weighted_current_bmin_prev$AVERAGE_BMI <- weighted_current_bmin_prev$BMI_AVE
+weighted_current_bmin_prev$`Average BMI` <- weighted_current_bmin_prev$BMI_AVE
 
 weighted_current_adi_prev <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_adi_w_counts_leaflet.feather")
-weighted_current_adi_prev$AVERAGE_ADI <- weighted_current_adi_prev$ADI_AVE
+weighted_current_adi_prev$`Average ADI` <- weighted_current_adi_prev$ADI_AVE
 
 #Reading in data for use in bivariate, multivariate, and regional graphs.
 current.all<-readRDS("/srv/shiny-server/databases/prevalencemaps/current_all.RDS")

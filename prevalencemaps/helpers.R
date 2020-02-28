@@ -1,8 +1,9 @@
 percent_map <- function(by_mmsa, z) {
   
   mapNames<-location_min_sf$NAME #Makes list of names to assign to map
-  matches <- match(location_min_sf$CBSAFP, by_mmsa$MMSA) #makes list of matches
+  matches <- match(location_min_sf$CBSAFP, by_mmsa$MMSA) #Makes list of matches
   
+  #Assigns values and Ns by MMSA to each variable
   if (z=="Asthma") {
     valsAsthma<-as.numeric(by_mmsa$Asthma_percent[matches])
     nsAsthma <- format(by_mmsa$count[matches],big.mark=",")
@@ -18,7 +19,7 @@ percent_map <- function(by_mmsa, z) {
   } else if (z=="`Depressive Disorder`") {
     valsdep<-as.numeric(by_mmsa$DEP_percent[matches])
     nsdep <- format(by_mmsa$count,big.mark=",")[matches]
-  } else if (z=="Smokes") {
+  } else if (z=="Smoking") {
     valssmoke<-as.numeric(by_mmsa$YNSMOKE_percent[matches])
     nssmoke <- format(by_mmsa$count,big.mark=",")[matches]
   } else if (z=="Diabetes") {
@@ -27,18 +28,18 @@ percent_map <- function(by_mmsa, z) {
   } else if (z=="`Good or Better Health`") {
     valsSRH<-as.numeric(by_mmsa$SRH_percent[matches])
     nsSRH <- format(by_mmsa$count,big.mark=",")[matches]
-  } else if (z=="AVERAGE_BMI") {
-    valsbmin<-as.numeric(by_mmsa$AVERAGE_BMI[matches])
+  } else if (z=="`Average BMI`") {
+    valsbmin<-as.numeric(by_mmsa$`Average BMI`[matches])
     nsbmin <- format(by_mmsa$count,big.mark=",")[matches]
-  } else if (z=="AVERAGE_ADI") {
-    valsadi<-as.numeric(by_mmsa$AVERAGE_ADI[matches])
+  } else if (z=="`Average ADI`") {
+    valsadi<-as.numeric(by_mmsa$`Average ADI`[matches])
     nsadi <- format(by_mmsa$count,big.mark=",")[matches]
   } else {
     valsFlushot<-as.numeric(by_mmsa$Flushot_percent[matches])
     nsFlushot <- format(by_mmsa$count,big.mark=",")[matches]
   }
   
-  
+  #Assigns colors to variables, with palettes reversed for ease of understanding between legend and map
   if(z=="Asthma"){
     palAsthma <- colorBin("OrRd", valsAsthma, 6, pretty=FALSE, na.color="#ADADAD", reverse=FALSE)
     revpalAsthma <- colorBin("OrRd", valsAsthma, 6, pretty=FALSE, na.color="#ADADAD", reverse=TRUE)
@@ -51,13 +52,13 @@ percent_map <- function(by_mmsa, z) {
   } else if (z=="Diabetes") {
     palDiabetes <- colorBin("OrRd", valsDiabetes, 6, pretty=FALSE, na.color="#ADADAD", reverse=FALSE)
     revpalDiabetes <- colorBin("OrRd", valsDiabetes, 6, pretty=FALSE, na.color="#ADADAD", reverse=TRUE)
-  } else if (z=="AVERAGE_BMI") {
+  } else if (z=="`Average BMI`") {
     palbmin <- colorBin("OrRd", valsbmin, 6, pretty=FALSE, na.color="#ADADAD", reverse=FALSE)
     revpalbmin <- colorBin("OrRd", valsbmin, 6, pretty=FALSE, na.color="#ADADAD", reverse=TRUE)
-  } else if (z=="AVERAGE_ADI") {
+  } else if (z=="`Average ADI`") {
     paladi <- colorBin("OrRd", valsadi, 6, pretty=FALSE, na.color="#ADADAD", reverse=FALSE)
     revpaladi <- colorBin("OrRd", valsadi, 6, pretty=FALSE, na.color="#ADADAD", reverse=TRUE)
-  } else if (z=="Smokes") {
+  } else if (z=="Smoking") {
     palsmoke <- colorBin("OrRd", valssmoke, 6, pretty=FALSE, na.color="#ADADAD", reverse=FALSE)
     revpalsmoke <- colorBin("OrRd", valssmoke, 6, pretty=FALSE, na.color="#ADADAD", reverse=TRUE)
   } else if (z=="`Good or Better Health`") {
@@ -74,6 +75,7 @@ percent_map <- function(by_mmsa, z) {
     revpalFlushot <- colorBin("OrRd", valsFlushot, 6, pretty=FALSE, na.color="#ADADAD", reverse=TRUE)
   }
   
+  #Assigns empty vectors to variables for displaying vals(Variable)
   percents_reformattedAsthma <- rep(0,945)
   percents_reformattedCHD <- rep(0,945)
   percents_reformattedCOPD <- rep(0,945)
@@ -97,7 +99,7 @@ percent_map <- function(by_mmsa, z) {
     for(i in c(1:945)){
       percents_reformattedCOPD[i] <- ifelse(!is.na(valscopd[i]), paste0(round(valscopd[i], 2), "%"), "No data")
     }
-  } else if (z=="Smokes") {
+  } else if (z=="Smoking") {
     for(i in c(1:945)){
       percents_reformattedsmoke[i] <- ifelse(!is.na(valssmoke[i]), paste0(round(valssmoke[i], 2), "%"), "No data")
     }
@@ -117,11 +119,11 @@ percent_map <- function(by_mmsa, z) {
     for(i in c(1:945)){
       percents_reformattedSRH[i] <- ifelse(!is.na(valsSRH[i]), paste0(round(valsSRH[i], 2), "%"), "No data")
     }
-  } else if (z=="AVERAGE_BMI") {
+  } else if (z=="`Average BMI`") {
     for(i in c(1:945)){
       percents_reformattedbmin[i] <- ifelse(!is.na(valsbmin[i]), paste0(round(valsbmin[i], 2)), "No data")
     }
-  } else if (z=="AVERAGE_ADI") {
+  } else if (z=="`Average ADI`") {
     for(i in c(1:945)){
       percents_reformattedadi[i] <- ifelse(!is.na(valsadi[i]), paste0(round(valsadi[i], 2)), "No data")
     }
@@ -130,13 +132,8 @@ percent_map <- function(by_mmsa, z) {
       percents_reformattedFlushot[i] <- ifelse(!is.na(valsFlushot[i]), paste0(round(valsFlushot[i], 2), "%"), "No data")
     }
   }
-  
-  
-  # names_reformatted <- rep(0, 945)
-  # for(i in c(1:945)){
-  #   names_reformatted[i] <- mapNames[i]
-  # }
-  
+
+  #Creates popup
   if(z=="Asthma"){
     mmsa_popup_Asthma <- paste0("<strong>MMSA: </strong>", 
                                 mapNames, 
@@ -150,44 +147,44 @@ percent_map <- function(by_mmsa, z) {
                              percents_reformattedCHD, "<br><strong>N: </strong>", nsCHD)
   } else if (z=="COPD") {
     mmsa_popup_COPD <- paste0("<strong>MMSA: </strong>", 
-                             mapNames, 
-                             "<br><strong>Weighted COPD Prevalence: </strong>", 
-                             percents_reformattedCOPD, "<br><strong>N: </strong>", nscopd)
-  } else if (z=="Smokes") {
-    mmsa_popup_smoke <- paste0("<strong>MMSA: </strong>", 
                               mapNames, 
-                              "<br><strong>Weighted Smoking Prevalence: </strong>", 
-                              percents_reformattedsmoke, "<br><strong>N: </strong>", nssmoke)
+                              "<br><strong>Weighted COPD Prevalence: </strong>", 
+                              percents_reformattedCOPD, "<br><strong>N: </strong>", nscopd)
+  } else if (z=="Smoking") {
+    mmsa_popup_smoke <- paste0("<strong>MMSA: </strong>", 
+                               mapNames, 
+                               "<br><strong>Weighted Smoking Prevalence: </strong>", 
+                               percents_reformattedsmoke, "<br><strong>N: </strong>", nssmoke)
   } else if (z=="Diabetes") {
     mmsa_popup_Diabetes <- paste0("<strong>MMSA: </strong>", 
-                             mapNames, 
-                             "<br><strong>Weighted Diabetes Prevalence: </strong>", 
-                             percents_reformattedDiabetes, "<br><strong>N: </strong>", nsDiabetes)
+                                  mapNames, 
+                                  "<br><strong>Weighted Diabetes Prevalence: </strong>", 
+                                  percents_reformattedDiabetes, "<br><strong>N: </strong>", nsDiabetes)
   } else if (z=="`Good or Better Health`") {
     mmsa_popup_SRH <- paste0("<strong>MMSA: </strong>", 
-                                  mapNames, 
-                                  "<br><strong>Weighted Good or Better Health: </strong>", 
-                                  percents_reformattedSRH, "<br><strong>N: </strong>", nsSRH)
+                             mapNames, 
+                             "<br><strong>Weighted Good or Better Health: </strong>", 
+                             percents_reformattedSRH, "<br><strong>N: </strong>", nsSRH)
   } else if (z=="`Has Health Insurance`") {
     mmsa_popup_hc <- paste0("<strong>MMSA: </strong>", 
-                             mapNames, 
-                             "<br><strong>Weighted Prevalence of Health Insurance: </strong>", 
-                             percents_reformattedhc, "<br><strong>N: </strong>", nshc)
+                            mapNames, 
+                            "<br><strong>Weighted Prevalence of Health Insurance: </strong>", 
+                            percents_reformattedhc, "<br><strong>N: </strong>", nshc)
   } else if (z=="`Depressive Disorder`") {
     mmsa_popup_dep <- paste0("<strong>MMSA: </strong>", 
                              mapNames, 
                              "<br><strong>Weighted Prevalence of Depressive Disorder: </strong>", 
                              percents_reformatteddep, "<br><strong>N: </strong>", nsdep)
-  } else if (z=="AVERAGE_BMI") {
+  } else if (z=="`Average BMI`") {
     mmsa_popup_bmin <- paste0("<strong>MMSA: </strong>", 
-                             mapNames, 
-                             "<br><strong>Weighted BMI Average: </strong>", 
-                             percents_reformattedbmin, "<br><strong>N: </strong>", nsbmin)
-  } else if (z=="AVERAGE_ADI") {
-    mmsa_popup_adi <- paste0("<strong>MMSA: </strong>", 
                               mapNames, 
-                              "<br><strong>Weighted ADI Average: </strong>", 
-                              percents_reformattedadi, "<br><strong>N: </strong>", nsadi)
+                              "<br><strong>Weighted BMI Average: </strong>", 
+                              percents_reformattedbmin, "<br><strong>N: </strong>", nsbmin)
+  } else if (z=="`Average ADI`") {
+    mmsa_popup_adi <- paste0("<strong>MMSA: </strong>", 
+                             mapNames, 
+                             "<br><strong>Weighted ADI Average: </strong>", 
+                             percents_reformattedadi, "<br><strong>N: </strong>", nsadi)
   } else {
     mmsa_popup_Flushot <- paste0("<strong>MMSA: </strong>", 
                                  mapNames, 
@@ -195,6 +192,7 @@ percent_map <- function(by_mmsa, z) {
                                  percents_reformattedFlushot, "<br><strong>N: </strong>", nsFlushot)
   }
   
+  #Creates the map
   if(z=="Asthma"){
     leaflet(location_min_sf) %>% 
       setView(lng=-94, lat=39, zoom=3.5) %>%
@@ -291,7 +289,7 @@ percent_map <- function(by_mmsa, z) {
                 opacity = 1,
                 na.label = "No data",
                 labFormat = labelFormat(digits = 1, suffix = "%",transform = function(x) sort(x, decreasing = TRUE)))
-  } else if (z=="Smokes") {
+  } else if (z=="Smoking") {
     leaflet(location_min_sf) %>% 
       addTiles(options = tileOptions(opacity = 1)) %>%
       addMapPane("below", zIndex = 410) %>%
@@ -451,7 +449,7 @@ percent_map <- function(by_mmsa, z) {
                 opacity = 1,
                 na.label = "No data",
                 labFormat = labelFormat(digits = 1, suffix = "%",transform = function(x) sort(x, decreasing = TRUE)))
-  } else if (z=="AVERAGE_BMI") {
+  } else if (z=="`Average BMI`") {
     leaflet(location_min_sf) %>% 
       addTiles(options = tileOptions(opacity = 1)) %>%
       addMapPane("below", zIndex = 410) %>%
@@ -483,7 +481,7 @@ percent_map <- function(by_mmsa, z) {
                 opacity = 1,
                 na.label = "No data",
                 labFormat = labelFormat(digits = 1,transform = function(x) sort(x, decreasing = TRUE)))
-  } else if (z=="AVERAGE_ADI") {
+  } else if (z=="`Average ADI`") {
     leaflet(location_min_sf) %>% 
       addTiles(options = tileOptions(opacity = 1)) %>%
       addMapPane("below", zIndex = 410) %>%

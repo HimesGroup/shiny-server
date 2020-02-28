@@ -77,22 +77,22 @@ function(input, output, clientData, session) {
              "`Good or Better Health` 2016" = filter(weighted_current_SRH_prev, YEAR==paste(input$var)),
              "`Good or Better Health` 2017" = filter(weighted_current_SRH_prev, YEAR==paste(input$var)),
              "`Good or Better Health` 2011-2017 (all years)" = filter(weighted_current_SRH_prev, YEAR==paste(input$var)),
-             "AVERAGE_BMI 2011" = filter(weighted_current_bmin_prev, YEAR==paste(input$var)),
-             "AVERAGE_BMI 2012" = filter(weighted_current_bmin_prev, YEAR==paste(input$var)),
-             "AVERAGE_BMI 2013" = filter(weighted_current_bmin_prev, YEAR==paste(input$var)),
-             "AVERAGE_BMI 2014" = filter(weighted_current_bmin_prev, YEAR==paste(input$var)),
-             "AVERAGE_BMI 2015" = filter(weighted_current_bmin_prev, YEAR==paste(input$var)),
-             "AVERAGE_BMI 2016" = filter(weighted_current_bmin_prev, YEAR==paste(input$var)),
-             "AVERAGE_BMI 2017" = filter(weighted_current_bmin_prev, YEAR==paste(input$var)),
-             "AVERAGE_BMI 2011-2017 (all years)" = filter(weighted_current_bmin_prev, YEAR==paste(input$var)),
-             "AVERAGE_ADI 2011" = filter(weighted_current_adi_prev, YEAR==paste(input$var)),
-             "AVERAGE_ADI 2012" = filter(weighted_current_adi_prev, YEAR==paste(input$var)),
-             "AVERAGE_ADI 2013" = filter(weighted_current_adi_prev, YEAR==paste(input$var)),
-             "AVERAGE_ADI 2014" = filter(weighted_current_adi_prev, YEAR==paste(input$var)),
-             "AVERAGE_ADI 2015" = filter(weighted_current_adi_prev, YEAR==paste(input$var)),
-             "AVERAGE_ADI 2016" = filter(weighted_current_adi_prev, YEAR==paste(input$var)),
-             "AVERAGE_ADI 2017" = filter(weighted_current_adi_prev, YEAR==paste(input$var)),
-             "AVERAGE_ADI 2011-2017 (all years)" = filter(weighted_current_adi_prev, YEAR==paste(input$var)),
+             "`Average BMI` 2011" = filter(weighted_current_bmin_prev, YEAR==paste(input$var)),
+             "`Average BMI` 2012" = filter(weighted_current_bmin_prev, YEAR==paste(input$var)),
+             "`Average BMI` 2013" = filter(weighted_current_bmin_prev, YEAR==paste(input$var)),
+             "`Average BMI` 2014" = filter(weighted_current_bmin_prev, YEAR==paste(input$var)),
+             "`Average BMI` 2015" = filter(weighted_current_bmin_prev, YEAR==paste(input$var)),
+             "`Average BMI` 2016" = filter(weighted_current_bmin_prev, YEAR==paste(input$var)),
+             "`Average BMI` 2017" = filter(weighted_current_bmin_prev, YEAR==paste(input$var)),
+             "`Average BMI` 2011-2017 (all years)" = filter(weighted_current_bmin_prev, YEAR==paste(input$var)),
+             "`Average ADI` 2011" = filter(weighted_current_adi_prev, YEAR==paste(input$var)),
+             "`Average ADI` 2012" = filter(weighted_current_adi_prev, YEAR==paste(input$var)),
+             "`Average ADI` 2013" = filter(weighted_current_adi_prev, YEAR==paste(input$var)),
+             "`Average ADI` 2014" = filter(weighted_current_adi_prev, YEAR==paste(input$var)),
+             "`Average ADI` 2015" = filter(weighted_current_adi_prev, YEAR==paste(input$var)),
+             "`Average ADI` 2016" = filter(weighted_current_adi_prev, YEAR==paste(input$var)),
+             "`Average ADI` 2017" = filter(weighted_current_adi_prev, YEAR==paste(input$var)),
+             "`Average ADI` 2011-2017 (all years)" = filter(weighted_current_adi_prev, YEAR==paste(input$var)),
              "`Has Health Insurance` 2011" = filter(weighted_current_HC_prev, YEAR==paste(input$var)),
              "`Has Health Insurance` 2012" = filter(weighted_current_HC_prev, YEAR==paste(input$var)),
              "`Has Health Insurance` 2013" = filter(weighted_current_HC_prev, YEAR==paste(input$var)),
@@ -117,18 +117,18 @@ function(input, output, clientData, session) {
              "COPD 2016" = filter(weighted_current_COPD_prev, YEAR==paste(input$var)),
              "COPD 2017" = filter(weighted_current_COPD_prev, YEAR==paste(input$var)),
              "COPD 2011-2017 (all years)" = filter(weighted_current_COPD_prev, YEAR==paste(input$var)),
-             "Smokes 2011" = filter(weighted_current_YNSMOKE_prev, YEAR==paste(input$var)),
-             "Smokes 2012" = filter(weighted_current_YNSMOKE_prev, YEAR==paste(input$var)),
-             "Smokes 2013" = filter(weighted_current_YNSMOKE_prev, YEAR==paste(input$var)),
-             "Smokes 2014" = filter(weighted_current_YNSMOKE_prev, YEAR==paste(input$var)),
-             "Smokes 2015" = filter(weighted_current_YNSMOKE_prev, YEAR==paste(input$var)),
-             "Smokes 2016" = filter(weighted_current_YNSMOKE_prev, YEAR==paste(input$var)),
-             "Smokes 2017" = filter(weighted_current_YNSMOKE_prev, YEAR==paste(input$var)),
-             "Smokes 2011-2017 (all years)" = filter(weighted_current_YNSMOKE_prev, YEAR==paste(input$var))
+             "Smoking 2011" = filter(weighted_current_YNSMOKE_prev, YEAR==paste(input$var)),
+             "Smoking 2012" = filter(weighted_current_YNSMOKE_prev, YEAR==paste(input$var)),
+             "Smoking 2013" = filter(weighted_current_YNSMOKE_prev, YEAR==paste(input$var)),
+             "Smoking 2014" = filter(weighted_current_YNSMOKE_prev, YEAR==paste(input$var)),
+             "Smoking 2015" = filter(weighted_current_YNSMOKE_prev, YEAR==paste(input$var)),
+             "Smoking 2016" = filter(weighted_current_YNSMOKE_prev, YEAR==paste(input$var)),
+             "Smoking 2017" = filter(weighted_current_YNSMOKE_prev, YEAR==paste(input$var)),
+             "Smoking 2011-2017 (all years)" = filter(weighted_current_YNSMOKE_prev, YEAR==paste(input$var))
       )
     })
     
-    #Calling in data for use in the MMSA graphs; not all variables here match with variables in the map due to ease of display
+#Calling in data for use in the MMSA graphs; not all variables here match with variables used in the map, due to redundancy (i.e BMI already displayed)
     full_dat <- reactive({
       switch(paste(c_disg,input$varg,sep=" "),
              "Asthma 2011" = filter(weighted_current_vars, YEAR==paste(input$varg)),
@@ -211,33 +211,33 @@ function(input, output, clientData, session) {
     
     #Multivariate graph formation
     output$multigraph <- renderPlot({ current.all %>% 
-      filter(!is.na(BMI)) %>%
-      ggplot(aes_string(x=paste(input$factors), fill=paste(input$control_disease3), weights="MMSAWT")) + 
-      geom_bar(position="fill") +
-      facet_grid(paste(input$multivariable), scales = "free") +
-      scale_x_discrete(paste(input$factors)) +
-      ggtitle("Multivariate Interactions") +
-      scale_fill_brewer(name=paste(input$control_disease3), palette = "OrRd") + 
-      theme(axis.text.x=element_text(hjust=1)) + ylab("") +
-      theme(axis.ticks.x = element_blank()) +
-      theme(axis.title.x = element_text(vjust=-1.5)) + 
-      theme(axis.text.x = element_text(angle = 20))
+        filter(!is.na(BMI)) %>%
+        ggplot(aes_string(x=paste(input$factors), fill=paste(input$control_disease3), weights="MMSAWT")) + 
+        geom_bar(position="fill") +
+        facet_grid(paste(input$multivariable), scales = "free") + 
+        scale_x_discrete(gsub("`","",paste(input$factors))) +
+        ggtitle("Multivariate Interactions") +
+        scale_fill_brewer(name=gsub("`","",paste(input$control_disease3)), palette = "OrRd") + 
+        theme(axis.text.x=element_text(hjust=1)) + ylab(gsub("`","",paste(input$multivariable))) +
+        theme(axis.ticks.x = element_blank()) +
+        theme(axis.title.x = element_text(vjust=-1.5)) + 
+        theme(axis.text.x = element_text(angle = 20))
     })
     gc()
      
     #Bivariate graph formation
     f.c_dis2<-as.factor(input$control_disease2)
     output$graph <- renderPlot ({ current.all %>% 
-      filter(!is.na(BMI)) %>%
-      ggplot(aes_string(x=paste(f.c_dis2), fill=(paste(input$variable)), weights = "MMSAWT")) + 
-      scale_x_discrete(paste(input$control_disease2), labels = c("0"="No","1"="Yes")) +
-      ggtitle(paste(input$control_disease2, "Prevalence Across", input$variable)) +
-      scale_fill_brewer(name=paste(input$variable), palette = "OrRd") + 
-      theme(axis.text.x=element_text(hjust=1)) + ylab("") +
-      geom_bar(position="fill") +
-      theme(axis.text.x=element_text(hjust=1)) +
-      theme(axis.title.x = element_text(vjust=-1.5)) + 
-      theme(axis.text.x = element_text(angle = 20))
+        filter(!is.na(BMI)) %>%
+        ggplot(aes_string(x=paste(f.c_dis2), fill=(paste(input$variable)), weights = "MMSAWT")) + 
+        scale_x_discrete(gsub("`","",paste(input$control_disease2)), labels = c("0"="No","1"="Yes")) +
+        ggtitle(paste(gsub("`","",input$control_disease2), "Prevalence Across", gsub("`","",input$variable))) +
+        scale_fill_brewer(name=gsub("`","",paste(input$variable)), palette = "OrRd") + 
+        theme(axis.text.x=element_text(hjust=1)) + ylab("") +
+        geom_bar(position="fill") +
+        theme(axis.text.x=element_text(hjust=1)) +
+        theme(axis.title.x = element_text(vjust=-1.5)) + 
+        theme(axis.text.x = element_text(angle = 20))
     })
     
     gc()
@@ -248,10 +248,10 @@ function(input, output, clientData, session) {
         filter(!is.na(BMI)) %>%
         filter(!is.na(Region)) %>%
         ggplot(aes_string(x=paste(input$control_disease4), fill=(paste(input$variable2)), weights = "MMSAWT")) + 
-        scale_x_discrete(paste(input$control_disease4)) +
+        scale_x_discrete(gsub("`","",paste(input$control_disease4))) +
         facet_wrap("Region", ncol=5) +
-        ggtitle(paste(input$control_disease4, "Prevalence Across U.S Regions")) +
-        scale_fill_brewer(name=(paste(input$variable2)), palette = "OrRd") +
+        ggtitle(paste(gsub("`","",input$control_disease4), "Prevalence Across U.S Regions")) +
+        scale_fill_brewer(name=(gsub("`","",paste(input$variable2))), palette = "OrRd") +
         theme(axis.text.x=element_text(hjust=1)) + ylab("") +
         geom_bar(position="fill") +
         theme(axis.title.x = element_text(vjust=-1.5)) + 
@@ -303,53 +303,12 @@ function(input, output, clientData, session) {
 
     sample_size <- reactive({ ifelse(!is.null(mmsas.click()) & !is.na(mmsas.click()), paste0(" (N = ", formatC(brfss_year()[match(as.numeric(paste(mmsas.click()[[1]])), brfss_year()$MMSA), "count"], format = "d", big.mark=","), ")"), "") })
 
-      output$mapinfo <- renderText({ if (length(mmsa.click()) == 1 & (disease_percent()) != "" & input$control_disease == "Asthma")  
-        paste0("Weighted ", input$control_disease, " Prevalence in ", input$mmsa_input, " in ", input$var,": ", disease_percent(), sample_size()) 
-        else if (length(mmsa.click()) == 1 & (disease_percent()) != "" & input$control_disease == "CHD")  
-        paste0("Weighted ", input$control_disease, " Prevalence in ", input$mmsa_input, " in ", input$var,": ", disease_percent(), sample_size())
-        else if (length(mmsa.click()) == 1 & (disease_percent()) != "" & input$control_disease == "COPD")  
-        paste0("Weighted ", input$control_disease, " Prevalence in ", input$mmsa_input, " in ", input$var,": ", disease_percent(), sample_size())
-        else if (length(mmsa.click()) == 1 & (disease_percent()) != "" & input$control_disease == "Diabetes")  
-        paste0("Weighted ", input$control_disease, " Prevalence in ", input$mmsa_input, " in ", input$var,": ", disease_percent(), sample_size())
-        else if (length(mmsa.click()) == 1 & (disease_percent()) != "" & input$control_disease == "`Flushot Administration`")  
-        paste0("Weighted Flushot Administration in ", input$mmsa_input, " in ", input$var,": ", disease_percent(), sample_size())
-        else if (length(mmsa.click()) == 1 & (disease_percent()) != "" & input$control_disease == "`Has Health Insurance`")  
-        paste0("Weighted Health Insurance Coverage in ", input$mmsa_input, " in ", input$var,": ", disease_percent(), sample_size())
-        else if (length(mmsa.click()) == 1 & (disease_percent()) != "" & input$control_disease == "Smokes")  
-        paste0("Weighted Smoking Prevalence in ", input$mmsa_input, " in ", input$var,": ", disease_percent(), sample_size())
-        else if (length(mmsa.click()) == 1 & (disease_percent()) != "" & input$control_disease == "`Depressive Disorder`")  
-        paste0("Weighted Depressive Disorder Prevalence in ", input$mmsa_input, " in ", input$var,": ", disease_percent(), sample_size())
-        else if (length(mmsa.click()) == 1 & (disease_percent()) != "" & input$control_disease == "`Good or Better Health`")  
-        paste0("Weighted Good or Better Health in ", input$mmsa_input, " in ", input$var,": ", disease_percent(), sample_size())
-        else if (length(mmsa.click()) == 1 & (disease_percent()) != "" & input$control_disease == "AVERAGE_BMI")  
-        paste0("Average BMI in ", input$mmsa_input, " in ", input$var,": ", disease_percent(), sample_size())
-        else if (length(mmsa.click()) == 1 & (disease_percent()) != "" & input$control_disease == "AVERAGE_ADI")  
-        paste0("Average ADI in ", input$mmsa_input, " in ", input$var,": ", disease_percent(), sample_size())
-        else if (!is.na(mmsa.click())) paste0( mmsa.click() , ": No data for this MMSA/year") 
-        else paste0("") })
-      
-      output$mapyearinfo <- renderText({ if (input$control_disease == "Asthma")
-        paste0(input$control_disease, " Prevalence in ", input$var) 
-        else if (input$control_disease == "CHD")
-        paste0(input$control_disease, " Prevalence in ", input$var)
-        else if (input$control_disease == "COPD")
-        paste0(input$control_disease, " Prevalence in ", input$var)
-        else if (input$control_disease == "Diabetes")
-        paste0(input$control_disease, " Prevalence in ", input$var)
-        else if (input$control_disease == "`Flushot Administration`")
-        paste0("Flushot Administration in ", input$var)
-        else if (input$control_disease == "`Depressive Disorder`")
-        paste0("Depressive Disorder in ", input$var)
-        else if (input$control_disease == "`Has Health Insurance`")
-        paste0("Health Insurance Coverage in ", input$var)
-        else if (input$control_disease == "Smokes")
-        paste0("Smoking Prevalence in ", input$var)
-        else if (input$control_disease == "`Good or Better Health`")
-        paste0("Reported Good or Better Health in ", input$var)
-        else if (input$control_disease == "AVERAGE_ADI")
-        paste0("Average ADI in ", input$var)
-        else paste0("Average BMI in ", input$var)
-        })
+    output$mapinfo <- renderText({ if (length(mmsa.click()) == 1 & (disease_percent()) != "")  
+      paste0("Weighted ", gsub("`","",input$control_disease), " Prevalence in ", input$mmsa_input, " in ", input$var,": ", disease_percent(), sample_size()) 
+      else if (!is.na(mmsa.click())) paste0( mmsa.click() , ": No data for this MMSA/year") 
+      else paste0("") })
+    
+    output$mapyearinfo <- renderText({paste0(gsub("`","",input$control_disease), " Prevalence in ", input$var) })
         
       #Making MMSA graphs and making conditions for data display
       mmsa.clickg <- reactive ({
@@ -386,8 +345,8 @@ function(input, output, clientData, session) {
           return(paste0(as.character(round(disease_percent_rawg(), 2)), "%"))
         else return ("") })
       
-        output$graphinfo <- renderText({ if(length(mmsa.clickg()) == 1 & disease_percentg()!= "")
-        paste("Data for", input$control_diseaseg, "in", input$mmsa_inputg, "in", input$varg, ": ")
+      output$graphinfo <- renderText({ if(length(mmsa.clickg()) == 1 & disease_percentg()!= "")
+        paste("Data for", gsub("`","",input$control_diseaseg), "in", input$mmsa_inputg, "in", input$varg, ": ")
         else if (!is.na(mmsa.clickg())) paste0(mmsa.clickg(), ": No data for this MMSA/year")
         else paste0("") })
         
@@ -409,7 +368,7 @@ function(input, output, clientData, session) {
       
       output$bmi_plot <- renderPlot({ ggplot(bmi(), aes(x = factor(bmi()[,1]), y = value, fill = factor(variable))) + 
           geom_bar(stat="identity", position="fill") +
-          scale_x_discrete(labels=c(paste("No",c_disg), paste(c_disg))) +
+          scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
           scale_fill_brewer(name="variable", palette = "OrRd") + 
           theme(legend.position = "top", legend.text = element_text(size = 10), legend.title = element_text(size = 14, face = "bold")) +
           guides(fill = guide_legend(title = "Body Mass Index (BMI)", title.position = "top", title.hjust = 0.5, nrow=2)) +
@@ -418,7 +377,7 @@ function(input, output, clientData, session) {
       
       output$race_plot <- renderPlot({ ggplot(race(), aes(x = factor(race()[,1]), y = value, fill = factor(variable))) + 
           geom_bar(stat="identity", position="fill") +
-          scale_x_discrete(labels=c(paste("No",c_disg), paste(c_disg))) +
+          scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
           scale_fill_brewer(name="variable", palette = "OrRd") + 
           theme(legend.position = "top", legend.text = element_text(size = 10), legend.title = element_text(size = 14, face = "bold")) +
           guides(fill = guide_legend(title = "Race/Ethnicity", title.position = "top", title.hjust = 0.5, nrow=3)) +
@@ -427,7 +386,7 @@ function(input, output, clientData, session) {
       
       output$income_plot <- renderPlot({ ggplot(income(), aes(x = factor(income()[,1]), y = value, fill = factor(variable))) + 
           geom_bar(stat="identity", position="fill") +
-          scale_x_discrete(labels=c(paste("No",c_disg), paste(c_disg))) +
+          scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
           scale_fill_brewer(name="variable", palette = "OrRd") + 
           theme(legend.position = "top", legend.text = element_text(size = 10), legend.title = element_text(size = 14, face = "bold")) +
           guides(fill = guide_legend(title = "Income", title.position = "top", title.hjust = 0.5)) +
@@ -436,7 +395,7 @@ function(input, output, clientData, session) {
       
       output$smoking_plot <- renderPlot({ ggplot(smoking(), aes(x = factor(smoking()[,1]), y = value, fill = factor(variable))) + 
           geom_bar(stat="identity", position="fill") +
-          scale_x_discrete(labels=c(paste("No",c_disg), paste(c_disg))) +
+          scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
           scale_fill_brewer(name="variable", palette = "OrRd") + 
           theme(legend.position = "top", legend.text = element_text(size = 10), legend.title = element_text(size = 14, face = "bold")) +
           guides(fill = guide_legend(title = "Smoking Status", title.position = "top", title.hjust = 0.5)) +
@@ -445,7 +404,7 @@ function(input, output, clientData, session) {
       
       output$age_plot <- renderPlot({ ggplot(age_cat(), aes(x = factor(age_cat()[,1]), y = value, fill = factor(variable))) + 
           geom_bar(stat="identity", position="fill") +
-          scale_x_discrete(labels=c(paste("No",c_disg), paste(c_disg))) +
+          scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
           scale_fill_brewer(name="variable", palette = "OrRd") + 
           theme(legend.position = "top", legend.text = element_text(size = 10), legend.title = element_text(size = 14, face = "bold")) +
           guides(fill = guide_legend(title = "Age", title.position = "top", title.hjust = 0.5)) +
@@ -454,7 +413,7 @@ function(input, output, clientData, session) {
       
       output$gender_plot <- renderPlot({ ggplot(gender(), aes(x = factor(gender()[,1]), y = value, fill = factor(variable))) + 
           geom_bar(stat="identity", position="fill") +
-          scale_x_discrete(labels=c(paste("No",c_disg), paste(c_disg))) +
+          scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
           scale_fill_brewer(name="variable", palette = "OrRd") + 
           theme(legend.position = "top", legend.text = element_text(size = 10), legend.title = element_text(size = 14, face = "bold")) +
           guides(fill = guide_legend(title = "Sex", title.position = "top", title.hjust = 0.5)) +
