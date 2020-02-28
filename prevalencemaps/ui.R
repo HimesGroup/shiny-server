@@ -4,7 +4,7 @@ library(shinyWidgets)
 library(shinydashboard)
 
 #Setting up the visual interface for the app
-shinyUI(fluidPage(
+shinyUI(fluidPage(title="Prevalence Maps",
   titlePanel(h1("Prevalence Maps", align = "left")),
   tabsetPanel(
     tabPanel("Introduction",
@@ -19,10 +19,10 @@ shinyUI(fluidPage(
               column(4,
                      selectInput("control_disease", "Condition of Interest:", 
                                  choices=c("Asthma" = "Asthma", "COPD" = "COPD", "CHD" = "CHD", "Diabetes"="Diabetes", 
-                                           "Average BMI" = "AVERAGE_BMI", "Average ADI" = "AVERAGE_ADI",
+                                           "Average BMI" = "`Average BMI`", "Average ADI" = "`Average ADI`",
                                            "Flushot Administration"= "`Flushot Administration`",
                                            "Good or Better Health" = "`Good or Better Health`",
-                                           "Smokes" = "Smokes",
+                                           "Smoking" = "Smoking",
                                            "Depressive Disorder" = "`Depressive Disorder`",
                                            "Has Health Insurance" = "`Has Health Insurance`"))
                      ),
@@ -120,10 +120,10 @@ shinyUI(fluidPage(
                                         "Has Health Insurance" = "`Has Health Insurance`")),
                   selectInput("factors",
                               "Other Variables:",
-                              choices=c("BMI"="BMI","Smokers"="Smokers","Education"="Education","Income"="Income",
+                              choices=c("Smokers"="Smokers","BMI"="BMI","Education"="Education","Income"="Income",
                                         "Race"="Race","Flushot"="`Flushot Administration`", "ADI Quintile" = "`ADI Quintile`")),
                   selectInput("multivariable", "Stratifying Factor:",
-                              choices = c("Smokers"="Smokers","BMI"="BMI","Education"="Education",
+                              choices = c("BMI"="BMI","Education"="Education",
                                           "Income"="Income","Race"="Race","Sex"="Sex", "ADI Quintile" = "`ADI Quintile`"))
                  ),
               box(width=9,
