@@ -15,22 +15,27 @@ library(sf)
 library(feather)
 library(survey)
 library(jtools)
+library(sjPlot)
 #write_feather(df, path) and read_feather(path) for quick reading of data
 
-##getting the sf object to plot and match with brfss data
+#Getting the sf object to plot and match with BRFSS data
+regions_min_sf<-st_read("/srv/shiny-server/databases/prevalencemaps/region_min_sf.shp")
 location_min_sf<-st_read("/srv/shiny-server/databases/prevalencemaps/location_min_sf.shp")
 
+#Loading the names of the MMSAs for matching between BRFSS data and census shapefile data
 mmsa_names<-read_feather("/srv/shiny-server/databases/prevalencemaps/mmsa_names.feather")
 polynamesnumbers<-read_feather("/srv/shiny-server/databases/prevalencemaps/polynamesnumbers.feather")
 
+#Reading in data for geographical plotting
 weighted_current_asthma_prev <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_asthma_w_counts_leaflet.feather")
 weighted_current_asthma_prev$Asthma_percent <- weighted_current_asthma_prev$asthnow*100
 
+#Reading in data for MMSA-stratifying graphical plotting
 weighted_current_vars <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_variables_asthma_leaflet.feather")
 colnames(weighted_current_vars) <- c("MMSA", "YEAR", "Asthma", "<$25,000", "$25,000-$75,000", ">$75,000", 
                                      "Male", "Female", "White", "Asian/Pacific Islander",
                                      "Black", "Hispanic", "American Indian/Alaskan Native",
-                                     "Not overweight or obese", "Overweight", "Grade 1 Obese", "Grades 2 & 3 Obese",
+                                     "Not overweight or obese", "Overweight", "Grade 1 Obese", "Grade 2 Obese", "Grade 3 Obese",
                                      "Never smoked", "Former smoker", "Current smoker",
                                      "Less than high school", "High school", "Some college or more",
                                      "18-24", "25-34", "35-44", "45-54", "55-64", "65+")
@@ -42,7 +47,7 @@ weighted_current_varschd <- read_feather("/srv/shiny-server/databases/prevalence
 colnames(weighted_current_varschd) <- c("MMSA", "YEAR", "CHD", "<$25,000", "$25,000-$75,000", ">$75,000", 
                                         "Male", "Female", "White", "Asian/Pacific Islander",
                                         "Black", "Hispanic", "American Indian/Alaskan Native",
-                                        "Not overweight or obese", "Overweight", "Grade 1 Obese", "Grades 2 & 3 Obese",
+                                        "Not overweight or obese", "Overweight", "Grade 1 Obese", "Grade 2 Obese", "Grade 3 Obese",
                                         "Never smoked", "Former smoker", "Current smoker",
                                         "Less than high school", "High school", "Some college or more",
                                         "18-24", "25-34", "35-44", "45-54", "55-64", "65+")
@@ -54,12 +59,79 @@ weighted_current_varsflushot <- read_feather("/srv/shiny-server/databases/preval
 colnames(weighted_current_varsflushot) <- c("MMSA", "YEAR", "Flushot", "<$25,000", "$25,000-$75,000", ">$75,000", 
                                             "Male", "Female", "White", "Asian/Pacific Islander",
                                             "Black", "Hispanic", "American Indian/Alaskan Native",
-                                            "Not overweight or obese", "Overweight", "Grade 1 Obese", "Grades 2 & 3 Obese",
+                                            "Not overweight or obese", "Overweight", "Grade 1 Obese", "Grade 2 Obese", "Grade 3 Obese",
                                             "Never smoked", "Former smoker", "Current smoker",
                                             "Less than high school", "High school", "Some college or more",
                                             "18-24", "25-34", "35-44", "45-54", "55-64", "65+")
 
+weighted_current_diabetes_prev <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_Diabetes_w_counts_leaflet.feather")
+weighted_current_diabetes_prev$Diabetes_percent <- weighted_current_diabetes_prev$Diabetes*100
+
+weighted_current_varsdiabetes <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_variables_Diabetes_leaflet.feather")
+colnames(weighted_current_varsdiabetes) <- c("MMSA", "YEAR", "Diabetes", "<$25,000", "$25,000-$75,000", ">$75,000", 
+                                            "Male", "Female", "White", "Asian/Pacific Islander",
+                                            "Black", "Hispanic", "American Indian/Alaskan Native",
+                                            "Not overweight or obese", "Overweight", "Grade 1 Obese", "Grade 2 Obese", "Grade 3 Obese",
+                                            "Never smoked", "Former smoker", "Current smoker",
+                                            "Less than high school", "High school", "Some college or more",
+                                            "18-24", "25-34", "35-44", "45-54", "55-64", "65+")
+
+weighted_current_SRH_prev <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_SRH_w_counts_leaflet.feather")
+weighted_current_SRH_prev$SRH_percent <- weighted_current_SRH_prev$SRH*100
+
+weighted_current_varsSRH <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_variables_SRH_leaflet.feather")
+colnames(weighted_current_varsSRH) <- c("MMSA", "YEAR", "`Good or Better Health`", "<$25,000", "$25,000-$75,000", ">$75,000", 
+                                        "Male", "Female", "White", "Asian/Pacific Islander",
+                                        "Black", "Hispanic", "American Indian/Alaskan Native",
+                                        "Not overweight or obese", "Overweight", "Grade 1 Obese", "Grade 2 Obese", "Grade 3 Obese",
+                                        "Never smoked", "Former smoker", "Current smoker",
+                                        "Less than high school", "High school", "Some college or more",
+                                        "18-24", "25-34", "35-44", "45-54", "55-64", "65+")
+
+weighted_current_HC_prev <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_HC_w_counts_leaflet.feather")
+weighted_current_HC_prev$HC_percent <- weighted_current_HC_prev$HC*100
+
+weighted_current_varsHC <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_variables_HC_leaflet.feather")
+colnames(weighted_current_varsHC) <- c("MMSA", "YEAR", "`Has Health Insurance`", "<$25,000", "$25,000-$75,000", ">$75,000", 
+                                        "Male", "Female", "White", "Asian/Pacific Islander",
+                                        "Black", "Hispanic", "American Indian/Alaskan Native",
+                                        "Not overweight or obese", "Overweight", "Grade 1 Obese", "Grade 2 Obese", "Grade 3 Obese",
+                                        "Never smoked", "Former smoker", "Current smoker",
+                                        "Less than high school", "High school", "Some college or more",
+                                        "18-24", "25-34", "35-44", "45-54", "55-64", "65+")
+
+weighted_current_DEP_prev <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_DEP_w_counts_leaflet.feather")
+weighted_current_DEP_prev$DEP_percent <- weighted_current_DEP_prev$DEP*100
+
+weighted_current_varsDEP <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_variables_DEP_leaflet.feather")
+colnames(weighted_current_varsDEP) <- c("MMSA", "YEAR", "`Depressive Disorder`", "<$25,000", "$25,000-$75,000", ">$75,000", 
+                                       "Male", "Female", "White", "Asian/Pacific Islander",
+                                       "Black", "Hispanic", "American Indian/Alaskan Native",
+                                       "Not overweight or obese", "Overweight", "Grade 1 Obese", "Grade 2 Obese", "Grade 3 Obese",
+                                       "Never smoked", "Former smoker", "Current smoker",
+                                       "Less than high school", "High school", "Some college or more",
+                                       "18-24", "25-34", "35-44", "45-54", "55-64", "65+")
+
+weighted_current_COPD_prev <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_COPD_w_counts_leaflet.feather")
+weighted_current_COPD_prev$COPD_percent <- weighted_current_COPD_prev$COPD*100
+
+weighted_current_varsCOPD <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_variables_COPD_leaflet.feather")
+colnames(weighted_current_varsCOPD) <- c("MMSA", "YEAR", "COPD", "<$25,000", "$25,000-$75,000", ">$75,000", 
+                                        "Male", "Female", "White", "Asian/Pacific Islander",
+                                        "Black", "Hispanic", "American Indian/Alaskan Native",
+                                        "Not overweight or obese", "Overweight", "Grade 1 Obese", "Grade 2 Obese", "Grade 3 Obese",
+                                        "Never smoked", "Former smoker", "Current smoker",
+                                        "Less than high school", "High school", "Some college or more",
+                                        "18-24", "25-34", "35-44", "45-54", "55-64", "65+")
+
+weighted_current_YNSMOKE_prev <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_YNSMOKE_w_counts_leaflet.feather")
+weighted_current_YNSMOKE_prev$YNSMOKE_percent <- weighted_current_YNSMOKE_prev$YNSMOKE*100
+
+weighted_current_bmin_prev <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_bmin_w_counts_leaflet.feather")
+weighted_current_bmin_prev$AVERAGE_BMI <- weighted_current_bmin_prev$BMI_AVE
+
+weighted_current_adi_prev <- read_feather("/srv/shiny-server/databases/prevalencemaps/weighted_current_adi_w_counts_leaflet.feather")
+weighted_current_adi_prev$AVERAGE_ADI <- weighted_current_adi_prev$ADI_AVE
+
+#Reading in data for use in bivariate, multivariate, and regional graphs.
 current.all<-readRDS("/srv/shiny-server/databases/prevalencemaps/current_all.RDS")
-current.all2007_2017<-readRDS("/srv/shiny-server/databases/prevalencemaps/current_all2007_2017.RDS")
-current.all2007_2010<-readRDS("/srv/shiny-server/databases/prevalencemaps/current_all2007_2010.RDS")
-current.all2011_2017<-readRDS("/srv/shiny-server/databases/prevalencemaps/current_all2011_2017.RDS")
