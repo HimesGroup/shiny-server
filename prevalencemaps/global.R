@@ -1,4 +1,4 @@
-.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/")
+.libPaths("/home/avantika/R/x86_64-pc-linux-gnu-library/3.4/")
 #File creation and library download
 library(shiny)
 library(leaflet)
@@ -16,6 +16,7 @@ library(feather)
 library(survey)
 library(jtools)
 library(sjPlot)
+library(bbplot)
 #write_feather(df, path) and read_feather(path) for quick reading of data
 
 #Getting the sf object to plot and match with BRFSS data
@@ -135,3 +136,4 @@ weighted_current_adi_prev$`Average ADI` <- weighted_current_adi_prev$ADI_AVE
 
 #Reading in data for use in bivariate, multivariate, and regional graphs.
 current.all<-readRDS("/srv/shiny-server/databases/prevalencemaps/current_all.RDS")
+current.all <- current.all %>% dplyr::mutate(`ADI Quartile` = as.factor(paste0("Q",ntile(ADI, 4))))

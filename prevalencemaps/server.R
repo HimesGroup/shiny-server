@@ -1,5 +1,5 @@
-.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/")
-source("/srv/shiny-server/prevalencemaps/global.R")
+.libPaths("/home/avantika/R/x86_64-pc-linux-gnu-library/3.4/")
+#source("/srv/shiny-server/prevalencemaps/global.R")
 function(input, output, clientData, session) {
   
   observe({
@@ -206,22 +206,28 @@ function(input, output, clientData, session) {
     gc()
     observe({
       input$reset_button
-      leafletProxy("map") %>% setView(lat = 39, lng = -94, zoom = 3)
+      leafletProxy("map") %>% setView(lat = 39, lng = -94, zoom = 4)
     })
     
     #Multivariate graph formation
-    output$multigraph <- renderPlot({ current.all %>% 
-        filter(!is.na(BMI)) %>%
-        ggplot(aes_string(x=paste(input$factors), fill=paste(input$control_disease3), weights="MMSAWT")) + 
-        geom_bar(position="fill") +
-        facet_grid(paste(input$multivariable), scales = "free") + 
+    output$multigraph <- renderPlot({ df <- current.all %>% filter(!is.na(BMI))
+  
+        ggplot(df, aes_string(x=paste(input$factors), fill=paste(input$control_disease3), weights="MMSAWT")) + 
+        geom_bar(position="fill", width=0.5) + coord_flip() + 
+        #facet_grid(paste(input$multivariable), scales = "free") + 
+        facet_wrap(paste(input$multivariable), nrow=length(unique(df[[paste(input$multivariable)]]))) + #ncol=length(unique(df[[paste(input$multivariable)]]))
         scale_x_discrete(gsub("`","",paste(input$factors))) +
-        ggtitle("Multivariate Interactions") +
-        scale_fill_brewer(name=gsub("`","",paste(input$control_disease3)), palette = "OrRd") + 
-        theme(axis.text.x=element_text(hjust=1)) + ylab(gsub("`","",paste(input$multivariable))) +
-        theme(axis.ticks.x = element_blank()) +
-        theme(axis.title.x = element_text(vjust=-1.5)) + 
-        theme(axis.text.x = element_text(angle = 20))
+        ggtitle("Multivariate Interactions of Variables (2011-2017)") +
+        scale_fill_manual(name=gsub("`","",paste(input$control_disease3)), values=c("#FDD49E","#FC8D59")) + 
+        xlab(gsub("`","",paste(input$multivariable))) + theme_bw() + 
+        theme(axis.text.x=element_text(hjust=1,angle=20,size=12), #
+            axis.text.y=element_text(size=14),
+            axis.title = element_blank(),
+            plot.title = element_text(size = 18, face="bold"),
+            strip.background = element_rect(fill="#f5f5f5"),
+            strip.text = element_text(size=14),
+            legend.text = element_text(size=14),
+            legend.title = element_text(size=15,face="bold"))
     })
     gc()
      
@@ -231,31 +237,49 @@ function(input, output, clientData, session) {
         filter(!is.na(BMI)) %>%
         ggplot(aes_string(x=paste(f.c_dis2), fill=(paste(input$variable)), weights = "MMSAWT")) + 
         scale_x_discrete(gsub("`","",paste(input$control_disease2)), labels = c("0"="No","1"="Yes")) +
-        ggtitle(paste(gsub("`","",input$control_disease2), "Prevalence Across", gsub("`","",input$variable))) +
-        scale_fill_brewer(name=gsub("`","",paste(input$variable)), palette = "OrRd") + 
-        theme(axis.text.x=element_text(hjust=1)) + ylab("") +
-        geom_bar(position="fill") +
-        theme(axis.text.x=element_text(hjust=1)) +
-        theme(axis.title.x = element_text(vjust=-1.5)) + 
-        theme(axis.text.x = element_text(angle = 20))
+        ggtitle(paste(gsub("`","",input$control_disease2), "Prevalence (2011-2017) Across", gsub("`","",input$variable))) +
+        scale_fill_brewer(name=gsub("`","",paste(input$variable)), palette = "OrRd") + ylab("") +
+        theme(axis.text.x=element_text(hjust=1)) + 
+        geom_bar(position="fill", width=0.5) + theme_bw() + 
+        theme(axis.text.x=element_text(size=15), #hjust=1,angle=20,
+              axis.text.y=element_text(size=12),
+              axis.title.x = element_blank(),
+              plot.title = element_text(size = 18, face="bold"),
+              legend.text = element_text(size=13),
+              legend.title = element_text(size=15, face="bold"))
     })
     
     gc()
   
     
     #Regionality graph formation
-    output$regiongraph <- renderPlot ({ current.all %>% 
+    
+    #label maker
+    addline_format <- function(x,...){
+      gsub('\\s','\n',x)
+    }
+    
+    output$regiongraph <- renderPlot ({ 
+        df <- current.all %>% 
         filter(!is.na(BMI)) %>%
-        filter(!is.na(Region)) %>%
-        ggplot(aes_string(x=paste(input$control_disease4), fill=(paste(input$variable2)), weights = "MMSAWT")) + 
-        scale_x_discrete(gsub("`","",paste(input$control_disease4))) +
-        facet_wrap("Region", ncol=5) +
-        ggtitle(paste(gsub("`","",input$control_disease4), "Prevalence Across U.S Regions")) +
+        filter(!is.na(Region)) 
+        
+        ggplot(df, aes_string(x=paste(input$control_disease4), fill=(paste(input$variable2)), weights = "MMSAWT")) + 
+        theme_bw() + 
+        facet_wrap("Region", nrow=5) + coord_flip() +
+        ggtitle(paste(gsub("`","",input$control_disease4), "Prevalence (2011-2017) Across U.S Regions")) +
         scale_fill_brewer(name=(gsub("`","",paste(input$variable2))), palette = "OrRd") +
-        theme(axis.text.x=element_text(hjust=1)) + ylab("") +
-        geom_bar(position="fill") +
-        theme(axis.title.x = element_text(vjust=-1.5)) + 
-        theme(axis.text.x = element_text(angle = 20))
+        geom_bar(position="fill",width=0.50) + 
+        scale_x_discrete(gsub("`","",paste(input$control_disease4))) + 
+                         #,breaks=unique(df[[input$control_disease4]]), labels=addline_format(unique(df[[input$control_disease4]]))) + 
+        theme(axis.text.x=element_text(hjust=1,angle=20,size=12),
+              axis.text.y=element_text(size=14),
+              axis.title = element_blank(),
+              plot.title = element_text(size = 18, face="bold"),
+              strip.background = element_rect(fill="#f5f5f5"),
+              strip.text = element_text(size=14),
+              legend.text = element_text(size=14),
+              legend.title = element_text(size=15,face="bold")) 
     })
     gc()
    
@@ -367,57 +391,75 @@ function(input, output, clientData, session) {
       
       
       output$bmi_plot <- renderPlot({ ggplot(bmi(), aes(x = factor(bmi()[,1]), y = value, fill = factor(variable))) + 
-          geom_bar(stat="identity", position="fill") +
+          geom_bar(stat="identity", position="fill",width=0.50) +
           scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
-          scale_fill_brewer(name="variable", palette = "OrRd") + 
-          theme(legend.position = "top", legend.text = element_text(size = 10), legend.title = element_text(size = 14, face = "bold")) +
+          scale_fill_brewer(name="variable", palette = "Blues") + bbc_style() +
+          geom_hline(yintercept = 0, size = 1, colour="#333333") +
+          geom_vline(xintercept = 0.5, size = 1, colour="#333333") +
+          theme(legend.position = "top", legend.text = element_text(size = 12), legend.title = element_text(size = 15, face = "bold")) +
           guides(fill = guide_legend(title = "Body Mass Index (BMI)", title.position = "top", title.hjust = 0.5, nrow=2)) +
-          theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank()) +
-          coord_flip() })
+          theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank(), axis.text = element_text(size=14),
+                panel.grid.major.x = element_line(color="#cbcbcb"), panel.grid.major.y=element_blank()) + coord_flip() 
+          })
       
       output$race_plot <- renderPlot({ ggplot(race(), aes(x = factor(race()[,1]), y = value, fill = factor(variable))) + 
-          geom_bar(stat="identity", position="fill") +
+          geom_bar(stat="identity", position="fill",width=0.50) + 
           scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
-          scale_fill_brewer(name="variable", palette = "OrRd") + 
-          theme(legend.position = "top", legend.text = element_text(size = 10), legend.title = element_text(size = 14, face = "bold")) +
+          scale_fill_brewer(name="variable", palette = "Greens") + bbc_style() +
+          geom_hline(yintercept = 0, size = 1, colour="#333333") +
+          geom_vline(xintercept = 0.5, size = 1, colour="#333333") +
+          theme(legend.position = "top", legend.text = element_text(size = 12), legend.title = element_text(size = 15, face = "bold")) +
           guides(fill = guide_legend(title = "Race/Ethnicity", title.position = "top", title.hjust = 0.5, nrow=3)) +
-          theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank()) +
-          coord_flip() })
+          theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank(), axis.text = element_text(size=14),
+                panel.grid.major.x = element_line(color="#cbcbcb"), panel.grid.major.y=element_blank()) + coord_flip() 
+           })
       
       output$income_plot <- renderPlot({ ggplot(income(), aes(x = factor(income()[,1]), y = value, fill = factor(variable))) + 
-          geom_bar(stat="identity", position="fill") +
+          geom_bar(stat="identity", position="fill",width=0.50) + 
           scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
-          scale_fill_brewer(name="variable", palette = "OrRd") + 
-          theme(legend.position = "top", legend.text = element_text(size = 10), legend.title = element_text(size = 14, face = "bold")) +
+          scale_fill_brewer(name="variable", palette = "Oranges") + bbc_style() +
+          geom_hline(yintercept = 0, size = 1, colour="#333333") +
+          geom_vline(xintercept = 0.5, size = 1, colour="#333333") +
+          theme(legend.position = "top", legend.text = element_text(size = 12), legend.title = element_text(size = 15, face = "bold")) +
           guides(fill = guide_legend(title = "Income", title.position = "top", title.hjust = 0.5)) +
-          theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank()) +
-          coord_flip() })
+          theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank(), axis.text = element_text(size=14),
+                panel.grid.major.x = element_line(color="#cbcbcb"), panel.grid.major.y=element_blank()) + coord_flip() 
+           })
       
       output$smoking_plot <- renderPlot({ ggplot(smoking(), aes(x = factor(smoking()[,1]), y = value, fill = factor(variable))) + 
-          geom_bar(stat="identity", position="fill") +
+          geom_bar(stat="identity", position="fill",width=0.50) + 
           scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
-          scale_fill_brewer(name="variable", palette = "OrRd") + 
-          theme(legend.position = "top", legend.text = element_text(size = 10), legend.title = element_text(size = 14, face = "bold")) +
+          scale_fill_brewer(name="variable", palette = "Purples") + bbc_style() +
+          geom_hline(yintercept = 0, size = 1, colour="#333333") +
+          geom_vline(xintercept = 0.5, size = 1, colour="#333333") +
+          theme(legend.position = "top", legend.text = element_text(size = 12), legend.title = element_text(size = 15, face = "bold")) +
           guides(fill = guide_legend(title = "Smoking Status", title.position = "top", title.hjust = 0.5)) +
-          theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank()) +
-          coord_flip() })
+          theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank(), axis.text = element_text(size=14),
+                panel.grid.major.x = element_line(color="#cbcbcb"), panel.grid.major.y=element_blank()) + coord_flip() 
+          })
       
       output$age_plot <- renderPlot({ ggplot(age_cat(), aes(x = factor(age_cat()[,1]), y = value, fill = factor(variable))) + 
-          geom_bar(stat="identity", position="fill") +
+          geom_bar(stat="identity", position="fill",width=0.50) + 
           scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
-          scale_fill_brewer(name="variable", palette = "OrRd") + 
-          theme(legend.position = "top", legend.text = element_text(size = 10), legend.title = element_text(size = 14, face = "bold")) +
+          scale_fill_brewer(name="variable", palette = "Reds") + bbc_style() +
+          geom_hline(yintercept = 0, size = 1, colour="#333333") +
+          geom_vline(xintercept = 0.5, size = 1, colour="#333333") +
+          theme(legend.position = "top", legend.text = element_text(size = 12), legend.title = element_text(size = 15, face = "bold")) +
           guides(fill = guide_legend(title = "Age", title.position = "top", title.hjust = 0.5)) +
-          theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank()) +
-          coord_flip() })
+          theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank(), axis.text = element_text(size=14),
+                panel.grid.major.x = element_line(color="#cbcbcb"), panel.grid.major.y=element_blank()) + coord_flip() 
+          })
       
       output$gender_plot <- renderPlot({ ggplot(gender(), aes(x = factor(gender()[,1]), y = value, fill = factor(variable))) + 
-          geom_bar(stat="identity", position="fill") +
+          geom_bar(stat="identity", position="fill",width=0.50) + 
           scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
-          scale_fill_brewer(name="variable", palette = "OrRd") + 
-          theme(legend.position = "top", legend.text = element_text(size = 10), legend.title = element_text(size = 14, face = "bold")) +
+          scale_fill_manual(name="variable", values=c("#fff3f5","#ff5b77")) + bbc_style() +
+          geom_hline(yintercept = 0, size = 1, colour="#333333") +
+          geom_vline(xintercept = 0.5, size = 1, colour="#333333") +
+          theme(legend.position = "top", legend.text = element_text(size = 12), legend.title = element_text(size = 15, face = "bold")) +
           guides(fill = guide_legend(title = "Sex", title.position = "top", title.hjust = 0.5)) +
-          theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank()) +
-          coord_flip() })
+          theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank(), axis.text = element_text(size=14),
+                panel.grid.major.x = element_line(color="#cbcbcb"), panel.grid.major.y=element_blank()) + coord_flip() 
+         })
       
   })}
