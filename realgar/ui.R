@@ -56,10 +56,10 @@ ui <- shinyUI(fluidPage(theme = shinytheme("lumen"),
                                                                                               "For the rank-based method, an analytic rank product is provided instead of the permutated empirical p-value, ",
                                                                                               "so we suggest users refer to the rank score when prioritizing the genes for functional validation. For more information, you can check the References tab."),
                                                                                             
-                                                                                            column(12, withSpinner(plotOutput(outputId="forestplot_asthma",width="1100px", height="auto"),color= "#9E443A"), align="center"), #1355px #1250px #1000px
+                                                                                            column(12, withSpinner(plotOutput(outputId="forestplot_asthma",width="1200px", height="auto"),color= "#9E443A"), align="center"), #1355px #1250px #1000px
                                                                                                 column(12, textOutput("asthma_pcomb_text"), align="center"), # output combined p-values
                                                                                                 column(12, downloadButton(outputId="asthma_fc_download",label="Download asthma forest plot"), align="center"), 
-                                                                                                column(12, br(), br(), withSpinner(plotOutput(outputId="forestplot_GC",width="1100px", height="auto"),color= "#9E443A"),align="center"),
+                                                                                                column(12, br(), br(), withSpinner(plotOutput(outputId="forestplot_GC",width="1200px", height="auto"),color= "#9E443A"),align="center"),
                                                                                                 column(12, textOutput("GC_pcomb_text"), align="center"), # output combined p-values
                                                                                                 column(12, downloadButton(outputId="GC_fc_download",label="Download GC forest plot"), align="center"),
                                                                                                 column(12, fluidRow(br(), br(), br()))),

@@ -43,7 +43,7 @@ asthma_choices <- c("Allergic asthma"="allergic_asthma", "Asthma"="asthma",
 #Treatment choices
 treatment_choices <- c("β2-agonist"="BA", 
                        "Phosphodiesterase inhibitor"="PDE",
-                       "Smoking"="smoking", "Vitamin D"="vitD","Glucocorticoid" = "GC")
+                       "Smoking"="smoking", "Vitamin D"="vitD","Glucocorticoid" = "GC","E-cigarette" = "ecig")
 
 #GWAS options
 gwas_choices <- c("EVE"="snp_eve_subs","Ferreira"="snp_fer_subs","GABRIEL"="snp_gabriel_subs","GRASP"="snp_subs","TAGC"="snp_TAGC_subs")
