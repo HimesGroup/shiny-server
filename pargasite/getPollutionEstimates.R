@@ -1,23 +1,24 @@
-pm_monthly_brick <- brick("../../../../var/www/pargasite_data/pm_monthly_brick.tif")
-ozone_monthly_brick <- brick("../../../../var/www/pargasite_data/ozone_monthly_brick.tif")
-no2_monthly_brick <- brick("../../../../var/www/pargasite_data/no2_monthly_brick.tif")
-so2_monthly_brick <- brick("../../../../var/www/pargasite_data/so2_monthly_brick.tif")
-co_monthly_brick <- brick("../../../../var/www/pargasite_data/co_monthly_brick.tif")
 
-pm_monthly_brick_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_pm_monthly_brick.tif")
-ozone_monthly_brick_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_ozone_monthly_brick.tif")
-no2_monthly_brick_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_no2_monthly_brick.tif")
-so2_monthly_brick_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_so2_monthly_brick.tif")
-co_monthly_brick_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_co_monthly_brick.tif")
+pm_monthly_brick <- brick("/srv/shiny-server/databases/pargasite_rasters/Monthly/10km_rasters/pm_monthly_brick_full_10km.tif")
+ozone_monthly_brick <- brick("/srv/shiny-server/databases/pargasite_rasters/Monthly/10km_rasters/ozone_monthly_brick_full_10km.tif")
+no2_monthly_brick <- brick("/srv/shiny-server/databases/pargasite_rasters/Monthly/10km_rasters/no2_monthly_brick_full_10km.tif")
+so2_monthly_brick <- brick("/srv/shiny-server/databases/pargasite_rasters/Monthly/10km_rasters/so2_monthly_brick_full_10km.tif")
+co_monthly_brick <- brick("/srv/shiny-server/databases/pargasite_rasters/Monthly/10km_rasters/co_monthly_brick_full_10km.tif")
+
+pm_monthly_brick_pr <- brick("/srv/shiny-server/databases/pargasite_rasters/Monthly/1km_rasters/pr_pm_monthly_brick_full_1km.tif")
+ozone_monthly_brick_pr <- brick("/srv/shiny-server/databases/pargasite_rasters/Monthly/1km_rasters/pr_ozone_monthly_brick_full_1km.tif")
+no2_monthly_brick_pr <- brick("/srv/shiny-server/databases/pargasite_rasters/Monthly/1km_rasters/pr_no2_monthly_brick_full_1km.tif")
+so2_monthly_brick_pr <- brick("/srv/shiny-server/databases/pargasite_rasters/Monthly/1km_rasters/pr_so2_monthly_brick_full_1km.tif")
+co_monthly_brick_pr <- brick("/srv/shiny-server/databases/pargasite_rasters/Monthly/1km_rasters/pr_co_monthly_brick_full_1km.tif")
 
 getPollutionEstimates.df.app <- function(data, monthyear_start,
                                          monthyear_end, location) {
   
   month_year_start <- as.numeric(strsplit(monthyear_start, "-")[[1]])
-  ind_start <- 12*(month_year_start[2]-2005) + month_year_start[1]
+  ind_start <- 12*(month_year_start[2]-1996) + month_year_start[1]
   
   month_year_end <- as.numeric(strsplit(monthyear_end, "-")[[1]])
-  ind_end <- 12*(month_year_end[2]-2005) + month_year_end[1]
+  ind_end <- 12*(month_year_end[2]-1996) + month_year_end[1]
   
   if(location == "USA"){
     pollutant_bricks <- list(pm_monthly_brick, ozone_monthly_brick,
