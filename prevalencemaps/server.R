@@ -128,7 +128,7 @@ function(input, output, clientData, session) {
       )
     })
     
-#Calling in data for use in the MMSA graphs; not all variables here match with variables used in the map, due to redundancy (i.e BMI already displayed)
+    #Calling in data for use in the MMSA graphs; not all variables here match with variables used in the map, due to redundancy (i.e BMI already displayed)
     full_dat <- reactive({
       switch(paste(c_disg,input$varg,sep=" "),
              "Asthma 2011" = filter(weighted_current_vars, YEAR==paste(input$varg)),
@@ -211,16 +211,16 @@ function(input, output, clientData, session) {
     
     #Multivariate graph formation
     output$multigraph <- renderPlot({ df <- current.all %>% filter(!is.na(BMI))
-  
-        ggplot(df, aes_string(x=paste(input$factors), fill=paste(input$control_disease3), weights="MMSAWT")) + 
-        geom_bar(position="fill", width=0.5) + coord_flip() + 
-        #facet_grid(paste(input$multivariable), scales = "free") + 
-        facet_wrap(paste(input$multivariable), nrow=length(unique(df[[paste(input$multivariable)]]))) + #ncol=length(unique(df[[paste(input$multivariable)]]))
-        scale_x_discrete(gsub("`","",paste(input$factors))) +
-        ggtitle("Multivariate Interactions of Variables (2011-2017)") +
-        scale_fill_manual(name=gsub("`","",paste(input$control_disease3)), values=c("#FDD49E","#FC8D59")) + 
-        xlab(gsub("`","",paste(input$multivariable))) + theme_bw() + 
-        theme(axis.text.x=element_text(hjust=1,angle=20,size=12), #
+    
+    ggplot(df, aes_string(x=paste(input$factors), fill=paste(input$control_disease3), weights="MMSAWT")) + 
+      geom_bar(position="fill", width=0.5) + coord_flip() + 
+      #facet_grid(paste(input$multivariable), scales = "free") + 
+      facet_wrap(paste(input$multivariable), nrow=length(unique(df[[paste(input$multivariable)]]))) + #ncol=length(unique(df[[paste(input$multivariable)]]))
+      scale_x_discrete(gsub("`","",paste(input$factors))) +
+      ggtitle("Multivariate Interactions of Variables (2011-2017)") +
+      scale_fill_manual(name=gsub("`","",paste(input$control_disease3)), values=c("#FDD49E","#FC8D59")) + 
+      xlab(gsub("`","",paste(input$multivariable))) + theme_bw() + 
+      theme(axis.text.x=element_text(hjust=1,angle=20,size=12), #
             axis.text.y=element_text(size=14),
             axis.title = element_blank(),
             plot.title = element_text(size = 18, face="bold"),
@@ -230,7 +230,7 @@ function(input, output, clientData, session) {
             legend.title = element_text(size=15,face="bold"))
     })
     gc()
-     
+    
     #Bivariate graph formation
     f.c_dis2<-as.factor(input$control_disease2)
     output$graph <- renderPlot ({ current.all %>% 
@@ -250,7 +250,7 @@ function(input, output, clientData, session) {
     })
     
     gc()
-  
+    
     
     #Regionality graph formation
     
@@ -260,18 +260,18 @@ function(input, output, clientData, session) {
     }
     
     output$regiongraph <- renderPlot ({ 
-        df <- current.all %>% 
+      df <- current.all %>% 
         filter(!is.na(BMI)) %>%
         filter(!is.na(Region)) 
-        
-        ggplot(df, aes_string(x=paste(input$control_disease4), fill=(paste(input$variable2)), weights = "MMSAWT")) + 
+      
+      ggplot(df, aes_string(x=paste(input$control_disease4), fill=(paste(input$variable2)), weights = "MMSAWT")) + 
         theme_bw() + 
         facet_wrap("Region", nrow=5) + coord_flip() +
         ggtitle(paste(gsub("`","",input$control_disease4), "Prevalence (2011-2017) Across U.S Regions")) +
         scale_fill_brewer(name=(gsub("`","",paste(input$variable2))), palette = "OrRd") +
         geom_bar(position="fill",width=0.50) + 
         scale_x_discrete(gsub("`","",paste(input$control_disease4))) + 
-                         #,breaks=unique(df[[input$control_disease4]]), labels=addline_format(unique(df[[input$control_disease4]]))) + 
+        #,breaks=unique(df[[input$control_disease4]]), labels=addline_format(unique(df[[input$control_disease4]]))) + 
         theme(axis.text.x=element_text(hjust=1,angle=20,size=12),
               axis.text.y=element_text(size=14),
               axis.title = element_blank(),
@@ -282,7 +282,7 @@ function(input, output, clientData, session) {
               legend.title = element_text(size=15,face="bold")) 
     })
     gc()
-   
+    
     #Making the map popups and labelling information
     mmsa.click <- reactive ({
       as.character(mmsa_names[match(input$mmsa_input, 
@@ -291,175 +291,175 @@ function(input, output, clientData, session) {
     mmsas.click <- reactive ({
       mmsamatches<-which(apply(mmsa_names, 1, function(x) all(x == mmsa.click())))
       if(!is.na(mmsa.click()))
-      return(polynamesnumbers[mmsamatches,3])
+        return(polynamesnumbers[mmsamatches,3])
       return(mmsas.click<-NA)
-     })
+    })
     
-      
-      disease_percent_raw <- reactive ({ if( length(mmsas.click())==1 & !is.na(mmsas.click()) ) 
-        return(brfss_year()[which(brfss_year()$MMSA == as.numeric(paste(mmsas.click()[[1]]))), 5]) 
-        return("") })
-      
-      disease_percent <- reactive ({ if(paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "Asthma") 
+    
+    disease_percent_raw <- reactive ({ if( length(mmsas.click())==1 & !is.na(mmsas.click()) ) 
+      return(brfss_year()[which(brfss_year()$MMSA == as.numeric(paste(mmsas.click()[[1]]))), 5]) 
+      return("") })
+    
+    disease_percent <- reactive ({ if(paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "Asthma") 
+      return(paste0(as.character(round(disease_percent_raw(), 2)), "%"))
+      else if(paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "CHD") 
         return(paste0(as.character(round(disease_percent_raw(), 2)), "%"))
-        else if(paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "CHD") 
+      else if(paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "COPD") 
         return(paste0(as.character(round(disease_percent_raw(), 2)), "%"))
-        else if(paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "COPD") 
+      else if(paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "Diabetes") 
         return(paste0(as.character(round(disease_percent_raw(), 2)), "%"))
-        else if(paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "Diabetes") 
+      else if(paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "`Flushot Administration`") 
         return(paste0(as.character(round(disease_percent_raw(), 2)), "%"))
-        else if(paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "`Flushot Administration`") 
+      else if(paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "`Has Health Insurance`")
         return(paste0(as.character(round(disease_percent_raw(), 2)), "%"))
-        else if(paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "`Has Health Insurance`")
+      else if(paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "`Depressive Disorder`")
         return(paste0(as.character(round(disease_percent_raw(), 2)), "%"))
-        else if(paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "`Depressive Disorder`")
+      else if(paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "Smokes")
         return(paste0(as.character(round(disease_percent_raw(), 2)), "%"))
-        else if(paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "Smokes")
+      else if(paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "`Good or Better Health`") 
         return(paste0(as.character(round(disease_percent_raw(), 2)), "%"))
-        else if(paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "`Good or Better Health`") 
-        return(paste0(as.character(round(disease_percent_raw(), 2)), "%"))
-        else if (paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "AVERAGE_BMI")
+      else if (paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "`Average BMI`")
         return(paste0(as.character(round(disease_percent_raw(), 2))))
-        else if (paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "AVERAGE_ADI")
+      else if (paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "`Average ADI`")
         return(paste0(as.character(round(disease_percent_raw(), 2))))
-        else return ("") })
-      
-
+      else return ("") })
+    
+    
     sample_size <- reactive({ ifelse(!is.null(mmsas.click()) & !is.na(mmsas.click()), paste0(" (N = ", formatC(brfss_year()[match(as.numeric(paste(mmsas.click()[[1]])), brfss_year()$MMSA), "count"], format = "d", big.mark=","), ")"), "") })
-
+    
     output$mapinfo <- renderText({ if (length(mmsa.click()) == 1 & (disease_percent()) != "")  
       paste0("Weighted ", gsub("`","",input$control_disease), " Prevalence in ", input$mmsa_input, " in ", input$var,": ", disease_percent(), sample_size()) 
       else if (!is.na(mmsa.click())) paste0( mmsa.click() , ": No data for this MMSA/year") 
       else paste0("") })
     
     output$mapyearinfo <- renderText({paste0(gsub("`","",input$control_disease), " Prevalence in ", input$var) })
-        
-      #Making MMSA graphs and making conditions for data display
-      mmsa.clickg <- reactive ({
-        as.character(mmsa_names[match(input$mmsa_inputg, 
-                                      mmsa_names$x), "x"]) })
-      
-      mmsas.clickg <- reactive ({
-        mmsamatches<-which(apply(mmsa_names, 1, function(x) all(x == mmsa.clickg())))
-        if(!is.na(mmsa.clickg()))
-          return(polynamesnumbers[mmsamatches,3])
-        return(mmsas.clickg<-NA)
-      })
-      
-      
-      disease_percent_rawg <- reactive ({ if( length(mmsas.clickg())==1 & !is.na(mmsas.clickg()) ) 
-        return(brfss_year()[which(brfss_year()$MMSA == as.numeric(paste(mmsas.clickg()[[1]]))), 5]) 
-        return("") })
-      
-      disease_percentg <- reactive ({ if(paste(disease_percent_rawg())!="numeric(0)" & input$control_diseaseg == "Asthma") 
+    
+    #Making MMSA graphs and making conditions for data display
+    mmsa.clickg <- reactive ({
+      as.character(mmsa_names[match(input$mmsa_inputg, 
+                                    mmsa_names$x), "x"]) })
+    
+    mmsas.clickg <- reactive ({
+      mmsamatches<-which(apply(mmsa_names, 1, function(x) all(x == mmsa.clickg())))
+      if(!is.na(mmsa.clickg()))
+        return(polynamesnumbers[mmsamatches,3])
+      return(mmsas.clickg<-NA)
+    })
+    
+    
+    disease_percent_rawg <- reactive ({ if( length(mmsas.clickg())==1 & !is.na(mmsas.clickg()) ) 
+      return(brfss_year()[which(brfss_year()$MMSA == as.numeric(paste(mmsas.clickg()[[1]]))), 5]) 
+      return("") })
+    
+    disease_percentg <- reactive ({ if(paste(disease_percent_rawg())!="numeric(0)" & input$control_diseaseg == "Asthma") 
+      return(paste0(as.character(round(disease_percent_rawg(), 2)), "%"))
+      else if(paste(disease_percent_rawg())!="numeric(0)" & input$control_diseaseg == "CHD") 
         return(paste0(as.character(round(disease_percent_rawg(), 2)), "%"))
-        else if(paste(disease_percent_rawg())!="numeric(0)" & input$control_diseaseg == "CHD") 
-          return(paste0(as.character(round(disease_percent_rawg(), 2)), "%"))
-        else if(paste(disease_percent_rawg())!="numeric(0)" & input$control_diseaseg == "COPD") 
-          return(paste0(as.character(round(disease_percent_rawg(), 2)), "%"))
-        else if(paste(disease_percent_rawg())!="numeric(0)" & input$control_diseaseg == "Diabetes") 
-          return(paste0(as.character(round(disease_percent_rawg(), 2)), "%"))
-        else if(paste(disease_percent_rawg())!="numeric(0)" & input$control_diseaseg == "`Flushot Administration`") 
-          return(paste0(as.character(round(disease_percent_rawg(), 2)), "%"))
-        else if(paste(disease_percent_rawg())!="numeric(0)" & input$control_diseaseg == "`Has Health Insurance`")
-          return(paste0(as.character(round(disease_percent_rawg(), 2)), "%"))
-        else if(paste(disease_percent_rawg())!="numeric(0)" & input$control_diseaseg == "`Depressive Disorder`")
-          return(paste0(as.character(round(disease_percent_rawg(), 2)), "%"))
-        else if(paste(disease_percent_rawg())!="numeric(0)" & input$control_diseaseg == "`Good or Better Health`") 
-          return(paste0(as.character(round(disease_percent_rawg(), 2)), "%"))
-        else return ("") })
-      
-      output$graphinfo <- renderText({ if(length(mmsa.clickg()) == 1 & disease_percentg()!= "")
-        paste("Data for", gsub("`","",input$control_diseaseg), "in", input$mmsa_inputg, "in", input$varg, ": ")
-        else if (!is.na(mmsa.clickg())) paste0(mmsa.clickg(), ": No data for this MMSA/year")
-        else paste0("") })
-        
-        
-  
+      else if(paste(disease_percent_rawg())!="numeric(0)" & input$control_diseaseg == "COPD") 
+        return(paste0(as.character(round(disease_percent_rawg(), 2)), "%"))
+      else if(paste(disease_percent_rawg())!="numeric(0)" & input$control_diseaseg == "Diabetes") 
+        return(paste0(as.character(round(disease_percent_rawg(), 2)), "%"))
+      else if(paste(disease_percent_rawg())!="numeric(0)" & input$control_diseaseg == "`Flushot Administration`") 
+        return(paste0(as.character(round(disease_percent_rawg(), 2)), "%"))
+      else if(paste(disease_percent_rawg())!="numeric(0)" & input$control_diseaseg == "`Has Health Insurance`")
+        return(paste0(as.character(round(disease_percent_rawg(), 2)), "%"))
+      else if(paste(disease_percent_rawg())!="numeric(0)" & input$control_diseaseg == "`Depressive Disorder`")
+        return(paste0(as.character(round(disease_percent_rawg(), 2)), "%"))
+      else if(paste(disease_percent_rawg())!="numeric(0)" & input$control_diseaseg == "`Good or Better Health`") 
+        return(paste0(as.character(round(disease_percent_rawg(), 2)), "%"))
+      else return ("") })
+    
+    output$graphinfo <- renderText({ if(length(mmsa.clickg()) == 1 & disease_percentg()!= "")
+      paste("Data for", gsub("`","",input$control_diseaseg), "in", input$mmsa_inputg, "in", input$varg, ": ")
+      else if (!is.na(mmsa.clickg())) paste0(mmsa.clickg(), ": No data for this MMSA/year")
+      else paste0("") })
+    
+    
+    
     mmsa_yearly_dat <- reactive ({ if(!is.na(as.numeric(paste(mmsas.clickg()[[1]])))) return(full_dat()[which(full_dat()$MMSA == as.numeric(paste(mmsas.clickg()[[1]]))),]) else return(data.frame(0)) })
-
     
     
-      bmi <- reactive({ reshape2::melt(select(mmsa_yearly_dat(), 3, 14, 15, 16, 17, 18), id.vars=c_disg) })
-      race <- reactive({ reshape2::melt(select(mmsa_yearly_dat(), 3, 9, 10, 11, 12, 13), id.vars=c_disg) })
-      income <- reactive({ reshape2::melt(select(mmsa_yearly_dat(), 3, 4, 5, 6), id.vars=c_disg) })
-      smoking <- reactive({ reshape2::melt(select(mmsa_yearly_dat(), 3, 19, 20, 21), id.vars=c_disg) })
-      age_cat <- reactive({ reshape2::melt(select(mmsa_yearly_dat(), 3, 25:30), id.vars=c_disg) })
-      gender <- reactive({ reshape2::melt(select(mmsa_yearly_dat(), 3, 7, 8), id.vars=c_disg) })
-      
- 
-      
-      
-      output$bmi_plot <- renderPlot({ ggplot(bmi(), aes(x = factor(bmi()[,1]), y = value, fill = factor(variable))) + 
-          geom_bar(stat="identity", position="fill",width=0.50) +
-          scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
-          scale_fill_brewer(name="variable", palette = "Blues") + bbc_style() +
-          geom_hline(yintercept = 0, size = 1, colour="#333333") +
-          geom_vline(xintercept = 0.5, size = 1, colour="#333333") +
-          theme(legend.position = "top", legend.text = element_text(size = 12), legend.title = element_text(size = 15, face = "bold")) +
-          guides(fill = guide_legend(title = "Body Mass Index (BMI)", title.position = "top", title.hjust = 0.5, nrow=2)) +
-          theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank(), axis.text = element_text(size=14),
-                panel.grid.major.x = element_line(color="#cbcbcb"), panel.grid.major.y=element_blank()) + coord_flip() 
-          })
-      
-      output$race_plot <- renderPlot({ ggplot(race(), aes(x = factor(race()[,1]), y = value, fill = factor(variable))) + 
-          geom_bar(stat="identity", position="fill",width=0.50) + 
-          scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
-          scale_fill_brewer(name="variable", palette = "Greens") + bbc_style() +
-          geom_hline(yintercept = 0, size = 1, colour="#333333") +
-          geom_vline(xintercept = 0.5, size = 1, colour="#333333") +
-          theme(legend.position = "top", legend.text = element_text(size = 12), legend.title = element_text(size = 15, face = "bold")) +
-          guides(fill = guide_legend(title = "Race/Ethnicity", title.position = "top", title.hjust = 0.5, nrow=3)) +
-          theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank(), axis.text = element_text(size=14),
-                panel.grid.major.x = element_line(color="#cbcbcb"), panel.grid.major.y=element_blank()) + coord_flip() 
-           })
-      
-      output$income_plot <- renderPlot({ ggplot(income(), aes(x = factor(income()[,1]), y = value, fill = factor(variable))) + 
-          geom_bar(stat="identity", position="fill",width=0.50) + 
-          scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
-          scale_fill_brewer(name="variable", palette = "Oranges") + bbc_style() +
-          geom_hline(yintercept = 0, size = 1, colour="#333333") +
-          geom_vline(xintercept = 0.5, size = 1, colour="#333333") +
-          theme(legend.position = "top", legend.text = element_text(size = 12), legend.title = element_text(size = 15, face = "bold")) +
-          guides(fill = guide_legend(title = "Income", title.position = "top", title.hjust = 0.5)) +
-          theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank(), axis.text = element_text(size=14),
-                panel.grid.major.x = element_line(color="#cbcbcb"), panel.grid.major.y=element_blank()) + coord_flip() 
-           })
-      
-      output$smoking_plot <- renderPlot({ ggplot(smoking(), aes(x = factor(smoking()[,1]), y = value, fill = factor(variable))) + 
-          geom_bar(stat="identity", position="fill",width=0.50) + 
-          scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
-          scale_fill_brewer(name="variable", palette = "Purples") + bbc_style() +
-          geom_hline(yintercept = 0, size = 1, colour="#333333") +
-          geom_vline(xintercept = 0.5, size = 1, colour="#333333") +
-          theme(legend.position = "top", legend.text = element_text(size = 12), legend.title = element_text(size = 15, face = "bold")) +
-          guides(fill = guide_legend(title = "Smoking Status", title.position = "top", title.hjust = 0.5)) +
-          theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank(), axis.text = element_text(size=14),
-                panel.grid.major.x = element_line(color="#cbcbcb"), panel.grid.major.y=element_blank()) + coord_flip() 
-          })
-      
-      output$age_plot <- renderPlot({ ggplot(age_cat(), aes(x = factor(age_cat()[,1]), y = value, fill = factor(variable))) + 
-          geom_bar(stat="identity", position="fill",width=0.50) + 
-          scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
-          scale_fill_brewer(name="variable", palette = "Reds") + bbc_style() +
-          geom_hline(yintercept = 0, size = 1, colour="#333333") +
-          geom_vline(xintercept = 0.5, size = 1, colour="#333333") +
-          theme(legend.position = "top", legend.text = element_text(size = 12), legend.title = element_text(size = 15, face = "bold")) +
-          guides(fill = guide_legend(title = "Age", title.position = "top", title.hjust = 0.5)) +
-          theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank(), axis.text = element_text(size=14),
-                panel.grid.major.x = element_line(color="#cbcbcb"), panel.grid.major.y=element_blank()) + coord_flip() 
-          })
-      
-      output$gender_plot <- renderPlot({ ggplot(gender(), aes(x = factor(gender()[,1]), y = value, fill = factor(variable))) + 
-          geom_bar(stat="identity", position="fill",width=0.50) + 
-          scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
-          scale_fill_manual(name="variable", values=c("#fff3f5","#ff5b77")) + bbc_style() +
-          geom_hline(yintercept = 0, size = 1, colour="#333333") +
-          geom_vline(xintercept = 0.5, size = 1, colour="#333333") +
-          theme(legend.position = "top", legend.text = element_text(size = 12), legend.title = element_text(size = 15, face = "bold")) +
-          guides(fill = guide_legend(title = "Sex", title.position = "top", title.hjust = 0.5)) +
-          theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank(), axis.text = element_text(size=14),
-                panel.grid.major.x = element_line(color="#cbcbcb"), panel.grid.major.y=element_blank()) + coord_flip() 
-         })
-      
+    
+    bmi <- reactive({ reshape2::melt(select(mmsa_yearly_dat(), 3, 14, 15, 16, 17, 18), id.vars=c_disg) })
+    race <- reactive({ reshape2::melt(select(mmsa_yearly_dat(), 3, 9, 10, 11, 12, 13), id.vars=c_disg) })
+    income <- reactive({ reshape2::melt(select(mmsa_yearly_dat(), 3, 4, 5, 6), id.vars=c_disg) })
+    smoking <- reactive({ reshape2::melt(select(mmsa_yearly_dat(), 3, 19, 20, 21), id.vars=c_disg) })
+    age_cat <- reactive({ reshape2::melt(select(mmsa_yearly_dat(), 3, 25:30), id.vars=c_disg) })
+    gender <- reactive({ reshape2::melt(select(mmsa_yearly_dat(), 3, 7, 8), id.vars=c_disg) })
+    
+    
+    
+    
+    output$bmi_plot <- renderPlot({ ggplot(bmi(), aes(x = factor(bmi()[,1]), y = value, fill = factor(variable))) + 
+        geom_bar(stat="identity", position="fill",width=0.50) +
+        scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
+        scale_fill_brewer(name="variable", palette = "Blues") + bbc_style() +
+        geom_hline(yintercept = 0, size = 1, colour="#333333") +
+        geom_vline(xintercept = 0.5, size = 1, colour="#333333") +
+        theme(legend.position = "top", legend.text = element_text(size = 12), legend.title = element_text(size = 15, face = "bold")) +
+        guides(fill = guide_legend(title = "Body Mass Index (BMI)", title.position = "top", title.hjust = 0.5, nrow=2)) +
+        theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank(), axis.text = element_text(size=14),
+              panel.grid.major.x = element_line(color="#cbcbcb"), panel.grid.major.y=element_blank()) + coord_flip() 
+    })
+    
+    output$race_plot <- renderPlot({ ggplot(race(), aes(x = factor(race()[,1]), y = value, fill = factor(variable))) + 
+        geom_bar(stat="identity", position="fill",width=0.50) + 
+        scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
+        scale_fill_brewer(name="variable", palette = "Greens") + bbc_style() +
+        geom_hline(yintercept = 0, size = 1, colour="#333333") +
+        geom_vline(xintercept = 0.5, size = 1, colour="#333333") +
+        theme(legend.position = "top", legend.text = element_text(size = 12), legend.title = element_text(size = 15, face = "bold")) +
+        guides(fill = guide_legend(title = "Race/Ethnicity", title.position = "top", title.hjust = 0.5, nrow=3)) +
+        theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank(), axis.text = element_text(size=14),
+              panel.grid.major.x = element_line(color="#cbcbcb"), panel.grid.major.y=element_blank()) + coord_flip() 
+    })
+    
+    output$income_plot <- renderPlot({ ggplot(income(), aes(x = factor(income()[,1]), y = value, fill = factor(variable))) + 
+        geom_bar(stat="identity", position="fill",width=0.50) + 
+        scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
+        scale_fill_brewer(name="variable", palette = "Oranges") + bbc_style() +
+        geom_hline(yintercept = 0, size = 1, colour="#333333") +
+        geom_vline(xintercept = 0.5, size = 1, colour="#333333") +
+        theme(legend.position = "top", legend.text = element_text(size = 12), legend.title = element_text(size = 15, face = "bold")) +
+        guides(fill = guide_legend(title = "Income", title.position = "top", title.hjust = 0.5)) +
+        theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank(), axis.text = element_text(size=14),
+              panel.grid.major.x = element_line(color="#cbcbcb"), panel.grid.major.y=element_blank()) + coord_flip() 
+    })
+    
+    output$smoking_plot <- renderPlot({ ggplot(smoking(), aes(x = factor(smoking()[,1]), y = value, fill = factor(variable))) + 
+        geom_bar(stat="identity", position="fill",width=0.50) + 
+        scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
+        scale_fill_brewer(name="variable", palette = "Purples") + bbc_style() +
+        geom_hline(yintercept = 0, size = 1, colour="#333333") +
+        geom_vline(xintercept = 0.5, size = 1, colour="#333333") +
+        theme(legend.position = "top", legend.text = element_text(size = 12), legend.title = element_text(size = 15, face = "bold")) +
+        guides(fill = guide_legend(title = "Smoking Status", title.position = "top", title.hjust = 0.5)) +
+        theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank(), axis.text = element_text(size=14),
+              panel.grid.major.x = element_line(color="#cbcbcb"), panel.grid.major.y=element_blank()) + coord_flip() 
+    })
+    
+    output$age_plot <- renderPlot({ ggplot(age_cat(), aes(x = factor(age_cat()[,1]), y = value, fill = factor(variable))) + 
+        geom_bar(stat="identity", position="fill",width=0.50) + 
+        scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
+        scale_fill_brewer(name="variable", palette = "Reds") + bbc_style() +
+        geom_hline(yintercept = 0, size = 1, colour="#333333") +
+        geom_vline(xintercept = 0.5, size = 1, colour="#333333") +
+        theme(legend.position = "top", legend.text = element_text(size = 12), legend.title = element_text(size = 15, face = "bold")) +
+        guides(fill = guide_legend(title = "Age", title.position = "top", title.hjust = 0.5)) +
+        theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank(), axis.text = element_text(size=14),
+              panel.grid.major.x = element_line(color="#cbcbcb"), panel.grid.major.y=element_blank()) + coord_flip() 
+    })
+    
+    output$gender_plot <- renderPlot({ ggplot(gender(), aes(x = factor(gender()[,1]), y = value, fill = factor(variable))) + 
+        geom_bar(stat="identity", position="fill",width=0.50) + 
+        scale_x_discrete(labels=c(paste("No",gsub("`","",c_disg)), paste(gsub("`","",c_disg)))) +
+        scale_fill_manual(name="variable", values=c("#fff3f5","#ff5b77")) + bbc_style() +
+        geom_hline(yintercept = 0, size = 1, colour="#333333") +
+        geom_vline(xintercept = 0.5, size = 1, colour="#333333") +
+        theme(legend.position = "top", legend.text = element_text(size = 12), legend.title = element_text(size = 15, face = "bold")) +
+        guides(fill = guide_legend(title = "Sex", title.position = "top", title.hjust = 0.5)) +
+        theme(axis.line = element_blank(), axis.title.y=element_blank(), axis.title.x = element_blank(), axis.text = element_text(size=14),
+              panel.grid.major.x = element_line(color="#cbcbcb"), panel.grid.major.y=element_blank()) + coord_flip() 
+    })
+    
   })}
