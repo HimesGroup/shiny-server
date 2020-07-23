@@ -208,6 +208,20 @@ function(input, output, clientData, session) {
       input$reset_button
       leafletProxy("map") %>% setView(lat = 39, lng = -94, zoom = 4)
     })
+    gc()
+    proxy <- leafletProxy("map")
+    observe({
+      if(input$mmsa_input!=""){
+        #Find polygon selected in map MMSA dropdown, and find a point on which to focus for adjusted zoom/center
+        selected_polygon <- subset(location_min_sf, location_min_sf$NAME==input$mmsa_input)
+        polygon_lat <- paste(selected_polygon$INTPTLAT)
+        polygon_lon <- paste(selected_polygon$INTPTLON)
+        
+        #Add a black highlight of the selected MMSA
+        proxy %>% addPolylines(stroke=TRUE, color="black", weight=3,data=selected_polygon,group="highlighted_polygon") %>%
+          setView(lng=polygon_lon,lat=polygon_lat,zoom=5)
+      }
+    })
     
     #Multivariate graph formation
     output$multigraph <- renderPlot({ df <- current.all %>% filter(!is.na(BMI))
@@ -318,9 +332,9 @@ function(input, output, clientData, session) {
         return(paste0(as.character(round(disease_percent_raw(), 2)), "%"))
       else if(paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "`Good or Better Health`") 
         return(paste0(as.character(round(disease_percent_raw(), 2)), "%"))
-      else if (paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "`Average BMI`")
+      else if (paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "AVERAGE_BMI")
         return(paste0(as.character(round(disease_percent_raw(), 2))))
-      else if (paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "`Average ADI`")
+      else if (paste(disease_percent_raw())!="numeric(0)" & input$control_disease == "AVERAGE_ADI")
         return(paste0(as.character(round(disease_percent_raw(), 2))))
       else return ("") })
     
