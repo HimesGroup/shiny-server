@@ -1,5 +1,5 @@
 #.libPaths("/home/rebecca/R/x86_64-pc-linux-gnu-library/3.4/")
-.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/")
+#.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/")
 
 library(leaflet)
 library(shiny)
@@ -13,34 +13,34 @@ source("month_to_num.R")
 source("getPollutionEstimates.R")
 
 ## load in annual bricks for full data
-pm_yearly_brick_full <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/10km_rasters/pm_yearly_brick_full_10km.tif")
-ozone_yearly_brick_full <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/10km_rasters/ozone_yearly_brick_full_10km.tif")
-no2_yearly_brick_full <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/10km_rasters/no2_yearly_brick_full_10km.tif")
-so2_yearly_brick_full <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/10km_rasters/so2_yearly_brick_full_10km.tif")
-co_yearly_brick_full <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/10km_rasters/co_yearly_brick_full_10km.tif")
+pm_yearly_brick_full <- brick("../../main_database/pargasite_rasters/Annual/10km_rasters/pm_yearly_brick_full_10km.tif")
+ozone_yearly_brick_full <- brick("../../main_database/pargasite_rasters/Annual/10km_rasters/ozone_yearly_brick_full_10km.tif")
+no2_yearly_brick_full <- brick("../../main_database/pargasite_rasters/Annual/10km_rasters/no2_yearly_brick_full_10km.tif")
+so2_yearly_brick_full <- brick("../../main_database/pargasite_rasters/Annual/10km_rasters/so2_yearly_brick_full_10km.tif")
+co_yearly_brick_full <- brick("../../main_database/pargasite_rasters/Annual/10km_rasters/co_yearly_brick_full_10km.tif")
 
-pm_yearly_brick_cropped <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/10km_rasters/pm_yearly_brick_full_10km_cropped.tif")
-ozone_yearly_brick_cropped <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/10km_rasters/ozone_yearly_brick_full_10km_cropped.tif")
-no2_yearly_brick_cropped <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/10km_rasters/no2_yearly_brick_full_10km_cropped.tif")
-so2_yearly_brick_cropped <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/10km_rasters/so2_yearly_brick_full_10km_cropped.tif")
-co_yearly_brick_cropped <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/10km_rasters/co_yearly_brick_full_10km_cropped.tif")
+pm_yearly_brick_cropped <- brick("../../main_database/pargasite_rasters/Annual/10km_rasters/pm_yearly_brick_full_10km_cropped.tif")
+ozone_yearly_brick_cropped <- brick("../../main_database/pargasite_rasters/Annual/10km_rasters/ozone_yearly_brick_full_10km_cropped.tif")
+no2_yearly_brick_cropped <- brick("../../main_database/pargasite_rasters/Annual/10km_rasters/no2_yearly_brick_full_10km_cropped.tif")
+so2_yearly_brick_cropped <- brick("../../main_database/pargasite_rasters/Annual/10km_rasters/so2_yearly_brick_full_10km_cropped.tif")
+co_yearly_brick_cropped <- brick("../../main_database/pargasite_rasters/Annual/10km_rasters/co_yearly_brick_full_10km_cropped.tif")
 
 ## load in annual bricks for Puerto Rico
-pm_yearly_brick_full_pr <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/1km_rasters/pr_pm_annual_1km_brick.tif")
-ozone_yearly_brick_full_pr <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/1km_rasters/pr_ozone_annual_1km_brick.tif")
-no2_yearly_brick_full_pr <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/1km_rasters/pr_no2_annual_1km_brick.tif")
-so2_yearly_brick_full_pr <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/1km_rasters/pr_so2_annual_1km_brick.tif")
-co_yearly_brick_full_pr <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/1km_rasters/pr_co_annual_1km_brick.tif")
+pm_yearly_brick_full_pr <- brick("../../main_database/pargasite_rasters/Annual/1km_rasters/pr_pm_annual_1km_brick.tif")
+ozone_yearly_brick_full_pr <- brick("../../main_database/pargasite_rasters/Annual/1km_rasters/pr_ozone_annual_1km_brick.tif")
+no2_yearly_brick_full_pr <- brick("../../main_database/pargasite_rasters/Annual/1km_rasters/pr_no2_annual_1km_brick.tif")
+so2_yearly_brick_full_pr <- brick("../../main_database/pargasite_rasters/Annual/1km_rasters/pr_so2_annual_1km_brick.tif")
+co_yearly_brick_full_pr <- brick("../../main_database/pargasite_rasters/Annual/1km_rasters/pr_co_annual_1km_brick.tif")
 
-pm_yearly_brick_cropped_pr <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/1km_rasters/pr_pm_annual_1km_brick_cropped.tif")
-ozone_yearly_brick_cropped_pr <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/1km_rasters/pr_ozone_annual_1km_brick_cropped.tif")
-no2_yearly_brick_cropped_pr <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/1km_rasters/pr_no2_annual_1km_brick_cropped.tif")
-so2_yearly_brick_cropped_pr <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/1km_rasters/pr_so2_annual_1km_brick_cropped.tif")
-co_yearly_brick_cropped_pr <- brick("/srv/shiny-server/databases/pargasite_rasters/Annual/1km_rasters/pr_co_annual_1km_brick_cropped.tif")
+pm_yearly_brick_cropped_pr <- brick("../../main_database/pargasite_rasters/Annual/1km_rasters/pr_pm_annual_1km_brick_cropped.tif")
+ozone_yearly_brick_cropped_pr <- brick("../../main_database/pargasite_rasters/Annual/1km_rasters/pr_ozone_annual_1km_brick_cropped.tif")
+no2_yearly_brick_cropped_pr <- brick("../../main_database/pargasite_rasters/Annual/1km_rasters/pr_no2_annual_1km_brick_cropped.tif")
+so2_yearly_brick_cropped_pr <- brick("../../main_database/pargasite_rasters/Annual/1km_rasters/pr_so2_annual_1km_brick_cropped.tif")
+co_yearly_brick_cropped_pr <- brick("../../main_database/pargasite_rasters/Annual/1km_rasters/pr_co_annual_1km_brick_cropped.tif")
 
 
 #EPA sites
-epa.sites <- read.csv("/srv/shiny-server/pargasite/data/epa_site_locations.csv") 
+epa.sites <- read.csv("data/epa_site_locations.csv") 
 
 #Map
 full_usa = st_as_sf(map("state", plot = FALSE, fill = TRUE))
