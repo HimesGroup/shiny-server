@@ -1,8 +1,8 @@
-.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4")
+#.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4")
 library(shiny)
 library(leaflet)
 
-county_names <- read.csv("../databases/map_data/county_names.csv")
+county_names <- read.csv("map_data/county_names.csv")
 counties <- as.character(county_names$x)
 
 shinyUI(navbarPage(id="nav",
