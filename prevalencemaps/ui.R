@@ -146,7 +146,7 @@ shinyUI(fluidPage(title="Prevalence Maps",
                     plotOutput("regiongraph", height=800),align="center",br())
             )),
     tabPanel("About",
-             includeHTML("/srv/shiny-server/databases/prevalencemaps/introprevalencemaps.html")
+             includeHTML("prevalencemaps/introprevalencemaps.html")
     )
     )
   )
