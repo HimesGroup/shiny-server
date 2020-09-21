@@ -1,15 +1,15 @@
 
-pm_monthly_brick <- brick("../../main_database/pargasite_rasters/Monthly/10km_rasters/pm_monthly_brick_full_10km.tif")
-ozone_monthly_brick <- brick("../../main_database/pargasite_rasters/Monthly/10km_rasters/ozone_monthly_brick_full_10km.tif")
-no2_monthly_brick <- brick("../../main_database/pargasite_rasters/Monthly/10km_rasters/no2_monthly_brick_full_10km.tif")
-so2_monthly_brick <- brick("../../main_database/pargasite_rasters/Monthly/10km_rasters/so2_monthly_brick_full_10km.tif")
-co_monthly_brick <- brick("../../main_database/pargasite_rasters/Monthly/10km_rasters/co_monthly_brick_full_10km.tif")
+pm_monthly_brick <- brick("pargasite_rasters/Monthly/10km_rasters/pm_monthly_brick_full_10km.tif")
+ozone_monthly_brick <- brick("pargasite_rasters/Monthly/10km_rasters/ozone_monthly_brick_full_10km.tif")
+no2_monthly_brick <- brick("pargasite_rasters/Monthly/10km_rasters/no2_monthly_brick_full_10km.tif")
+so2_monthly_brick <- brick("pargasite_rasters/Monthly/10km_rasters/so2_monthly_brick_full_10km.tif")
+co_monthly_brick <- brick("pargasite_rasters/Monthly/10km_rasters/co_monthly_brick_full_10km.tif")
 
-pm_monthly_brick_pr <- brick("../../main_database/pargasite_rasters/Monthly/1km_rasters/pr_pm_monthly_brick_full_1km.tif")
-ozone_monthly_brick_pr <- brick("../../main_database/pargasite_rasters/Monthly/1km_rasters/pr_ozone_monthly_brick_full_1km.tif")
-no2_monthly_brick_pr <- brick("../../main_database/pargasite_rasters/Monthly/1km_rasters/pr_no2_monthly_brick_full_1km.tif")
-so2_monthly_brick_pr <- brick("../../main_database/pargasite_rasters/Monthly/1km_rasters/pr_so2_monthly_brick_full_1km.tif")
-co_monthly_brick_pr <- brick("../../main_database/pargasite_rasters/Monthly/1km_rasters/pr_co_monthly_brick_full_1km.tif")
+pm_monthly_brick_pr <- brick("pargasite_rasters/Monthly/1km_rasters/pr_pm_monthly_brick_full_1km.tif")
+ozone_monthly_brick_pr <- brick("pargasite_rasters/Monthly/1km_rasters/pr_ozone_monthly_brick_full_1km.tif")
+no2_monthly_brick_pr <- brick("pargasite_rasters/Monthly/1km_rasters/pr_no2_monthly_brick_full_1km.tif")
+so2_monthly_brick_pr <- brick("pargasite_rasters/Monthly/1km_rasters/pr_so2_monthly_brick_full_1km.tif")
+co_monthly_brick_pr <- brick("pargasite_rasters/Monthly/1km_rasters/pr_co_monthly_brick_full_1km.tif")
 
 getPollutionEstimates.df.app <- function(data, monthyear_start,
                                          monthyear_end, location) {
