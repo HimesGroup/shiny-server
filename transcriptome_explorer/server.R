@@ -1,4 +1,4 @@
-.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/")
+#.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/")
 library(shiny)
 library(datasets)
 library(ggplot2)
@@ -12,24 +12,24 @@ library(feather)
 
 #Load data files - gene names and dataset info
 # "lcte" appended to beginning of filename stands for "lung cell transcriptome explorer"
-sras <- read_feather("/srv/shiny-server/databases/asthmagenes_deseq2/lcte_dataset_info_asm.feather") %>% tbl_df
-all_genes <- read_feather("/srv/shiny-server/databases/lcte_gene_names.feather") %>% tbl_df
-unfiltered_genes <- read_feather("/srv/shiny-server/databases/lcte_sleuth_unfiltered_genes.feather") %>% tbl_df
-#all_genes <- read_feather("/srv/shiny-server/databases/Gene_names.feather")
+sras <- read_feather("transcriptomics/asthmagenes_deseq2/lcte_dataset_info_asm.feather") %>% tbl_df
+all_genes <- read_feather("transcriptomics/lcte_gene_names.feather") %>% tbl_df
+unfiltered_genes <- read_feather("transcriptomics/lcte_sleuth_unfiltered_genes.feather") %>% tbl_df
+#all_genes <- read_feather("transcriptomics/Gene_names.feather")
 
 #deseq2 results : log2FC, padj and conditions- for datatable 
 de <- list()
-de[["SRP033351"]] <- read_feather("/srv/shiny-server/databases/asthmagenes_deseq2/SRP033351/SRP033351_de.feather") %>% tbl_df
-de[["SRP043162"]] <- read_feather("/srv/shiny-server/databases/asthmagenes_deseq2/SRP043162/SRP043162_de.feather") %>% tbl_df
-de[["SRP098649"]] <- read_feather("/srv/shiny-server/databases/asthmagenes_deseq2/SRP098649/SRP098649_de.feather") %>% tbl_df
-de[["SRP005411"]] <- read_feather("/srv/shiny-server/databases/asthmagenes_deseq2/SRP005411/SRP005411_de.feather") %>% tbl_df
+de[["SRP033351"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP033351/SRP033351_de.feather") %>% tbl_df
+de[["SRP043162"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP043162/SRP043162_de.feather") %>% tbl_df
+de[["SRP098649"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP098649/SRP098649_de.feather") %>% tbl_df
+de[["SRP005411"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP005411/SRP005411_de.feather") %>% tbl_df
 
 #Deseq2 count results - by gene for plots
 tpms <- list()
-tpms[["SRP033351"]] <- read_feather("/srv/shiny-server/databases/asthmagenes_deseq2/SRP033351/SRP033351_pheno+counts.feather") %>% tbl_df
-tpms[["SRP043162"]] <- read_feather("/srv/shiny-server/databases/asthmagenes_deseq2/SRP043162/SRP043162_pheno+counts.feather") %>% tbl_df
-tpms[["SRP098649"]] <- read_feather("/srv/shiny-server/databases/asthmagenes_deseq2/SRP098649/SRP098649_pheno+counts.feather") %>% tbl_df
-tpms[["SRP005411"]] <- read_feather("/srv/shiny-server/databases/asthmagenes_deseq2/SRP005411/SRP005411_pheno+counts.feather") %>% tbl_df
+tpms[["SRP033351"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP033351/SRP033351_pheno+counts.feather") %>% tbl_df
+tpms[["SRP043162"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP043162/SRP043162_pheno+counts.feather") %>% tbl_df
+tpms[["SRP098649"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP098649/SRP098649_pheno+counts.feather") %>% tbl_df
+tpms[["SRP005411"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP005411/SRP005411_pheno+counts.feather") %>% tbl_df
 
 
 # make a list of gene symbols in all datasets for checking whether gene symbol entered is valid - used later on
@@ -157,7 +157,7 @@ server <- shinyServer(function(input, output, session) {
     #R logo for user interface 
     output$logo <- renderImage({ 
       return(list(
-        src = "/srv/shiny-server/databases/www/bigorb.png",
+        src = "transcriptomics/bigorb.png",
         height=38.7*1.5,
         width=42.7*1.5,
         filetype = "image/png",

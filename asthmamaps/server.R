@@ -1,4 +1,4 @@
-.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4")
+#.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4")
 library(shiny)
 library(ggplot2)
 library(maps)
@@ -31,12 +31,12 @@ library(reshape2)
 # polynames_final <- polynames_ed[!is.na(polynames_ed)]
 # write.csv(polynames_final, "data/county_names.csv")
 
-county_names <- read.csv("../databases/map_data/county_names.csv")
+county_names <- read.csv("map_data/county_names.csv")
 
-weighted_current_asthma_prev <- read.csv("../databases/map_data/weighted_current_asthma_w_counts_leaflet.csv")
+weighted_current_asthma_prev <- read.csv("map_data/weighted_current_asthma_w_counts_leaflet.csv")
 weighted_current_asthma_prev$asthma_percent <- weighted_current_asthma_prev$asthnow*100
 
-weighted_current_vars <- read.csv("../databases/map_data/weighted_current_variables_leaflet.csv")
+weighted_current_vars <- read.csv("map_data/weighted_current_variables_leaflet.csv")
 colnames(weighted_current_vars) <- c("id", "CntyFIPS", "YEAR", "ASTHMA", "<$25,000", "$25,000-$75,000", ">$75,000", 
                                      "Male", "Female", "White", "Asian/Pacific Islander",
                                      "Black", "Hispanic", "American Indian/Alaskan Native",
