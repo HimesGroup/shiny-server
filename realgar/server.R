@@ -213,7 +213,7 @@ server <- shinyServer(function(input, output, session) {
     validate(need(GeneSymbol() != FALSE, "Please enter a valid gene symbol or SNP ID."))
 
     out.table <- out.table %>%
-                          filter(Unique_ID %in% UserDataset_Info()$Unique_ID) %>%
+                          dplyr::filter(Unique_ID %in% UserDataset_Info()$Unique_ID) %>%
                           dplyr::rename(adj.P.Val = adjPVal,P.Value = PValue) %>%
                           arrange(desc(Fold_Change),desc(Upper_bound_CI))
   })
@@ -225,12 +225,12 @@ server <- shinyServer(function(input, output, session) {
   
   # asthma
   data_Asthma <- reactive({ 
-  output.tableforplot_asthma <- output.tableforplot() %>% filter(App == "asthma")
+  output.tableforplot_asthma <- output.tableforplot() %>% dplyr::filter(App == "asthma")
   })
   
   # GC
   data_GC <- reactive({ 
-  output.tableforplot_GC <- output.tableforplot() %>% filter(App %in% c("GC", "BA", "smoking", "vitD","PDE"))
+  output.tableforplot_GC <- output.tableforplot() %>% dplyr::filter(App %in% c("GC", "BA", "smoking", "vitD","PDE"))
   })
   
   
@@ -301,7 +301,7 @@ server <- shinyServer(function(input, output, session) {
   data2_Asthma <- reactive({ # dataset without meta-analysis results
       data_Asthma()%>%
           dplyr::select(Unique_ID, adj.P.Val, P.Value,Fold_Change, neglogofP, Lower_bound_CI, Upper_bound_CI) %>%
-          arrange(desc(Fold_Change),desc(Upper_bound_CI)) %>% # sort by first effect size (fold change) and then by upper CI in a descending order
+          dplyr::arrange(desc(Fold_Change),desc(Upper_bound_CI)) %>% # sort by first effect size (fold change) and then by upper CI in a descending order
           dplyr::mutate(Fold_Change=round(Fold_Change,digits=2),
                         adj.P.Val=format(adj.P.Val, scientific=TRUE, digits=3), 
                         P.Value =format(P.Value, scientific=TRUE, digits=3), 
@@ -479,7 +479,7 @@ server <- shinyServer(function(input, output, session) {
       #need the second filter criterion because otherwise will output snp names & otherwise blank if NA pvalues
       snp_eve <- get_query_db("snp_eve",curr_gene())
       which_eve_pval <- paste0("color_",input$which_eve_pvals) #Column selected
-      snp_eve_temp <- snp_eve %>% filter(!is.na(which_eve_pval))
+      snp_eve_temp <- snp_eve %>% dplyr::filter(!is.na(which_eve_pval))
       if (nrow(snp_eve_temp) > 0) {snp_eve_temp} else {data.frame(matrix(nrow = 0, ncol = 0))} #since pval_selector might remove all rows 
     } else {data.frame(matrix(nrow = 0, ncol = 0))}
   }) #only non-zero if corresponding checkbox is selected - but can't have "NULL" - else get "argument is of length zero" error
@@ -502,7 +502,7 @@ server <- shinyServer(function(input, output, session) {
     if(("snp_TAGC_subs" %in% input$which_SNPs)) {
       snp_TAGC <- get_query_db("snp_TAGC",curr_gene())
       which_TAGC_pval <- paste0("color_",input$which_TAGC_pvals) #Column selected
-      snp_TAGC_temp <- snp_TAGC %>% filter(!is.na(which_TAGC_pval))
+      snp_TAGC_temp <- snp_TAGC %>% dplyr::filter(!is.na(which_TAGC_pval))
       if (nrow(snp_TAGC_temp) > 0) {snp_TAGC_temp} else {data.frame(matrix(nrow = 0, ncol = 0))} #since pval_selector might remove all rows 
     } else {data.frame(matrix(nrow = 0, ncol = 0))}
   }) #only non-zero if corresponding checkbox is selected - but can't have "NULL" - else get "argument is of length zero" error
