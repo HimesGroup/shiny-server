@@ -2,10 +2,10 @@ library(DBI, quietly = T)
 library(RSQLite, quietly=T)
 
 #SQLite for omics database ---
-ngs_db <- dbConnect(SQLite(), dbname="/srv/shiny-server/databases/realgar-omics.sqlite")
+ngs_db <- dbConnect(SQLite(), dbname="realgar_data/realgar-omics.sqlite")
 
 #SQLite for gwas data from database ---
-gwas_db <- dbConnect(SQLite(), dbname="/srv/shiny-server/databases/realgar-gwas.sqlite")
+gwas_db <- dbConnect(SQLite(), dbname="realgar_data/realgar-gwas.sqlite")
 
 ## FUNCTIONS ------
 ## Get databases from gwas files and filter selected gene

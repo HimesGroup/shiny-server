@@ -1,5 +1,4 @@
 
-.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/") # else have problems with Gviz package not being found
 library(shiny)
 library(shinythemes)
 library(shinyWidgets)
@@ -49,12 +48,12 @@ treatment_choices <- c("β2-agonist"="BA",
 gwas_choices <- c("EVE"="snp_eve_subs","Ferreira"="snp_fer_subs","GABRIEL"="snp_gabriel_subs","GRASP"="snp_subs","TAGC"="snp_TAGC_subs")
 
 #Gene list
-all_genes <- read_feather("/srv/shiny-server/databases/gene_list.feather")
+all_genes <- read_feather("realgar_data/gene_list.feather")
 gene_list <- as.vector(all_genes$V1)
 rm(all_genes)
 
 #Gene choices
-genec <- read_feather("/srv/shiny-server/databases/Sig_gene_list.feather")
+genec <- read_feather("realgar_data/Sig_gene_list.feather")
 gene_choices <- as.vector(genec$V1)
 rm(genec)
 
@@ -63,7 +62,7 @@ rm(genec)
 ####################
 
 # load descriptions of all gene expression and GWAS datasets
-Alldata_Info <- read_feather("/srv/shiny-server/databases/Microarray_data_infosheet_latest_R.feather")
+Alldata_Info <- read_feather("realgar_data/Microarray_data_infosheet_latest_R.feather")
 
 #then split off into gene expression and GWAS dataset info - else forest plot text columns get messed up
 GWAS_Dataset_Info <- Alldata_Info[which(Alldata_Info$App == "GWAS"),]
@@ -86,6 +85,6 @@ BA_PDE_Info <- Dataset_Info %>% dplyr::filter(Asthma == "BA_PDE")
 #load info for gene tracks: gene locations, TFBS, SNPs, etc.
 
 #from feather files ---
-chrom_bands <- read_feather("/srv/shiny-server/databases/chrom_bands.feather") #chromosome band info for ideogram - makes ideogram load 25 seconds faster
+chrom_bands <- read_feather("realgar_data/chrom_bands.feather") #chromosome band info for ideogram - makes ideogram load 25 seconds faster
 
 

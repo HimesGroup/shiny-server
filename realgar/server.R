@@ -450,7 +450,7 @@ server <- shinyServer(function(input, output, session) {
   #horizontal color scale for gene tracks
   output$color_scale3 <- renderImage({ 
     return(list(
-      src = "/srv/shiny-server/databases/www/color_scale_horizontal.png",
+      src = "realgar_data/color_scale_horizontal.png",
       height=109*1.05,
       width=1015*1.05,
       filetype = "image/png",
