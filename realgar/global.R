@@ -49,12 +49,12 @@ treatment_choices <- c("β2-agonist"="BA",
 gwas_choices <- c("EVE"="snp_eve_subs","Ferreira"="snp_fer_subs","GABRIEL"="snp_gabriel_subs","GRASP"="snp_subs","TAGC"="snp_TAGC_subs")
 
 #Gene list
-all_genes <- read_feather("/home/avantika/shiny_apps/shiny-server/realgar/realgar_data/gene_list.feather")
+all_genes <- read_feather("realgar_data/gene_list.feather")
 gene_list <- as.vector(all_genes$V1)
 rm(all_genes)
 
 #Gene choices
-genec <- read_feather("/home/avantika/shiny_apps/shiny-server/realgar/realgar_data/Sig_gene_list.feather")
+genec <- read_feather("realgar_data/Sig_gene_list.feather")
 gene_choices <- as.vector(genec$V1)
 rm(genec)
 
@@ -63,7 +63,7 @@ rm(genec)
 ####################
 
 # load descriptions of all gene expression and GWAS datasets
-Alldata_Info <- read_feather("/home/avantika/shiny_apps/shiny-server/realgar/realgar_data/Microarray_data_infosheet_latest_R.feather")
+Alldata_Info <- read_feather("realgar_data/Microarray_data_infosheet_latest_R.feather")
 
 #then split off into gene expression and GWAS dataset info - else forest plot text columns get messed up
 GWAS_Dataset_Info <- Alldata_Info[which(Alldata_Info$App == "GWAS"),]
@@ -86,7 +86,7 @@ BA_PDE_Info <- Dataset_Info %>% dplyr::filter(Asthma == "BA_PDE")
 #load info for gene tracks: gene locations, TFBS, SNPs, etc.
 
 #from feather files ---
-chrom_bands <- read_feather("/home/avantika/shiny_apps/shiny-server/realgar/realgar_data/chrom_bands.feather") #chromosome band info for ideogram - makes ideogram load 25 seconds faster
+chrom_bands <- read_feather("realgar_data/chrom_bands.feather") #chromosome band info for ideogram - makes ideogram load 25 seconds faster
 
 ###########################
 ## Transcriptomic data ##
@@ -94,23 +94,23 @@ chrom_bands <- read_feather("/home/avantika/shiny_apps/shiny-server/realgar/real
 
 #Load data files - gene names and dataset info
 # "lcte" appended to beginning of filename stands for "lung cell transcriptome explorer"
-sras <- read_feather("/home/avantika/shiny_apps/shiny-server/realgar/transcriptomics/asthmagenes_deseq2/lcte_dataset_info_asm.feather") %>% tibble::as_tibble()
-all_genes_te <- read_feather("/home/avantika/shiny_apps/shiny-server/realgar/transcriptomics/lcte_gene_names.feather") %>% tibble::as_tibble()
-unfiltered_genes <- read_feather("/home/avantika/shiny_apps/shiny-server/realgar/transcriptomics/lcte_sleuth_unfiltered_genes.feather") %>% tibble::as_tibble()
+sras <- read_feather("transcriptomics/asthmagenes_deseq2/lcte_dataset_info_asm.feather") %>% tibble::as_tibble()
+all_genes_te <- read_feather("transcriptomics/lcte_gene_names.feather") %>% tibble::as_tibble()
+unfiltered_genes <- read_feather("transcriptomics/lcte_sleuth_unfiltered_genes.feather") %>% tibble::as_tibble()
 
 #Deseq2 results : log2FC, padj and conditions- for datatable 
 de <- list()
-de[["SRP033351"]] <- read_feather("/home/avantika/shiny_apps/shiny-server/realgar/transcriptomics/asthmagenes_deseq2/SRP033351/SRP033351_de.feather") %>% tibble::as_tibble()
-de[["SRP043162"]] <- read_feather("/home/avantika/shiny_apps/shiny-server/realgar/transcriptomics/asthmagenes_deseq2/SRP043162/SRP043162_de.feather") %>% tibble::as_tibble()
-de[["SRP098649"]] <- read_feather("/home/avantika/shiny_apps/shiny-server/realgar/transcriptomics/asthmagenes_deseq2/SRP098649/SRP098649_de.feather") %>% tibble::as_tibble()
-de[["SRP005411"]] <- read_feather("/home/avantika/shiny_apps/shiny-server/realgar/transcriptomics/asthmagenes_deseq2/SRP005411/SRP005411_de.feather") %>% tibble::as_tibble()
+de[["SRP033351"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP033351/SRP033351_de.feather") %>% tibble::as_tibble()
+de[["SRP043162"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP043162/SRP043162_de.feather") %>% tibble::as_tibble()
+de[["SRP098649"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP098649/SRP098649_de.feather") %>% tibble::as_tibble()
+de[["SRP005411"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP005411/SRP005411_de.feather") %>% tibble::as_tibble()
 
 #Deseq2 count results - by gene for plots
 tpms <- list()
-tpms[["SRP033351"]] <- read_feather("/home/avantika/shiny_apps/shiny-server/realgar/transcriptomics/asthmagenes_deseq2/SRP033351/SRP033351_pheno+counts.feather") %>% tibble::as_tibble()
-tpms[["SRP043162"]] <- read_feather("/home/avantika/shiny_apps/shiny-server/realgar/transcriptomics/asthmagenes_deseq2/SRP043162/SRP043162_pheno+counts.feather") %>% tibble::as_tibble()
-tpms[["SRP098649"]] <- read_feather("/home/avantika/shiny_apps/shiny-server/realgar/transcriptomics/asthmagenes_deseq2/SRP098649/SRP098649_pheno+counts.feather") %>% tibble::as_tibble()
-tpms[["SRP005411"]] <- read_feather("/home/avantika/shiny_apps/shiny-server/realgar/transcriptomics/asthmagenes_deseq2/SRP005411/SRP005411_pheno+counts.feather") %>% tibble::as_tibble()
+tpms[["SRP033351"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP033351/SRP033351_pheno+counts.feather") %>% tibble::as_tibble()
+tpms[["SRP043162"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP043162/SRP043162_pheno+counts.feather") %>% tibble::as_tibble()
+tpms[["SRP098649"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP098649/SRP098649_pheno+counts.feather") %>% tibble::as_tibble()
+tpms[["SRP005411"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP005411/SRP005411_pheno+counts.feather") %>% tibble::as_tibble()
 
 
 # make a list of gene symbols in all datasets for checking whether gene symbol entered is valid - used later on

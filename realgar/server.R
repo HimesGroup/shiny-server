@@ -752,9 +752,9 @@ server <- shinyServer(function(input, output, session) {
   
   # more information about the dataset selected
   output$studyText <- renderUI({
-    if (!is.null(input$debugcode) && (input$debugcode == "studyText")) {
-      browser()
-    }
+    # if (!is.null(input$debugcode) && (input$debugcode == "studyText")) {
+    #   browser()
+    # }
     sras %>% filter(SRA_ID == input$tissue_te) %$% 
       p("Data used is available in the SRA under accession ",
         a(paste0(SRA_ID, ","), href=paste0("http://www.ncbi.nlm.nih.gov/sra/?term=", SRA_ID), target="_blank"),
@@ -805,9 +805,9 @@ server <- shinyServer(function(input, output, session) {
   
   #output boxplot
   output$GeneBoxPlot <- renderPlot(width = 650, height = 500, {
-    if (!is.null(input$debugcode) && (input$debugcode == "geneBoxPlot")) {
-      browser()
-    }
+    # if (!is.null(input$debugcode) && (input$debugcode == "geneBoxPlot")) {
+    #   browser()
+    # }
     gbp <- getGeneBoxPlot()
     gbp
   })
@@ -819,9 +819,9 @@ server <- shinyServer(function(input, output, session) {
   })
   
   output$diffResults <- renderDataTable({
-    if (!is.null(input$debugcode) && (input$debugcode == "diffResults")) {
-      browser()
-    }
+    # if (!is.null(input$debugcode) && (input$debugcode == "diffResults")) {
+    #   browser()
+    # }
     
     sras %>% filter(SRA_ID == input$tissue_te) %$% de[[SRA_ID]] %>% subset(gene_symbol %in% curr_gene_te()) %>%  
       arrange(-log2FoldChange, padj) %>%   
