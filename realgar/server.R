@@ -145,9 +145,9 @@ server <- shinyServer(function(input, output, session) {
       
       UserDataset_Info() %>%
           dplyr::mutate(GEO_ID_link = ifelse(grepl("SRP", GEO_ID), #GEO link is conditional on whether GEO_ID is an "SRP" or "GSE"
-                                             paste0("http://www.ncbi.nlm.nih.gov/sra/?term=", GEO_ID), 
+                                             paste0("https://www.ncbi.nlm.nih.gov/sra/?term=", GEO_ID), 
                                              paste0("https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=", GEO_ID)),
-                        PMID_link = paste0("http://www.ncbi.nlm.nih.gov/pubmed/?term=", PMID),
+                        PMID_link = paste0("https://www.ncbi.nlm.nih.gov/pubmed/?term=", PMID),
                         QC_link = ifelse(grepl("SRP", GEO_ID), #QC link is conditional on whether GEO_ID is an "SRP" or "GSE"
                                # paste0("http://public.himeslab.org/realgar_qc/",GEO_ID,"_QC_RnaSeqReport.html"),
                                # paste0("http://public.himeslab.org/realgar_qc/",GEO_ID,"_QC_report.html")))})
@@ -757,11 +757,11 @@ server <- shinyServer(function(input, output, session) {
     # }
     sras %>% filter(SRA_ID == input$tissue_te) %$% 
       p("Data used is available in the SRA under accession ",
-        a(paste0(SRA_ID, ","), href=paste0("http://www.ncbi.nlm.nih.gov/sra/?term=", SRA_ID), target="_blank"),
+        a(paste0(SRA_ID, ","), href=paste0("https://www.ncbi.nlm.nih.gov/sra/?term=", SRA_ID), target="_blank"),
         "and corresponds to ",
         Description,
         "More details were published ",
-        a("here.", href=paste0("http://www.ncbi.nlm.nih.gov/pubmed/?term=", PMID), target="_blank"))
+        a("here.", href=paste0("https://www.ncbi.nlm.nih.gov/pubmed/?term=", PMID), target="_blank"))
   })
   
   #generate faceted boxplot for the gene selected, using kallisto TPMs
