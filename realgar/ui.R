@@ -122,16 +122,16 @@ ui <- shinyUI(fluidPage(theme = shinytheme("lumen"),
                                                  tabPanel("About",
                                                    p("REALGAR is a tissue-specific, disease-focused resource for integrating omics results. ",
                                                      "This app brings together genome-wide association study (GWAS) results, "," transcript data from ",
-                                                     a("GENCODE,", href="http://www.gencodegenes.org/", target="_blank"),
+                                                     a("GENCODE,", href="https://www.gencodegenes.org/", target="_blank"),
                                                      "ChIP-Seq data, microarray gene expression and gene-level RNA-Seq results from the ", 
-                                                     a("Gene Expression Omnibus (GEO).", href="http://www.ncbi.nlm.nih.gov/geo/", target="_blank"),
+                                                     a("Gene Expression Omnibus (GEO).", href="https://www.ncbi.nlm.nih.gov/geo/", target="_blank"),
                                                      " REALGAR facilitates prioritization of genes and experiment design of functional validation studies."),
                                                    p("To use REALGAR, input an official gene symbol or SNP ID, and select tissues, phenotypes, treatments/exposures",
                                                      " and GWAS of interest. The 'Results' tab allows you to visualize and download ", 
                                                      "results for the studies matching your selection criteria. ",
                                                      "The 'Datasets loaded' tab provides more information about the datasets selected. "),br(),
                                                    p("If you use REALGAR in your research, please cite the following papers:"),
-                                                   p("Shumyatcher M, Hong R, Levin J, Himes BE.", a("Disease-Specific Integration of Omics Data to Guide Functional Validation of Genetic Associations.",href="http://himeslab.org/wp-content/uploads/2018/06/REALGAR_resubmission_07.06.2017_FINAL_Corrected.pdf", target="_blank"),"AMIA Annu Symp Proc. 2018;2017:1589–1596. 
+                                                   p("Shumyatcher M, Hong R, Levin J, Himes BE.", a("Disease-Specific Integration of Omics Data to Guide Functional Validation of Genetic Associations.",href="REALGAR_resubmission_07.06.2017_FINAL_Corrected.pdf", target="_blank"),"AMIA Annu Symp Proc. 2018;2017:1589–1596. 
                         Published 2018 Apr 16. (PMID:",a("29854229).",href="https://www.ncbi.nlm.nih.gov/pubmed/29854229", target="_blank"),"You can refer to the code",a("here.",href="https://github.com/HimesGroup/taffeta",target="_blank")),
                                                    p("Kan M, Shumyatcher M, Diwadkar A, Soliman G, Himes BE.", a("Integration of Transcriptomic Data Identifies Global and 
                          Cell-Specific Asthma-Related Gene Expression Signatures.",href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6371257/pdf/2973744.pdf",target="_blank"),"AMIA Annu Symp Proc. 2018;2018:1338–1347. 
@@ -139,6 +139,6 @@ ui <- shinyUI(fluidPage(theme = shinytheme("lumen"),
                                                      "You can refer to the code",a("here.",href="https://github.com/HimesGroup/raved", target="_blank")),
                                                    #Footer
                                                    tags$footer(img(src="RStudio-Logo-final.png", height=124*.65, width=110.4*.65), 
-                                                               "Created with RStudio's ", a("Shiny", href="http://www.rstudio.com/shiny", target="_blank"),
-                                                               p("This app was created by Maya Shumyatcher, Mengyuan Kan, Avantika Diwadkar and Blanca Himes at the ", a("Himes Lab.", href="http://himeslab.org/", target="_blank")),style = footstyle)))))
+                                                               "Created with RStudio's ", a("Shiny", href="https://www.rstudio.com/shiny", target="_blank"),
+                                                               p("This app was created by Maya Shumyatcher, Mengyuan Kan, Avantika Diwadkar and Blanca Himes at the ", a("Himes Lab.", href="https://himeslab.org/", target="_blank")),style = footstyle)))))
                                                                                                                                                                                                                                    
