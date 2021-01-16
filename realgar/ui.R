@@ -23,12 +23,14 @@ ui <- shinyUI(fluidPage(theme = shinytheme("lumen"),
                                                                                     column(3,fluidRow(div(style="margin-left: 25px", checkboxGroupInput("Tissue",label = strong("Tissue:"),
                                                                                            choices = tissue_choices,selected=tissue_choices))),
                                                                                            actionButton("selectall_tissue","Unselect all")),
-                                                                                    column(2,fluidRow(checkboxGroupInput(inputId="Asthma", label=strong("Condition vs Healthy:"),choices=asthma_choices,selected=asthma_choices)),
-                                                                                           fluidRow(actionButton("selectall_asthma","Unselect all")),br(),
+                                                                                    column(2,fluidRow(checkboxGroupInput(inputId="Asthma", label=strong("Condition vs Healthy:"),choices=asthma_choices,selected=c("severe_asthma","asthma"))),
+                                                                                           fluidRow(actionButton("selectall_asthma","Select all")),br(),
                                                                                            fluidRow(checkboxGroupInput(inputId = "Status", label = strong("Restrict Age Group:"),choices=c("Children"="childhood")))),
                                                                                     column(1, withSpinner(uiOutput("loadProxy"),color= "#9E443A",type=8)),
-                                                                                    column(3, fluidRow(checkboxGroupInput(inputId="Treatment", label=strong("Treatment:"), choices = treatment_choices,selected=treatment_choices)),
-                                                                                           fluidRow(actionButton("selectall_treatment","Unselect all")),br(),
+                                                                                    column(3, fluidRow(checkboxGroupInput(inputId="Treatment", label=strong("Treatment:"), choices = treatment_choices,selected="GC")),
+                                                                                           fluidRow(actionButton("selectall_treatment","Select all")),br(),
+                                                                                           fluidRow(checkboxGroupInput(inputId="Smoking", label=strong("Smoking:"), choices = smoking_choices,selected="cig")),
+                                                                                           fluidRow(actionButton("selectall_smoking","Select all")),br(),
                                                                                            fluidRow(checkboxGroupInput(inputId = "Experiment", label = strong("Experiment Design:"),choices=c("Cell-based assay"="invitro","Human response study"="invivo"),selected="invitro")),
                                                                                            fluidRow(br(),
                                                                                                     selectizeInput("current", "Official Gene Symbol or SNP ID:", choices=gene_choices[1:200], selected="GAPDH", width="185px", options = list(create = TRUE))),
@@ -55,14 +57,21 @@ ui <- shinyUI(fluidPage(theme = shinytheme("lumen"),
                                                                                               "so we suggest that users apply a stringent threshold of multiple corrections corresponding to 25,000 genes (i.e. 2x10-6). ",
                                                                                               "For the rank-based method, an analytic rank product is provided instead of the permutated empirical p-value, ",
                                                                                               "so we suggest users refer to the rank score when prioritizing the genes for functional validation. For more information, you can check the References tab."),
-                                                                                            
-                                                                                            column(12, withSpinner(plotOutput(outputId="forestplot_asthma",width="1200px", height="auto"),color= "#9E443A"), align="center"), #1355px #1250px #1000px
-                                                                                                column(12, textOutput("asthma_pcomb_text"), align="center"), # output combined p-values
-                                                                                                column(12, downloadButton(outputId="asthma_fc_download",label="Download asthma forest plot"), align="center"), 
-                                                                                                column(12, br(), br(), withSpinner(plotOutput(outputId="forestplot_GC",width="1200px", height="auto"),color= "#9E443A"),align="center"),
-                                                                                                column(12, textOutput("GC_pcomb_text"), align="center"), # output combined p-values
-                                                                                                column(12, downloadButton(outputId="GC_fc_download",label="Download GC forest plot"), align="center"),
-                                                                                                column(12, fluidRow(br(), br(), br()))),
+                                                                                        tabsetPanel(tabPanel("Asthma",br(),                    
+                                                                                                    column(12, withSpinner(plotOutput(outputId="forestplot_asthma",width="1200px", height="auto"),color= "#9E443A"), align="center"), #1355px #1250px #1000px
+                                                                                                        column(12, textOutput("asthma_pcomb_text"), align="center"), # output combined p-values
+                                                                                                        column(12, downloadButton(outputId="asthma_fc_download",label="Download asthma forest plot"), align="center"), 
+                                                                                                        column(12, br(), br())), 
+                                                                                                    tabPanel("Treatment",br(),
+                                                                                                    column(12, withSpinner(plotOutput(outputId="forestplot_GC",width="1200px", height="auto"),color= "#9E443A"),align="center"),
+                                                                                                        column(12, textOutput("GC_pcomb_text"), align="center"), # output combined p-values
+                                                                                                        column(12, downloadButton(outputId="GC_fc_download",label="Download GC forest plot"), align="center"),
+                                                                                                        column(12, fluidRow(br(), br(), br()))),
+                                                                                                    tabPanel("Smoking",br(),
+                                                                                                             column(12, withSpinner(plotOutput(outputId="forestplot_cig",width="1200px", height="auto"),color= "#9E443A"),align="center"),
+                                                                                                             column(12, textOutput("cig_pcomb_text"), align="center"), # output combined p-values
+                                                                                                             column(12, downloadButton(outputId="cig_fc_download",label="Download smoking forest plot"), align="center"),
+                                                                                                             column(12, fluidRow(br(), br(), br()))))),
                                                                                                                        
                                                                                    tabPanel("Gene Tracks", br(),
                                                                                             p("Transcripts for the selected gene are displayed here. ",
@@ -77,9 +86,13 @@ ui <- shinyUI(fluidPage(theme = shinytheme("lumen"),
                                                                                                  column(12, downloadButton(outputId="gene_tracks_download", label="Download gene tracks"), align="center"), br(),
                                                                                                  column(12, HTML("<div style='height: 90px;'>"), imageOutput("color_scale3"), align="center", HTML("</div>")), 
                                                                                                  column(12, align="center", plotOutput(outputId="gene_tracks_outp2")),
-                                                                                                 column(12, fluidRow(br(), br(), br(),br()))) #tabPanel
+                                                                                                 column(12, fluidRow(br(), br(), br(),br())))
                                                                                                  )#tabsetPanel
                                                                                                  )),
+                                                                                   #tabPanel("KaryoplotR", br(),
+                                                                                            #plotOutput("karyoPlot",height = "1000px",width="900px"))#tabPanel
+                                                                                            #)#tabsetPanel
+                                                                                            #)),
                                                                               
                                                      tabPanel("Datasets loaded",
                                                                  column(12,align="left",

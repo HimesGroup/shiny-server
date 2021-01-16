@@ -68,16 +68,15 @@ server <- shinyServer(function(input, output, session) {
   })
   
   #Disease
-  
   observe({
     if(input$selectall_asthma == 0) return(NULL) 
     else if (input$selectall_asthma%%2 == 0) {
-      updateCheckboxGroupInput(session,"Asthma",label="Condition vs Healthy:", choices=asthma_choices, selected = asthma_choices)
-      updateActionButton(session, "selectall_asthma", label="Unselect all")
-    }
-    else {
       updateCheckboxGroupInput(session, "Asthma", label="Condition vs Healthy:", choices=asthma_choices)
       updateActionButton(session, "selectall_asthma", label="Select all")
+    }
+    else {
+      updateCheckboxGroupInput(session,"Asthma",label="Condition vs Healthy:", choices=asthma_choices, selected = asthma_choices)
+      updateActionButton(session, "selectall_asthma", label="Unselect all")
     }})
   
   
@@ -85,13 +84,25 @@ server <- shinyServer(function(input, output, session) {
   observe({
       if(input$selectall_treatment == 0) return(NULL) 
       else if (input$selectall_treatment%%2 == 0) {
-        updateCheckboxGroupInput(session, "Treatment", "Treatment:", choices = treatment_choices, selected = treatment_choices)
-        updateActionButton(session, "selectall_treatment", label="Unselect all")
+        updateCheckboxGroupInput(session, "Treatment", "Treatment:", choices = treatment_choices)
+        updateActionButton(session, "selectall_treatment", label="Select all")
       }
       else {
-          updateCheckboxGroupInput(session, "Treatment", "Treatment:", choices = treatment_choices)
-          updateActionButton(session, "selectall_treatment", label="Select all")
+          updateCheckboxGroupInput(session, "Treatment", "Treatment:", choices = treatment_choices, selected = treatment_choices)
+          updateActionButton(session, "selectall_treatment", label="Unselect all")
       }})
+  
+  #Smoking
+  observe({
+    if(input$selectall_smoking == 0) return(NULL) 
+    else if (input$selectall_smoking%%2 == 0) {
+      updateCheckboxGroupInput(session, "Smoking", "Smoking:", choices = smoking_choices)
+      updateActionButton(session, "selectall_smoking", label="Select all")
+    }
+    else {
+      updateCheckboxGroupInput(session, "Smoking", "Smoking:", choices = smoking_choices, selected = smoking_choices)
+      updateActionButton(session, "selectall_smoking", label="Unselect all")
+    }})
   
   #GWAS
   observe({
@@ -124,8 +135,10 @@ server <- shinyServer(function(input, output, session) {
     else {Dataset_Info_A <- subset(Dataset_Info, Dataset_Info$Asthma %in% input$Asthma & Dataset_Info$Status %in% input$Status)}
     if(is.null(input$Treatment)| is.null(input$Experiment)){Dataset_Info_B <- subset(Dataset_Info, Dataset_Info$Asthma %in% input$Treatment | Dataset_Info$Experiment %in% input$Experiment)}
     else {Dataset_Info_B <- subset(Dataset_Info, Dataset_Info$Asthma %in% input$Treatment & Dataset_Info$Experiment %in% input$Experiment)}
+    if(is.null(input$Smoking)| is.null(input$Experiment)){Dataset_Info_C <- subset(Dataset_Info, Dataset_Info$Asthma %in% input$Smoking | Dataset_Info$Experiment %in% input$Experiment)}
+    else {Dataset_Info_C <- subset(Dataset_Info, Dataset_Info$Asthma %in% input$Smoking & Dataset_Info$Experiment %in% input$Experiment)}
     
-    Dataset_Info_Asthma <- rbind(Dataset_Info_A,Dataset_Info_B)
+    Dataset_Info_Asthma <- rbind(rbind(Dataset_Info_A,Dataset_Info_B),Dataset_Info_C)
     
     if ((nrow(Dataset_Info_Tissue)==0)|(nrow(Dataset_Info_Asthma)==0)) {Dataset_Info1 <- rbind(Dataset_Info_Tissue,Dataset_Info_Asthma)}
     else {Dataset_Info1 <- subset(Dataset_Info_Tissue,Dataset_Info_Tissue$Unique_ID%in%Dataset_Info_Asthma$Unique_ID)}
@@ -217,6 +230,7 @@ server <- shinyServer(function(input, output, session) {
                           dplyr::filter(Unique_ID %in% UserDataset_Info()$Unique_ID) %>%
                           dplyr::rename(adj.P.Val = adjPVal,P.Value = PValue) %>%
                           arrange(desc(Fold_Change),desc(Upper_bound_CI))
+    
   })
   
   
@@ -231,7 +245,12 @@ server <- shinyServer(function(input, output, session) {
   
   # GC
   data_GC <- reactive({ 
-  output.tableforplot_GC <- output.tableforplot() %>% dplyr::filter(App %in% c("GC", "BA", "smoking", "vitD","PDE"))
+  output.tableforplot_GC <- output.tableforplot() %>% dplyr::filter(App == "GC")
+  })
+  
+  # Smoking
+  data_cig <- reactive({ 
+    output.tableforplot_cig <- output.tableforplot() %>% dplyr::filter(App == "Smoking")
   })
   
   
@@ -269,6 +288,21 @@ server <- shinyServer(function(input, output, session) {
   
   output$GC_pcomb_text <- renderText({GC_pcomb()})
   
+  # Smoking
+  cig_pcomb <- reactive({
+    dat <- data_cig()
+    if (length(dat$adj.P.Val)>1) {
+      #write.table(dat,paste0("GC_",curr_gene(),".txt"),col.names=T,row.names=F,sep="\t",quote=F)
+      cig_rankprod_pcomb <- rankprod_stat(dat)
+      cig_sumlog_pcomb <- sumlog_stat(dat)
+      pcomb_text=paste0("P-value-based integration = ", cig_sumlog_pcomb, "; Rank-based integration = ", cig_rankprod_pcomb)
+    }
+    else {pcomb_text=""}
+    pcomb_text
+  })
+  
+  output$cig_pcomb_text <- renderText({cig_pcomb()})
+  
   ###################################
   ##          Meta-analysis        ##
   ###################################
@@ -293,23 +327,19 @@ server <- shinyServer(function(input, output, session) {
       res
   })  
   
+  meta_cig <- reactive({
+    dat <- data_cig()
+    if (length(dat$adj.P.Val)>1) {
+      res <- meta_stat(dat)
+    }
+    else {res <- list(meta_pval=NA,meta_fc=NA,meta_lower=NA,meta_upper=NA)}
+    res
+  })  
+  
+  
   ###################################
   ## Data table accompanying plots ##
   ###################################
-  
-  # asthma
-  
-  data2_Asthma <- reactive({ # dataset without meta-analysis results
-      data_Asthma()%>%
-          dplyr::select(Unique_ID, adj.P.Val, P.Value,Fold_Change, neglogofP, Lower_bound_CI, Upper_bound_CI) %>%
-          dplyr::arrange(desc(Fold_Change),desc(Upper_bound_CI)) %>% # sort by first effect size (fold change) and then by upper CI in a descending order
-          dplyr::mutate(Fold_Change=round(Fold_Change,digits=2),
-                        adj.P.Val=format(adj.P.Val, scientific=TRUE, digits=3), 
-                        P.Value =format(P.Value, scientific=TRUE, digits=3), 
-                        Lower_bound_CI = round(Lower_bound_CI, digits = 2), 
-                        Upper_bound_CI = round(Upper_bound_CI, digits = 2), 
-                        Comparison = "Asthma vs. non-asthma")%>%
-          dplyr::rename(`Study ID`=Unique_ID, `P Value`=P.Value, `Q Value`=adj.P.Val, `Fold Change`=Fold_Change)})
   
   # Function: "interdata_func"
   # obtain intermediate data with meta-analysis results added for table output and forest plots
@@ -369,6 +399,19 @@ server <- shinyServer(function(input, output, session) {
       return(data4table)
   }
   
+  # asthma
+  data2_Asthma <- reactive({ # dataset without meta-analysis results
+    data_Asthma()%>%
+      dplyr::select(Unique_ID, adj.P.Val, P.Value,Fold_Change, neglogofP, Lower_bound_CI, Upper_bound_CI) %>%
+      dplyr::arrange(desc(Fold_Change),desc(Upper_bound_CI)) %>% # sort by first effect size (fold change) and then by upper CI in a descending order
+      dplyr::mutate(Fold_Change=round(Fold_Change,digits=2),
+                    adj.P.Val=format(adj.P.Val, scientific=TRUE, digits=3), 
+                    P.Value =format(P.Value, scientific=TRUE, digits=3), 
+                    Lower_bound_CI = round(Lower_bound_CI, digits = 2), 
+                    Upper_bound_CI = round(Upper_bound_CI, digits = 2), 
+                    Comparison = "Asthma vs. non-asthma")%>%
+      dplyr::rename(`Study ID`=Unique_ID, `P Value`=P.Value, `Q Value`=adj.P.Val, `Fold Change`=Fold_Change)})
+  
   # obtain intermediate asthma data for table output and forest plots
   data3_Asthma <- reactive({
     interdata_func(data2_Asthma(),meta_Asthma())
@@ -383,8 +426,12 @@ server <- shinyServer(function(input, output, session) {
   data2_GC <- reactive({
       data_GC()%>%
           dplyr::select(Unique_ID, adj.P.Val, P.Value,Fold_Change, neglogofP, Lower_bound_CI, Upper_bound_CI) %>%
-          dplyr::mutate(Fold_Change=round(Fold_Change,digits=2),adj.P.Val=format(adj.P.Val, scientific=TRUE, digits=3), P.Value =format(P.Value, scientific=TRUE, digits=3), 
-                        Lower_bound_CI = round(Lower_bound_CI, digits = 2), Upper_bound_CI = round(Upper_bound_CI, digits = 2), Comparison = "Stimulation vs. at baseline")%>%
+          dplyr::mutate(Fold_Change=round(Fold_Change,digits=2),
+                        adj.P.Val=format(adj.P.Val, scientific=TRUE, digits=3), 
+                        P.Value =format(P.Value, scientific=TRUE, digits=3), 
+                        Lower_bound_CI = round(Lower_bound_CI, digits = 2), 
+                        Upper_bound_CI = round(Upper_bound_CI, digits = 2), 
+                        Comparison = "Stimulation vs. at baseline")%>%
           dplyr::rename(`Study ID`=Unique_ID, `P Value`=P.Value, `Q Value`=adj.P.Val, `Fold Change`=Fold_Change)})
   
   # obtain intermediate GC data for table output and forest plots
@@ -398,8 +445,31 @@ server <- shinyServer(function(input, output, session) {
   })
   
   
-  #combine asthma & GC into one
-  output$tableforgraph <- DT::renderDataTable(rbind(tableforgraph_Asthma(), tableforgraph_GC()),
+  # Smoking
+  data2_cig <- reactive({
+    data_cig()%>%
+      dplyr::select(Unique_ID, adj.P.Val, P.Value,Fold_Change, neglogofP, Lower_bound_CI, Upper_bound_CI) %>%
+      dplyr::mutate(Fold_Change=round(Fold_Change,digits=2),
+                    adj.P.Val=format(adj.P.Val, scientific=TRUE, digits=3), 
+                    P.Value =format(P.Value, scientific=TRUE, digits=3), 
+                    Lower_bound_CI = round(Lower_bound_CI, digits = 2), 
+                    Upper_bound_CI = round(Upper_bound_CI, digits = 2), 
+                    Comparison = "Stimulation vs. at baseline")%>%
+      dplyr::rename(`Study ID`=Unique_ID, `P Value`=P.Value, `Q Value`=adj.P.Val, `Fold Change`=Fold_Change)})
+  
+  # obtain intermediate smoking data for table output and forest plots
+  data3_cig <- reactive({
+    interdata_func(data2_cig(),meta_cig())
+  }) 
+  
+  # output table for Smoking
+  tableforgraph_cig <- reactive({
+    tableforgraph_func(data3_cig())
+  })
+  
+  
+  #combine asthma & GC & Smoking into one
+  output$tableforgraph <- DT::renderDataTable(rbind(rbind(tableforgraph_Asthma(), tableforgraph_GC()),tableforgraph_cig),
                                               class = 'cell-border stripe', 
                                               rownames = FALSE, 
                                               options = list(paging = FALSE, searching = FALSE),
@@ -440,9 +510,22 @@ server <- shinyServer(function(input, output, session) {
     forestplot_func(data3_GC(),"Exposure Transcriptomic Results for ",curr_gene())
   }) 
   
+  # Smoking forestplot
+  
+  getHeightcig <- reactive({
+    getHeight_func(data3_cig())
+  })
+  
+  forestplot_cig <- reactive({
+    forestplot_func(data3_cig(),"Smoking Transcriptomic Results for ",curr_gene())
+  }) 
+  
+  
   output$forestplot_asthma = renderPlot({forestplot_asthma()}, height=getHeightAsthma)
   
   output$forestplot_GC = renderPlot({forestplot_GC()}, height=getHeightGC)
+  
+  output$forestplot_cig = renderPlot({forestplot_cig()}, height=getHeightcig)
   
   ###############################
   ## Gene, SNP and TFBS tracks ##
@@ -731,6 +814,31 @@ server <- shinyServer(function(input, output, session) {
   
   snp_data <- reactive({dplyr::bind_rows(snp_subs_temp(), snp_eve_subs_temp(), snp_gabriel_subs_temp(), snp_fer_subs_temp(), snp_TAGC_subs_temp())})
   
+  #########################
+  ## KARYOPLOTR TRACKS ##
+  ########################
+  
+  # gene.region <- reactive({
+  #   df <- all_genes %>% dplyr::filter(symbol == curr_gene()) %>% dplyr::select(Pos)
+  #   toGRanges(as.vector(df$Pos))}) #"chr16:84,799,980-84,929,510" # #CRISPLD2: chr16:84,853,587-84,954,374 #as.vector(df$Pos)
+  # 
+  # #GWAS SNPs
+  # fer_gwas <- reactive({
+  #   
+  #   toGRanges(fer_gwas)
+  # })
+  # 
+  # tagc_gwas <- reactive({
+  #   tagc_gwas <- snp_TAGC_subs() %>% dplyr::select(chromosome, start, end, snp, neg_log_p, color)
+  #   print(tagc_gwas)
+  #   #tagc_gwas$V6 <- inferno(50)[as.numeric(cut(tagc_gwas$neg_log_p,breaks = 50))]
+  #   toGRanges(tagc_gwas)
+  # })
+  # 
+  # 
+  # ## Plot 
+  # output$karyoPlot <- renderPlot({make_karyoplot(gene.region(),fer_gwas(), tagc_gwas())})
+  
   ###############################
   ## TRANSCRIPTOMIC EXPLORER ##
   ###############################
@@ -781,24 +889,27 @@ server <- shinyServer(function(input, output, session) {
     
     #gene plot initialize
     if (nrow(curr_data_te) > 0) { # this iteration of curr_data has already been filtered to only have average_tpm > 1
-      gene_plot <- ggplot(curr_data_te, aes(x = Status, y = value, fill=Status)) + 
-        geom_boxplot(outlier.colour=NA, lwd=0.2, color="grey18") + 
+      #gene_plot <- ggplot(curr_data_te, aes(x = Status, y = value, fill=Status)) + 
+      gene_plot <- ggplot(curr_data_te, aes(x = Status, y = value)) + 
+        geom_boxplot(outlier.colour=NA, lwd=0.2, color="grey18",fill="#1B9E77") + 
         stat_boxplot(geom ='errorbar', color="grey18") + 
-        geom_jitter(aes(shape=Donor),size=1, width=0.2) +
+        geom_jitter(aes(shape=Donor),size=2, width=0.2) +
         scale_shape_manual(values=seq(0,length(curr_data_te$Donor))) + 
         facet_wrap(~Gene) + 
         guides(fill=FALSE) + 
         theme_bw() +  
         labs(title=curr_gene_te()) + 
         labs(x="condition") + labs(y="Normalized Read Count") + 
-        theme(text = element_text(size=9), 
-              strip.text.x = element_text(size = 10), 
-              axis.text.x = element_text(angle = 90, hjust = 1, size=12),
-              axis.text.y = element_text(size=9),
-              title = element_text(size=12),
-              axis.title.x = element_text(size=12),
-              legend.text=element_text(size=9),
-              axis.title.y = element_text(size=12))
+        theme(#text = element_text(size=14), 
+              strip.background = element_rect(colour="black",fill="#fbf7f5"),
+              strip.text.x = element_text(size = 16), 
+              #axis.text.x = element_text(angle = 90, hjust = 1, size=12),
+              axis.text.x = element_text(angle=45, hjust=1, size=16),
+              axis.text.y = element_text(size=14),
+              title = element_text(size=16, face="bold.italic"),
+              axis.title.x = element_text(size=16,face="bold"),
+              legend.text=element_text(size=12),
+              axis.title.y = element_text(size=16,face="bold"))
       if (nrow(curr_data_te) > 0) {gene_plot}
     }
   })
@@ -864,6 +975,13 @@ server <- shinyServer(function(input, output, session) {
     content=function(file){
       png(file, width=16, height=plotHeight(data3_GC()), units="in", res=300)
       print(forestplot_func(data3_GC(),"Exposure Transcriptomic Results for ",curr_gene()))
+      dev.off()})
+  
+  output$cig_fc_download <- downloadHandler(
+    filename= function(){paste0("REALGAR_smoking_forestplot_", graphgene(), ".png")},
+    content=function(file){
+      png(file, width=16, height=plotHeight(data3_cig()), units="in", res=300)
+      print(forestplot_func(data3_cig(),"Smoking Transcriptomic Results for ",curr_gene()))
       dev.off()})
   
   output$gene_tracks_download <- downloadHandler(

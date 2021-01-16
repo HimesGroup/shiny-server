@@ -19,6 +19,7 @@ source("utilities/meta.R")
 source("utilities/comb_pval.R")
 source("utilities/name_convert.R")
 source("utilities/forestplots.R")
+#source("utilities/karyoplot.R")
 
 
 
@@ -41,17 +42,22 @@ asthma_choices <- c("Allergic asthma"="allergic_asthma", "Asthma"="asthma",
                     "Non-allergic asthma"="non_allergic_asthma")
 
 #Treatment choices
-treatment_choices <- c("β2-agonist"="BA", 
-                       "Phosphodiesterase inhibitor"="PDE",
-                       "Smoking"="smoking", "Vitamin D"="vitD","Glucocorticoid" = "GC","E-cigarette" = "ecig")
-
+treatment_choices <- c("β2-agonist"="BA", "Glucocorticoid" = "GC",
+                       "Phosphodiesterase inhibitor"="PDE","Vitamin D"="vitD")
+                        #"Smoking"="smoking", "E-cigarette" = "ecig")
+#smoking choices
+smoking_choices <- c("Cigarette"="cig", "E-cigarette" = "ecig")
+                      
 #GWAS options
 gwas_choices <- c("EVE"="snp_eve_subs","Ferreira"="snp_fer_subs","GABRIEL"="snp_gabriel_subs","GRASP"="snp_subs","TAGC"="snp_TAGC_subs")
 
 #Gene list
-all_genes <- read_feather("realgar_data/gene_list.feather")
-gene_list <- as.vector(all_genes$V1)
-rm(all_genes)
+# all_genes <- read_feather("realgar_data/gene_list.feather")
+# gene_list <- as.vector(all_genes$V1)
+# rm(all_genes)
+
+all_genes <- readRDS("realgar_data/gene_symbol_POS.RDS")
+gene_list <- as.vector(all_genes$symbol)
 
 #Gene choices
 genec <- read_feather("realgar_data/Sig_gene_list.feather")
@@ -63,7 +69,8 @@ rm(genec)
 ####################
 
 # load descriptions of all gene expression and GWAS datasets
-Alldata_Info <- read_feather("realgar_data/Microarray_data_infosheet_latest_R.feather")
+#Alldata_Info <- read_feather("realgar_data/Microarray_data_infosheet_latest_R.feather")
+Alldata_Info <- read.csv("realgar_data/Microarray_data_infosheet_latest_R.csv")
 
 #then split off into gene expression and GWAS dataset info - else forest plot text columns get messed up
 GWAS_Dataset_Info <- Alldata_Info[which(Alldata_Info$App == "GWAS"),]
@@ -107,11 +114,20 @@ de[["SRP005411"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP005411/
 
 #Deseq2 count results - by gene for plots
 tpms <- list()
-tpms[["SRP033351"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP033351/SRP033351_pheno+counts.feather") %>% tibble::as_tibble()
-tpms[["SRP043162"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP043162/SRP043162_pheno+counts.feather") %>% tibble::as_tibble()
-tpms[["SRP098649"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP098649/SRP098649_pheno+counts.feather") %>% tibble::as_tibble()
+
+t1 <- read_feather("transcriptomics/asthmagenes_deseq2/SRP033351/SRP033351_pheno+counts.feather") %>% tibble::as_tibble()
+t1$Status <- str_to_title(gsub("_","+",t1$Status))
+tpms[["SRP033351"]] <- t1
+
+t2 <- read_feather("transcriptomics/asthmagenes_deseq2/SRP043162/SRP043162_pheno+counts.feather") %>% tibble::as_tibble()
+t2$Status <- gsub(" ","_", gsub("Vitd","VitD",str_to_title(gsub("_"," ",t2$Status))))
+tpms[["SRP043162"]] <- t2
+
+t3 <- read_feather("transcriptomics/asthmagenes_deseq2/SRP098649/SRP098649_pheno+counts.feather") %>% tibble::as_tibble()
+t3$Status <- str_to_title(t3$Status)
+tpms[["SRP098649"]] <- t3
+
 tpms[["SRP005411"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP005411/SRP005411_pheno+counts.feather") %>% tibble::as_tibble()
-
-
+ 
 # make a list of gene symbols in all datasets for checking whether gene symbol entered is valid - used later on
 deseq2_filtered_genes <- unique(c(de$SRP005411$gene_symbol, de$SRP043162$gene_symbol, de$SRP033351$gene_symbol, de$SRP005411$gene_symbol))
