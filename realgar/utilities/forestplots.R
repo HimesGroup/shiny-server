@@ -124,7 +124,7 @@ forestplot_func <- function(dat, ptitle,curr_gene) {
   
   ##G2 Plot 2 - forestplot
   g2 <- ggplot(tableplot,aes(Fold.Change,group)) + 
-    geom_errorbarh(aes(xmax = tableplot$Upper_bound_CI, xmin = tableplot$Lower_bound_CI), height = 0.40, 
+    geom_errorbarh(aes(xmax = Upper_bound_CI, xmin = Lower_bound_CI), height = 0.40, 
                    colour= ifelse(tableplot$group == tableplot$group[nrow(tableplot)] & tableplot$neglogofP2 == tableplot$neglogofP2[nrow(tableplot)],"#E7E7E7",colors),
                    na.rm=TRUE, size=1.2) + #0.15 #removed error bar for the final integration
     geom_point(aes(fill=neglogofP2),size=boxsize, shape=point, colour = colors, na.rm=TRUE)+

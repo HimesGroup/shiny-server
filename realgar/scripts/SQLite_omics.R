@@ -12,7 +12,8 @@ library(feather)
 # load descriptions of all gene expression and GWAS datasets
 #Alldata_Info <- read_feather("/mnt/volume_nyc1_01/data/Microarray_data_infosheet_latest_R.feather")
 #Alldata_Info <- read.csv("Microarray_data_infosheet_latest_R.csv")
-Alldata_Info <- read_feather("Microarray_data_infosheet_latest_R.feather")
+#Alldata_Info <- read_feather("/home/avantika/shiny_apps/main_database/realgar_data/results/Microarray_data_infosheet_latest_R.feather")
+Alldata_Info <- read.csv("/home/avantika/shiny_apps/main_database/realgar_data/Microarray_data_infosheet_latest_R.csv")
 
 #then split off into gene expression and GWAS dataset info - else forest plot text columns get messed up
 GWAS_Dataset_Info <- Alldata_Info[which(Alldata_Info$App == "GWAS"),]
@@ -24,14 +25,14 @@ Total_Info <- Dataset_Info %>% dplyr::select(Unique_ID,Total,App)
 ## Read in datafiles for transcriptomics studies
 #load and name GEO microarray and RNA-Seq datasets
 #/mnt/volume_nyc1_01/data/
-db = dbConnect(SQLite(), dbname="realgar-omics.sqlite") #realgar-db.sqlite
+db = dbConnect(SQLite(), dbname="/home/avantika/shiny_apps/main_database/realgar_data/results/realgar-omics.sqlite") #realgar-db.sqlite
 
 # List tables in your database
 dbListTables(db)
 
 # List files
 f = as.vector(na.omit(Dataset_Info$Unique_ID))
-path = "/mnt/volume_nyc1_01/data/results_feather_files/"
+path = "/home/avantika/shiny_apps/main_database/realgar_data/results/"
 
 #Data filter function
 data_filter <- function(x){
@@ -47,17 +48,17 @@ data_filter <- function(x){
 }
 
 #Filter out new feather files
-query <- paste0("SELECT Unique_ID FROM REALGAR")
-res <- dbSendQuery(db, query)
-fdata <- dbFetch(res)
-dbClearResult(res)
-
-#new files
-new_files <- setdiff(f,as.vector(na.omit(fdata$Unique_ID)))
+# query <- paste0("SELECT Unique_ID FROM REALGAR")
+# res <- dbSendQuery(db, query)
+# fdata <- dbFetch(res)
+# dbClearResult(res)
+# 
+# #new files
+# new_files <- setdiff(f,as.vector(na.omit(fdata$Unique_ID)))
 
 # Write new files to database 
 # Use f instead of new_files if you want to re-write the whole database. This will take around 10 minutes
-for (i in new_files){
+for (i in f){
   d = read_feather(paste0(path, i,".feather"))
   names(d) <- gsub("[.]","",names(d))
   data <- cbind(Unique_ID = i,d)
