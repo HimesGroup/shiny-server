@@ -13,7 +13,7 @@ library(feather)
 #Alldata_Info <- read_feather("/mnt/volume_nyc1_01/data/Microarray_data_infosheet_latest_R.feather")
 #Alldata_Info <- read.csv("Microarray_data_infosheet_latest_R.csv")
 #Alldata_Info <- read_feather("/home/avantika/shiny_apps/main_database/realgar_data/results/Microarray_data_infosheet_latest_R.feather")
-Alldata_Info <- read.csv("/home/avantika/shiny_apps/main_database/realgar_data/Microarray_data_infosheet_latest_R.csv")
+Alldata_Info <- read.csv("realgar_data/Microarray_data_infosheet_latest_R.csv")
 
 #then split off into gene expression and GWAS dataset info - else forest plot text columns get messed up
 GWAS_Dataset_Info <- Alldata_Info[which(Alldata_Info$App == "GWAS"),]
@@ -25,14 +25,14 @@ Total_Info <- Dataset_Info %>% dplyr::select(Unique_ID,Total,App)
 ## Read in datafiles for transcriptomics studies
 #load and name GEO microarray and RNA-Seq datasets
 #/mnt/volume_nyc1_01/data/
-db = dbConnect(SQLite(), dbname="/home/avantika/shiny_apps/main_database/realgar_data/results/realgar-omics.sqlite") #realgar-db.sqlite
+db = dbConnect(SQLite(), dbname="realgar_data/results/realgar-omics.sqlite") #realgar-db.sqlite
 
 # List tables in your database
 dbListTables(db)
 
 # List files
 f = as.vector(na.omit(Dataset_Info$Unique_ID))
-path = "/home/avantika/shiny_apps/main_database/realgar_data/results/"
+path = "realgar_data/results/"
 
 #Data filter function
 data_filter <- function(x){
