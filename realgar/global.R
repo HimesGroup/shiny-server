@@ -69,8 +69,8 @@ rm(genec)
 ####################
 
 # load descriptions of all gene expression and GWAS datasets
-#Alldata_Info <- read_feather("realgar_data/Microarray_data_infosheet_latest_R.feather")
-Alldata_Info <- read.csv("realgar_data/Microarray_data_infosheet_latest_R.csv")
+Alldata_Info <- read_feather("realgar_data/Microarray_data_infosheet_latest_R.feather")
+#Alldata_Info <- read.csv("realgar_data/Microarray_data_infosheet_latest_R.csv")
 
 #then split off into gene expression and GWAS dataset info - else forest plot text columns get messed up
 GWAS_Dataset_Info <- Alldata_Info[which(Alldata_Info$App == "GWAS"),]
