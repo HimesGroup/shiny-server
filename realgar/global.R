@@ -115,17 +115,11 @@ de[["SRP005411"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP005411/
 #Deseq2 count results - by gene for plots
 tpms <- list()
 
-t1 <- read_feather("transcriptomics/asthmagenes_deseq2/SRP033351/SRP033351_pheno+counts.feather") %>% tibble::as_tibble()
-t1$Status <- str_to_title(gsub("_","+",t1$Status))
-tpms[["SRP033351"]] <- t1
+tpms[["SRP033351"]]  <- read_feather("transcriptomics/asthmagenes_deseq2/SRP033351/SRP033351_pheno+counts_updated.feather") %>% tibble::as_tibble()
 
-t2 <- read_feather("transcriptomics/asthmagenes_deseq2/SRP043162/SRP043162_pheno+counts.feather") %>% tibble::as_tibble()
-t2$Status <- gsub(" ","_", gsub("Vitd","VitD",str_to_title(gsub("_"," ",t2$Status))))
-tpms[["SRP043162"]] <- t2
+tpms[["SRP043162"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP043162/SRP043162_pheno+counts_updated.feather") %>% tibble::as_tibble()
 
-t3 <- read_feather("transcriptomics/asthmagenes_deseq2/SRP098649/SRP098649_pheno+counts.feather") %>% tibble::as_tibble()
-t3$Status <- str_to_title(t3$Status)
-tpms[["SRP098649"]] <- t3
+tpms[["SRP098649"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP098649/SRP098649_pheno+counts_updated.feather") %>% tibble::as_tibble()
 
 tpms[["SRP005411"]] <- read_feather("transcriptomics/asthmagenes_deseq2/SRP005411/SRP005411_pheno+counts.feather") %>% tibble::as_tibble()
  
