@@ -172,11 +172,13 @@ shinyServer(function(input, output, session){
     addRasterImage(x = ras.tpr(), colors = palette.pr(), method = "ngb", opacity = 0.7) %>%
     addLegend(pal = colorNumeric(terrain.colors(8), c(values(ras.t()),values(ras.tpr())), na.color = "transparent"),
               values = c(values(ras.t()),values(ras.tpr())),
+              title = paste0(input$pollutant),
               labFormat = myLabelFormat(t.val = trunc.val()),
               position = "bottomleft") 
     } else {fmap() %>% 
         addLegend(pal = colorNumeric(terrain.colors(8), values(ras.t()), na.color = "transparent"),
                   values = values(ras.t()),
+                  title = paste0(input$pollutant),
                   labFormat = myLabelFormat(t.val = trunc.val()),
                   position = "bottomleft") %>%
         addPopups(-66.48, 18.24, message,options = popupOptions(closeButton = TRUE)) 
