@@ -12,6 +12,10 @@ source("labelFormatFunction.R")
 source("month_to_num.R")
 source("getPollutionEstimates.R")
 
+#set colors
+#replace terrain.colors(8)
+map_colors <- c("#8c2d04","#cc4c02","#ec7014","#fe9929","#fec44f","#fee391","#fff7bc","#ffffe5")
+
 ## load in annual bricks for full data
 pm_yearly_brick_full <- brick("pargasite_rasters/Annual/10km_rasters/pm_yearly_brick_full_10km.tif")
 ozone_yearly_brick_full <- brick("pargasite_rasters/Annual/10km_rasters/ozone_yearly_brick_full_10km.tif")
@@ -141,12 +145,12 @@ shinyServer(function(input, output, session){
   #Color palette for rasters
   #USA
   palette = reactive({
-    colorNumeric(rev(terrain.colors(8)), c(values(ras.t()),values(ras.tpr())), na.color = "transparent")
+    colorNumeric(rev(map_colors), c(values(ras.t()),values(ras.tpr())), na.color = "transparent")
   })
   
   #PR
   palette.pr = reactive({
-    colorNumeric(rev(terrain.colors(8)), values(ras.tpr()), na.color = "transparent")
+    colorNumeric(rev(map_colors), values(ras.tpr()), na.color = "transparent")
   })
   
   #Warning message for Puerto Rico
@@ -170,13 +174,13 @@ shinyServer(function(input, output, session){
     if(!all(is.na(values(ras.tpr())))){
       fmap() %>%
     addRasterImage(x = ras.tpr(), colors = palette.pr(), method = "ngb", opacity = 0.7) %>%
-    addLegend(pal = colorNumeric(terrain.colors(8), c(values(ras.t()),values(ras.tpr())), na.color = "transparent"),
+    addLegend(pal = colorNumeric(map_colors, c(values(ras.t()),values(ras.tpr())), na.color = "transparent"),
               values = c(values(ras.t()),values(ras.tpr())),
               title = paste0(input$pollutant),
               labFormat = myLabelFormat(t.val = trunc.val()),
               position = "bottomleft") 
     } else {fmap() %>% 
-        addLegend(pal = colorNumeric(terrain.colors(8), values(ras.t()), na.color = "transparent"),
+        addLegend(pal = colorNumeric(map_colors, values(ras.t()), na.color = "transparent"),
                   values = values(ras.t()),
                   title = paste0(input$pollutant),
                   labFormat = myLabelFormat(t.val = trunc.val()),
