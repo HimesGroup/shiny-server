@@ -232,8 +232,9 @@ shinyServer(function(input, output, session){
       "pargasite_sample_input_file.csv"
     },
     content = function(file) {
+      #cat("\n", file = "data/pargasite_sample_input_file.csv", append = TRUE)
       sample_input <- read.csv("data/pargasite_sample_input_file.csv")
-      write.csv(sample_input, file,row.names = FALSE)
+      write.csv(sample_input, file,row.names = FALSE, quote = FALSE)
     }
   )
   
