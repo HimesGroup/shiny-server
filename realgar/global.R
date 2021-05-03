@@ -28,10 +28,10 @@ source("utilities/forestplots.R")
 ##############################################
 
 #Tissue types
-tissue_choices <-c("Airway smooth muscle"="ASM", "Bronchial epithelium"="BE","Lens epithelium" = "LEC","BEAS-2B" = "BEAS-2B",
-                   "Nasal epithelium"="NE","Small airway epithelium"="SAE","Whole lung"="Lung","Skeletal muscle myotubes"="myotubes",
+tissue_choices <-c("Airway smooth muscle"="ASM", "Bronchial epithelium"="BE", "Large airway epithelium"="LAE", "Lens epithelium" = "LEC","BEAS-2B" = "BEAS-2B",
+                   "Nasal epithelium"="NE","Small airway epithelium"="SAE", "Trachea"="trachea", "Buccal mucosa"="Buccal", "Whole lung"="Lung","Skeletal muscle myotubes"="myotubes",
                    "CD4"="CD4", "CD8"="CD8", "MCF10A-Myc" = "MCF10A-Myc","CD3" = "CD3", "A549" = "A549", 
-                   "Lymphoblastoid cell" = "LCL","Macrophage" = "MACRO",  
+                   "Lymphoblastoid cell" = "LCL","Macrophage" = "MACRO", "Alveolar macrophages" = "BAL_AM", 
                    "Peripheral blood mononuclear cell"="PBMC","White blood cell"="WBC","Whole blood"="Blood",
                    "Lymphoblastic leukemia cell" = "chALL","Osteosarcoma U2OS cell" = "U2OS")
 
