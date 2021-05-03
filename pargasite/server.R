@@ -14,7 +14,7 @@ source("getPollutionEstimates.R")
 
 #set colors
 #replace terrain.colors(8)
-map_colors <- c("#8c2d04","#cc4c02","#ec7014","#fe9929","#fec44f","#fee391","#fff7bc","#ffffe5")
+map_colors <- c("#08589e","#2b8cbe","#4eb3d3","#7bccc4","#a8ddb5","#ccebc5","#e0f3db","#f7fcf0")
 
 ## load in annual bricks for full data
 pm_yearly_brick_full <- brick("pargasite_rasters/Annual/10km_rasters/pm_yearly_brick_full_10km.tif")
