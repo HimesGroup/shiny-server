@@ -33,7 +33,7 @@ ASM.merge.GRs <- c( GR_dex="ASM.GR.dex.bw", GR_EtOH="ASM.GR.control.bw", RNAP2_d
 BE.merge.GRs <- c( GR_dex="BE.GR.dex.bw", GR_EtOH="BE.GR.control.bw", RNAP2_dex="BE.RNAP2.dex.bw", RNAP2_EtOH="BE.RNAP2.control.bw")
 A549.merge.GRs <- c( GR_dex="A549.GR.dex.bw", GR_EtOH="A549.GR.control.bw", RNAP2_dex="A549.RNAP2.dex.bw", RNAP2_EtOH="A549.RNAP2.control.bw")
 total.tracks <- length(ASM.merge.GRs) + length(BE.merge.GRs) + length(A549.merge.GRs)
-path="bigwig_merge/"
+path="https://public.himeslab.dev/bigwig_merge/"
 
 #helper functions
 
