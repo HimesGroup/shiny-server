@@ -1,5 +1,5 @@
 
-#Install ui libraries in path /usr/local/lib/R/site-library
+#Install ui libraries in path /opt/R/4.0.2/lib/R/library
 ###
 #
 
@@ -33,7 +33,7 @@ ui <- shinyUI(fluidPage(theme = shinytheme("lumen"),
                                                                                            fluidRow(actionButton("selectall_smoking","Select all")),br(),
                                                                                            fluidRow(checkboxGroupInput(inputId = "Experiment", label = strong("Experiment Design:"),choices=c("Cell-based assay"="invitro","Human response study"="invivo"),selected="invitro")),
                                                                                            fluidRow(br(),
-                                                                                                    selectizeInput("current", "Official Gene Symbol or SNP ID:", choices=gene_choices[1:200], selected="GAPDH", width="185px", options = list(create = TRUE))),
+                                                                                                    selectizeInput("current", "Official Gene Symbol or SNP ID:", choices=gene_choices[1:200], selected="FKBP5", width="185px", options = list(create = TRUE))),
                                                                                            align="left"),
                                                                                     column(2,
                                                                                            fluidRow(checkboxGroupInput(inputId="which_SNPs", label=strong("GWAS Results:"), 
@@ -41,7 +41,8 @@ ui <- shinyUI(fluidPage(theme = shinytheme("lumen"),
                                                                                            fluidRow(actionButton("selectall_GWAS","Select all")), br(), 
                                                                                            fluidRow(textOutput("GWAS_text")), 
                                                                                            fluidRow(uiOutput("eve_options")),
-                                                                                           fluidRow(uiOutput("TAGC_options")), align="left"))),br(),hr(),
+                                                                                           fluidRow(uiOutput("TAGC_options")),
+                                                                                           fluidRow(uiOutput("UKBB_options")), align="left"))),br(),hr(),
                                                                                            fluidRow(column(12, h4(strong("Download results displayed in forestplot and gene track:")),align = "left")),
                                                                                            fluidRow(column(6, downloadButton(outputId="table_download", label="Download gene expression results"), align="left"),
                                                                                                     column(6, downloadButton(outputId="SNP_data_download", label="Download GWAS results"), align="left"))))),
@@ -73,26 +74,37 @@ ui <- shinyUI(fluidPage(theme = shinytheme("lumen"),
                                                                                                              column(12, downloadButton(outputId="cig_fc_download",label="Download smoking forest plot"), align="center"),
                                                                                                              column(12, fluidRow(br(), br(), br()))))),
                                                                                                                        
+                                                                                   # tabPanel("Gene Tracks", br(),
+                                                                                   #          p("Transcripts for the selected gene are displayed here. ",
+                                                                                   #            "Any SNPs and/or transcription factor binding sites that fall within the gene ",
+                                                                                   #            "or within +/- 10kb of the gene are also displayed, ",
+                                                                                   #            "each in a separate track. Transcription factor binding sites are colored by the ",
+                                                                                   #            "ENCODE binding score (shown below each binding site), ",
+                                                                                   #            "with the highest binding scores corresponding to the brightest colors. ",
+                                                                                   #            "Only those SNPs with p-value <= 0.05 are included. ",
+                                                                                   #            "SNPs are colored by p-value, with the lowest p-values corresponding to the brightest colors. ",
+                                                                                   #            "All SNP p-values are obtained directly from the study in which the association was published."),br(),
+                                                                                   #               column(12, downloadButton(outputId="gene_tracks_download", label="Download gene tracks"), align="center"), br(),
+                                                                                   #               column(12, HTML("<div style='height: 90px;'>"), imageOutput("color_scale3"), align="center", HTML("</div>")), 
+                                                                                   #               column(12, align="center", plotOutput(outputId="gene_tracks_outp2")),
+                                                                                   #               column(12, fluidRow(br(), br(), br(),br()))),
+                                                                                                 # )#tabsetPanel
+                                                                                                 # )),
                                                                                    tabPanel("Gene Tracks", br(),
                                                                                             p("Transcripts for the selected gene are displayed here. ",
                                                                                               "Any SNPs and/or transcription factor binding sites that fall within the gene ",
                                                                                               "or within +/- 10kb of the gene are also displayed, ",
                                                                                               "each in a separate track. Transcription factor binding sites are colored by the ",
-                                                                                              "ENCODE binding score (shown below each binding site), ",
-                                                                                              "with the highest binding scores corresponding to the brightest colors. ",
+                                                                                              "adjusted p-value from the analysis, ",
+                                                                                              "with the lowest p-values corresponding to the brightest colors. ",
                                                                                               "Only those SNPs with p-value <= 0.05 are included. ",
                                                                                               "SNPs are colored by p-value, with the lowest p-values corresponding to the brightest colors. ",
                                                                                               "All SNP p-values are obtained directly from the study in which the association was published."),br(),
-                                                                                                 column(12, downloadButton(outputId="gene_tracks_download", label="Download gene tracks"), align="center"), br(),
-                                                                                                 column(12, HTML("<div style='height: 90px;'>"), imageOutput("color_scale3"), align="center", HTML("</div>")), 
-                                                                                                 column(12, align="center", plotOutput(outputId="gene_tracks_outp2")),
-                                                                                                 column(12, fluidRow(br(), br(), br(),br())))
-                                                                                                 )#tabsetPanel
-                                                                                                 )),
-                                                                                   #tabPanel("KaryoplotR", br(),
-                                                                                            #plotOutput("karyoPlot",height = "1000px",width="900px"))#tabPanel
-                                                                                            #)#tabsetPanel
-                                                                                            #)),
+                                                                                            column(12, downloadButton(outputId="gene_tracks_download", label="Download gene tracks"), align="center"), br(),
+                                                                                            #column(12, HTML("<div style='height: 90px;'>"), imageOutput("color_scale3"), align="center", HTML("</div>")), 
+                                                                                            column(12, withSpinner(plotOutput("karyoPlot",height = "1300px",width="1200px")),color= "#9E443A"),align="center")#tabPanel #1200px
+                                                                                   )#tabsetPanel
+                                                                                   )),
                                                                               
                                                      tabPanel("Datasets loaded",
                                                                  column(12,align="left",

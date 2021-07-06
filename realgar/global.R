@@ -19,8 +19,8 @@ source("utilities/meta.R")
 source("utilities/comb_pval.R")
 source("utilities/name_convert.R")
 source("utilities/forestplots.R")
-#source("utilities/karyoplot.R")
-
+source("utilities/karyoplot.R")
+#source("utilities/gviz_gene_track.R")
 
 
 ##############################################
@@ -28,10 +28,10 @@ source("utilities/forestplots.R")
 ##############################################
 
 #Tissue types
-tissue_choices <-c("Airway smooth muscle"="ASM", "Bronchial epithelium"="BE","Lens epithelium" = "LEC","BEAS-2B" = "BEAS-2B",
-                   "Nasal epithelium"="NE","Small airway epithelium"="SAE","Whole lung"="Lung","Skeletal muscle myotubes"="myotubes",
-                   "CD4"="CD4", "CD8"="CD8", "MCF10A-Myc" = "MCF10A-Myc","CD3" = "CD3", "A549" = "A549", 
-                   "Lymphoblastoid cell" = "LCL","Macrophage" = "MACRO",  
+tissue_choices <-c("Airway smooth muscle"="ASM", "Bronchial epithelium"="BE", "Large airway epithelium"="LAE", "Lens epithelium" = "LEC",
+                   "BEAS-2B" = "BEAS-2B","Nasal epithelium"="NE","Small airway epithelium"="SAE", "Trachea"="trachea", "Buccal mucosa"="Buccal", 
+                   "Whole lung"="Lung","Skeletal muscle myotubes"="myotubes","CD4"="CD4", "CD8"="CD8", "MCF10A-Myc" = "MCF10A-Myc","CD3" = "CD3", 
+                   "A549" = "A549","Lymphoblastoid cell" = "LCL","Macrophage" = "MACRO", "Alveolar macrophages" = "AM", 
                    "Peripheral blood mononuclear cell"="PBMC","White blood cell"="WBC","Whole blood"="Blood",
                    "Lymphoblastic leukemia cell" = "chALL","Osteosarcoma U2OS cell" = "U2OS")
 
@@ -49,14 +49,16 @@ treatment_choices <- c("β2-agonist"="BA", "Glucocorticoid" = "GC",
 smoking_choices <- c("Cigarette"="cig", "E-cigarette" = "ecig")
                       
 #GWAS options
-gwas_choices <- c("EVE"="snp_eve_subs","Ferreira"="snp_fer_subs","GABRIEL"="snp_gabriel_subs","GRASP"="snp_subs","TAGC"="snp_TAGC_subs")
+gwas_choices <- c("EVE"="snp_eve_subs","Ferreira"="snp_fer_subs","GABRIEL"="snp_gabriel_subs","GRASP"="snp_subs","TAGC"="snp_TAGC_subs","UKBiobank"="snp_UKBB_subs")
 
 #Gene list
 # all_genes <- read_feather("realgar_data/gene_list.feather")
 # gene_list <- as.vector(all_genes$V1)
 # rm(all_genes)
 
-all_genes <- readRDS("realgar_data/gene_symbol_POS.RDS")
+#all_genes <- readRDS("/mnt/volume_nyc3_01/realgar_data/gene_symbol_POS.RDS")
+#all_genes <- readRDS("/mnt/volume_nyc3_01/realgar_files/gene_symbol_coords_hg19.RDS")
+all_genes <- readRDS("realgar_data/gene_symbol_coords_hg38.RDS")
 gene_list <- as.vector(all_genes$symbol)
 
 #Gene choices
