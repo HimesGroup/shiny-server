@@ -15,10 +15,10 @@ getPollutionEstimates.df.app <- function(data, monthyear_start,
                                          monthyear_end, location) {
   
   month_year_start <- as.numeric(strsplit(monthyear_start, "-")[[1]])
-  ind_start <- 12*(month_year_start[2]-1996) + month_year_start[1]
+  ind_start <- 12*(month_year_start[2]-1997) + month_year_start[1]
   
   month_year_end <- as.numeric(strsplit(monthyear_end, "-")[[1]])
-  ind_end <- 12*(month_year_end[2]-1996) + month_year_end[1]
+  ind_end <- 12*(month_year_end[2]-1997) + month_year_end[1]
   
   if(location == "USA"){
     pollutant_bricks <- list(pm_monthly_brick, ozone_monthly_brick,
