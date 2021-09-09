@@ -32,7 +32,7 @@ dbListTables(db)
 
 # List files
 f = as.vector(na.omit(Dataset_Info$Unique_ID))
-path = "realgar_data/results/"
+path = "/mnt/volume_nyc3_01/realgar_files/realgar_results/"
 
 #Data filter function
 data_filter <- function(x){
